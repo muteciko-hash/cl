@@ -19,12 +19,12 @@
   --px:max(env(safe-area-inset-left),clamp(20px,calc(3.2*var(--vw)),44px));
   --compass-top:max(env(safe-area-inset-top),2px);
   --compass-h:clamp(24px,calc(4.1*var(--vh)),34px);
-  --eq-h:clamp(16px,calc(2.8*var(--vh)),24px);
+  --eq-h:clamp(20px,calc(3.8*var(--vh)),28px);
   --radio-line-h:clamp(18px,calc(3.1*var(--vh)),25px);
   --bg:#000000;
   --card:#11161f;
   --line:rgba(148,197,232,.14);
-  --acc:229,72,77;
+  --acc:64,196,255;
   --red:rgb(var(--acc));
   --ice:#93ddff;
   --ice-bright:#f2faff;
@@ -43,12 +43,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 .screen{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
 
-/* TAM EKRAN HARİTA KATMANI */
-.map-stage{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:pointer}
+/* HARİTA KATMANI */
+.map-stage{
+  position:absolute;inset:0;
+  z-index:1;cursor:pointer
+}
 .road-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
 .fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 
-/* EN ÜST: BAR OLMADAN KİBAR PUSULA ŞERİDİ */
+/* EN ÜST: PUSULA ŞERİDİ */
 .top-compass{
   position:absolute;left:0;right:0;top:var(--compass-top);
   height:var(--compass-h);z-index:7;pointer-events:none;
@@ -57,26 +60,33 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .compass-cv{width:100%;height:100%;display:block}
 
-/* SOL ÜST: SAAT & AKILLI EĞİM */
+/* SOL ÜST: SAAT + ALTINDA DERECE + EĞİM */
 .top-left-hud{
   position:absolute;left:var(--px);top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
-  z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(6px,calc(1.2*var(--vh)),12px)
+  z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(3px,calc(.65*var(--vh)),7px)
 }
 .mini-clock{
-  font-size:clamp(14px,calc(2.5*var(--vh)),20px);font-weight:700;letter-spacing:.06em;
+  font-size:clamp(18px,calc(3.3*var(--vh)),26px);font-weight:700;letter-spacing:.04em;line-height:1;
   color:var(--clk,var(--ice-bright));cursor:pointer;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 12px rgba(var(--acc),.35)
+  text-shadow:0 0 12px rgba(var(--acc),.42)
 }
+.mini-temp{
+  display:inline-flex;align-items:baseline;gap:2px;
+  font-size:clamp(13px,calc(2.25*var(--vh)),17.5px);font-weight:600;letter-spacing:.03em;line-height:1.15;
+  color:var(--ice-sub);font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 8px rgba(0,0,0,.9)
+}
+.mini-temp sup{font-size:.7em;font-weight:500;color:var(--ice-dim)}
 .grade-pill{
-  display:none;align-items:center;gap:5px;
-  padding:4px 10px;border-radius:8px;
+  display:none;align-items:center;gap:5px;margin-top:2px;
+  padding:3px 9px;border-radius:8px;
   background:rgba(4,9,18,.52);pointer-events:none;
-  font-size:clamp(10px,calc(1.7*var(--vh)),13px);font-weight:600;letter-spacing:.14em;
+  font-size:clamp(9.5px,calc(1.55*var(--vh)),12px);font-weight:600;letter-spacing:.14em;
   color:var(--ice);font-variant-numeric:tabular-nums
 }
 .grade-pill.on{display:inline-flex}
 
-/* SAĞ ÜST (PUSULANIN ALTINDA): YÖNLENDİRME OKU & MESAFE */
+/* SAĞ ÜST: YÖNLENDİRME OKU & MESAFE */
 .top-right-hud{
   position:absolute;right:var(--px);top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
   z-index:6;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none
@@ -112,10 +122,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .ahead-chip.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* EKOLAYZIRIN HEMEN ÜSTÜ: KUTUSUZ TEK SATIR RADYO */
+/* EKOLAYZIRIN HEMEN ÜSTÜ: TEK SATIR RADYO */
 .radio-strip{
   position:absolute;left:var(--px);right:var(--px);
-  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + clamp(4px,calc(.65*var(--vh)),8px));
+  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + clamp(3px,calc(.55*var(--vh)),7px));
   height:var(--radio-line-h);z-index:8;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   pointer-events:auto;background:transparent
@@ -172,15 +182,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .sig-route.on{display:block}
 
-/* EN ALT: YATAY SPEKTRUM EKOLAYZIRI */
+/* EN ALT: DİKEY ÇUBUK EKOLAYZIR */
 .bottom-eq{
   position:absolute;left:var(--px);right:var(--px);
   bottom:max(env(safe-area-inset-bottom),2px);
-  height:var(--eq-h);z-index:7;pointer-events:none;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 3%,#000 97%,transparent 100%);
-  mask-image:linear-gradient(90deg,transparent 0%,#000 3%,#000 97%,transparent 100%)
+  height:var(--eq-h);z-index:7;pointer-events:none
 }
-.eq-cv{width:100%;height:100%;display:block}
+.eq-cv{display:block;width:100%;height:100%}
 
 /* MOLA MODU */
 .map-stage,.top-left-hud,.top-compass,.sig-wrap{transition:opacity 1s}
@@ -228,20 +236,21 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
   <canvas class="fx-cv" id="fxCanvas"></canvas>
 
-  <!-- EN ÜST: BAR OLMADAN KİBAR PUSULA ŞERİDİ -->
+  <!-- EN ÜST: PUSULA ŞERİDİ -->
   <div class="top-compass">
     <canvas class="compass-cv" id="compassCanvas"></canvas>
   </div>
 
-  <!-- SOL ÜST: SAAT (TEMA & MOLA) + AKILLI EĞİM -->
+  <!-- SOL ÜST: SAAT + ALTINDA DERECE + EĞİM -->
   <div class="top-left-hud">
     <div class="mini-clock" id="miniClock">--:--</div>
+    <div class="mini-temp"><b id="miniTemp">--</b><sup>°C</sup></div>
     <div class="grade-pill" id="gradePill">
       <span id="gradeText">%0</span>
     </div>
   </div>
 
-  <!-- SAĞ ÜST (PUSULANIN ALTINDA): YÖNLENDİRME OKU & MESAFE -->
+  <!-- SAĞ ÜST: YÖNLENDİRME OKU & MESAFE -->
   <div class="top-right-hud">
     <div class="nav-hud" id="navHud" onclick="cancelNav(true)">
       <div class="nav-ico" id="navIcon"></div>
@@ -255,7 +264,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <span id="aheadText"></span>
   </div>
 
-  <!-- EKOLAYZIRIN HEMEN ÜSTÜ: KUTUSUZ TEK SATIR RADYO -->
+  <!-- EKOLAYZIRIN HEMEN ÜSTÜ: TEK SATIR RADYO -->
   <div class="radio-strip" id="radioStrip">
     <div class="rs-main">
       <span class="rs-track paused" id="rsTrack" onclick="toggleRadio()">StockXL - Lunar Radio (Spacesynth 80)</span>
@@ -277,7 +286,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <div class="sig-route" id="sigRoute">--</div>
   </div>
 
-  <!-- EN ALT: YATAY SPEKTRUM EKOLAYZIRI -->
+  <!-- EN ALT: DİKEY ÇUBUK EKOLAYZIR -->
   <div class="bottom-eq">
     <canvas class="eq-cv" id="eqCanvas"></canvas>
   </div>
@@ -331,7 +340,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   </div>
 </div>
 
-<audio id="radioAudio" crossorigin="anonymous" preload="none"></audio>
+<audio id="radioAudio" preload="none"></audio>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -349,14 +358,14 @@ function toast(t){
   toast.t = setTimeout(() => el.classList.remove('on'), 1600);
 }
 
-/* ---------- RENK TEMALARI ---------- */
+/* ---------- RENK TEMALARI (SAAT, PUSULA, EKOLAYZIR & YOL) ---------- */
 const THEMES = {
-  red:   { n:'Kırmızı',    acc:[229,72,77],   core:[255,112,96],  far:[200,50,90],   arrow:[240,138,69], play:[217,119,36], clk:[245,245,247] },
-  amber: { n:'Kehribar',   acc:[255,176,0],   core:[255,205,100], far:[255,130,0],   arrow:[255,176,0],  play:[255,176,0],  clk:[255,191,71] },
+  red:   { n:'Kırmızı',    acc:[229,72,77],   core:[255,120,105], far:[200,50,90],   arrow:[240,138,69], play:[217,119,36], clk:[255,155,155] },
+  amber: { n:'Kehribar',   acc:[255,176,0],   core:[255,210,105], far:[255,130,0],   arrow:[255,176,0],  play:[255,176,0],  clk:[255,204,92] },
   ice:   { n:'Buz mavisi', acc:[64,196,255],  core:[150,225,255], far:[60,140,255],  arrow:[95,208,255], play:[76,195,255], clk:[191,234,255] },
   green: { n:'Neon yeşil', acc:[57,255,120],  core:[150,255,185], far:[20,200,160],  arrow:[57,255,120], play:[57,255,120], clk:[168,255,198] },
-  synth: { n:'Synthwave',  acc:[255,60,200],  core:[255,140,230], far:[150,90,255],  arrow:[255,79,216], play:[182,107,255],clk:[255,155,236] },
-  white: { n:'Beyaz',      acc:[245,245,247], core:[255,255,255], far:[190,190,205], arrow:[255,255,255],play:[255,255,255],clk:[255,255,255] }
+  synth: { n:'Synthwave',  acc:[255,60,200],  core:[255,145,232], far:[150,90,255],  arrow:[255,79,216], play:[182,107,255],clk:[255,155,236] },
+  white: { n:'Beyaz',      acc:[245,245,247], core:[255,255,255], far:[195,195,210], arrow:[255,255,255],play:[255,255,255],clk:[255,255,255] }
 };
 const THEME_ORDER = ['ice', 'red', 'amber', 'green', 'synth', 'white', 'auto'];
 const THEME_KEYS = ['acc', 'core', 'far', 'arrow', 'play', 'clk'];
@@ -365,7 +374,7 @@ let themeKey = 'ice';
 try{ const sv = localStorage.getItem('theme'); if (sv && THEME_ORDER.includes(sv)) themeKey = sv; }catch{}
 let curTheme = cloneTheme(THEMES.ice), tweenRaf = 0;
 const TH = {
-  acc: '64,196,255', core: '150,225,255', far: '60,140,255', arrow: '245,158,11', clk: '191,234,255',
+  acc: '64,196,255', core: '150,225,255', far: '60,140,255', arrow: '95,208,255', clk: '191,234,255',
   accA: [64,196,255], coreA: [150,225,255], farA: [60,140,255]
 };
 
@@ -377,6 +386,7 @@ function applyThemeColors(c){
   root.setProperty('--clk', 'rgb(' + r(c.clk) + ')');
   TH.acc = r(c.acc); TH.core = r(c.core); TH.far = r(c.far); TH.arrow = r(c.arrow); TH.clk = r(c.clk);
   TH.accA = c.acc.slice(); TH.coreA = c.core.slice(); TH.farA = c.far.slice();
+  if (typeof eqKick === 'function') eqKick();
   if (typeof drawTopCompass === 'function') drawTopCompass();
   if (typeof drawRoadMap === 'function') drawRoadMap();
 }
@@ -409,7 +419,7 @@ function setTheme(key, announce, instant){
   if (announce) toast('Renk: ' + (key === 'auto' ? 'Otomatik (' + r.label + ')' : THEMES[key].n));
 }
 
-/* ---------- SAAT & MOLA MODU ---------- */
+/* ---------- SAAT, DERECE & MOLA MODU ---------- */
 let restMode = false, lastMoveAt = Date.now(), restRef = null, restSnoozeUntil = 0, clkLong = false, clkPress = 0;
 function tickClock(){
   const n = new Date(), s = `${pad(n.getHours())}:${pad(n.getMinutes())}`;
@@ -420,6 +430,19 @@ function tickClock(){
   }
 }
 tickClock(); setInterval(tickClock, 4000);
+
+let lastWxLat = null, lastWxLon = null, lastWxAt = 0;
+async function fetchTempOnly(lat, lon, force=false){
+  const now = Date.now(), moved = lastWxLat !== null ? distKm(lastWxLat, lastWxLon, lat, lon) : 99;
+  if (!force && lastWxLat !== null && moved < 3 && now - lastWxAt < 180000) return;
+  lastWxLat = lat; lastWxLon = lon; lastWxAt = now;
+  try{
+    const d = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`)).json();
+    if (d && d.current && typeof d.current.temperature_2m === 'number'){
+      $('miniTemp').textContent = Math.round(d.current.temperature_2m);
+    }
+  }catch{}
+}
 
 function enterRest(){
   if (restMode) return;
@@ -536,7 +559,7 @@ function fxFrame(ts){
   fxRaf = requestAnimationFrame(fxFrame);
 }
 
-/* ---------- RADYO OYNATICI (GÖRSELDEKİ GİBİ TEK SATIR: ŞARKI - KANAL) ---------- */
+/* ---------- RADYO OYNATICI ---------- */
 const SW = "https://playerservices.streamtheworld.com/api/livestream-redirect/";
 const STATIONS = [
   { name: 'NIGHTRIDE FM',        defaultTrack: 'StockXL - Lunar Radio (Spacesynth 80)', url: 'https://stream.nightride.fm/nightride.mp3',   metaType: 'nightride', metaKey: 'nightride' },
@@ -559,9 +582,9 @@ const STATIONS = [
 
 let stIdx = 0, radioPlaying = false, metaTimer = null, metaAbort = null;
 const audioEl = $('radioAudio');
-let eqCtx = null, eqSrc = null, analyserNode = null, freqBuf = null;
 
 function renderStation(sub){
+  eqKick();
   const st = STATIONS[stIdx];
   const trk = $('rsTrack');
   trk.textContent = sub || st.currentTrack || st.defaultTrack;
@@ -622,27 +645,9 @@ function stopMetaPolling(){
   if (metaAbort){ metaAbort.abort(); metaAbort = null; }
 }
 
-function ensureAudioAnalyser(){
-  try{
-    if (eqCtx) return;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    eqCtx = new AC();
-    eqSrc = eqCtx.createMediaElementSource(audioEl);
-    analyserNode = eqCtx.createAnalyser();
-    analyserNode.fftSize = 256;
-    analyserNode.smoothingTimeConstant = 0.78;
-    freqBuf = new Uint8Array(analyserNode.frequencyBinCount);
-    eqSrc.connect(analyserNode);
-    analyserNode.connect(eqCtx.destination);
-  }catch{}
-}
-
 async function playCurrentStation(){
   const st = STATIONS[stIdx];
   stopMetaPolling();
-  ensureAudioAnalyser();
-  if (eqCtx && eqCtx.state === 'suspended') eqCtx.resume().catch(() => {});
   audioEl.pause();
   audioEl.src = st.url;
   radioPlaying = true;
@@ -700,77 +705,48 @@ function openRadioModal(){
 }
 function closeRadioModal(){ $('radioModal').classList.remove('open'); }
 
-/* ---------- EN ALT: YATAY SPEKTRUM EKOLAYZIRI ---------- */
-const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d');
-let eqRaf = null;
-const EQ_BARS = 88;
-const barLevels = new Float32Array(EQ_BARS);
+/* ---------- EKOLAYZIR (DİKEY ÇUBUKLAR + TEMA RENGİ) ---------- */
+const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d'), NB = 96, bars = new Float32Array(NB);
+let eqRaf = null, eqLast = 0;
+const EQ_MAX = 0.72;
 
 function eqSize(){
-  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * DPR));
-  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * DPR));
+  const dp = window.devicePixelRatio || 1;
+  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * dp));
+  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * dp));
 }
 
-function renderEqLoop(ts){
-  if (document.hidden){ eqRaf = null; return; }
-  const w = eqCv.width, h = eqCv.height;
-  if (w && h){
-    const dp = DPR, t = (ts || performance.now()) * 0.001;
-    ectx.clearRect(0, 0, w, h);
-
-    let hasAudio = false;
-    if (radioPlaying && analyserNode && freqBuf){
-      analyserNode.getByteFrequencyData(freqBuf);
-      for (let i = 0; i < EQ_BARS; i++){
-        if (freqBuf[i % freqBuf.length] > 6){ hasAudio = true; break; }
-      }
-    }
-
-    const baseLineY = h * 0.48, maxUp = h * 0.40;
-    const cellW = w / EQ_BARS;
-    const barW = Math.max(1.4 * dp, cellW * 0.42);
-    const dotSize = Math.max(1.5 * dp, barW);
-
-    for (let i = 0; i < EQ_BARS; i++){
-      const nx = (i / (EQ_BARS - 1)) * 2 - 1;
-      const env = 0.55 + 0.45 * Math.cos(nx * Math.PI * 0.5);
-
-      let targetH = 0;
-      if (hasAudio){
-        const binIdx = Math.min(freqBuf.length - 1, Math.floor((i / EQ_BARS) * (freqBuf.length * 0.72)));
-        targetH = (freqBuf[binIdx] / 255) * maxUp * env;
-      } else if (radioPlaying){
-        const w1 = 0.5 + 0.5 * Math.sin(i * 0.42 - t * 6.5);
-        const w2 = 0.5 + 0.5 * Math.cos(i * 0.19 + t * 3.8);
-        const beat = 0.45 + 0.55 * Math.pow(0.5 + 0.5 * Math.sin(t * 7.4), 2);
-        targetH = (0.12 + 0.88 * w1 * w2 * beat) * maxUp * env;
-      } else {
-        const calm = 0.5 + 0.5 * Math.sin(i * 0.26 + t * 1.4);
-        targetH = (0.04 + 0.14 * calm) * maxUp * env;
-      }
-
-      barLevels[i] += (targetH - barLevels[i]) * (radioPlaying ? 0.26 : 0.12);
-      const val = Math.max(0, barLevels[i]);
-      const cx = (i + 0.5) * cellW;
-
-      ectx.fillStyle = `rgba(215, 238, 255, ${(radioPlaying ? 0.35 + 0.45 * (val / Math.max(1, maxUp)) : 0.24).toFixed(3)})`;
-      ectx.fillRect(cx - dotSize * 0.5, baseLineY - maxUp * 0.82 - dotSize * 0.5, dotSize, dotSize);
-
-      if (val > 0.6 * dp){
-        const barH = Math.min(maxUp, val);
-        ectx.fillStyle = `rgba(186, 232, 255, ${Math.min(0.95, 0.28 + (barH / maxUp) * 0.67).toFixed(3)})`;
-        ectx.fillRect(cx - barW * 0.5, baseLineY - barH * 0.35, barW, barH);
-      }
-
-      ectx.fillStyle = radioPlaying ? 'rgba(147, 221, 255, 0.36)' : 'rgba(147, 221, 255, 0.16)';
-      ectx.fillRect(cx - dotSize * 0.45, baseLineY + maxUp * 0.72 - dotSize * 0.45, dotSize * 0.9, dotSize * 0.9);
-    }
+function eqFrame(ts){
+  if (eqLast && ts - eqLast < 30){ eqRaf = requestAnimationFrame(eqFrame); return; }
+  eqLast = ts;
+  const w = eqCv.width, h = eqCv.height, t = ts / 1000, dp = window.devicePixelRatio || 1;
+  const bw = Math.max(1, Math.round(Math.max(1.5 * dp, (w / NB) * 0.34))), step = (w - bw) / (NB - 1);
+  let mx = 0;
+  ectx.clearRect(0, 0, w, h);
+  ectx.lineCap = 'butt';
+  ectx.lineWidth = bw;
+  for (let i = 0; i < NB; i++){
+    const c = i / (NB - 1);
+    const leftBias = 0.14 + 0.86 * Math.exp(-Math.pow((c - 0.26) / 0.24, 2)) + 0.35 * Math.exp(-Math.pow((c - 0.05) / 0.07, 2));
+    const w1 = Math.abs(Math.sin(t * 2.1 + i * 0.52));
+    const w2 = Math.abs(Math.sin(t * 1.35 - i * 0.21 + 1.1));
+    const w3 = 0.5 + 0.5 * Math.sin(t * 3.7 + i * 1.17);
+    const tg = radioPlaying ? Math.min(1, (0.08 + 0.92 * (w1 * w2 * 0.75 + w3 * 0.25)) * leftBias) * EQ_MAX : 0;
+    bars[i] += (tg - bars[i]) * (tg > bars[i] ? 0.42 : 0.14);
+    mx = Math.max(mx, bars[i]);
+    const bh = Math.round(Math.max(2 * dp, bars[i] * (h - 2 * dp)));
+    const x = Math.round(i * step) + bw / 2;
+    ectx.strokeStyle = bars[i] < 0.08 ? `rgba(${TH.acc},.48)` : `rgba(${TH.core},.95)`;
+    ectx.beginPath();
+    ectx.moveTo(x, h);
+    ectx.lineTo(x, h - bh);
+    ectx.stroke();
   }
-  eqRaf = requestAnimationFrame(renderEqLoop);
+  eqRaf = (radioPlaying || mx > 0.01) ? requestAnimationFrame(eqFrame) : null;
 }
-function startEqAnim(){ if (!eqRaf) eqRaf = requestAnimationFrame(renderEqLoop); }
+function eqKick(){ if (!eqRaf) eqRaf = requestAnimationFrame(eqFrame); }
 
-/* ---------- ÜST PUSULA ŞERİDİ ---------- */
+/* ---------- ÜST PUSULA ŞERİDİ (TEMA RENGİNE DUYARLI) ---------- */
 const compCv = $('compassCanvas'), cctx = compCv.getContext('2d');
 const CARDINAL_MAP = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
 const INTER_MAP = { 45: 'NE', 135: 'SE', 225: 'SW', 315: 'NW' };
@@ -816,35 +792,35 @@ function drawTopCompass(){
     if (isCenter){
       cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
       cctx.textBaseline = 'top';
-      cctx.fillStyle = '#ff5252';
+      cctx.fillStyle = `rgb(${TH.core})`;
       cctx.fillText('0', x, 0.5 * dp);
     } else if (isCard){
       cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
       cctx.textBaseline = 'top';
-      cctx.fillStyle = '#f87171';
+      cctx.fillStyle = `rgb(${TH.acc})`;
       cctx.fillText(CARDINAL_MAP[norm], x, 0.5 * dp);
     }
 
     const tTop = (isCard || is15) ? tickTopBase : tickTopBase + 1.8 * dp;
     const tBot = (isCard || is15) ? tickBotBase : tickBotBase - 1.2 * dp;
-    cctx.strokeStyle = isCard ? 'rgba(255, 105, 105, 0.85)' : (is15 ? 'rgba(235, 246, 255, 0.58)' : 'rgba(210, 234, 252, 0.30)');
+    cctx.strokeStyle = isCard ? `rgba(${TH.acc}, 0.88)` : (is15 ? `rgba(${TH.clk}, 0.58)` : `rgba(${TH.clk}, 0.30)`);
     cctx.lineWidth = (isCard ? 1.25 : (is15 ? 1.05 : 0.85)) * dp;
     cctx.beginPath(); cctx.moveTo(x, tTop); cctx.lineTo(x, tBot); cctx.stroke();
 
     cctx.font = `600 ${botFontPx}px 'Montserrat', sans-serif`;
     cctx.textBaseline = 'bottom';
-    if (isCenter){ cctx.fillStyle = '#ff6b6b'; cctx.fillText(`${Math.round(((centerDeg % 360) + 360) % 360)}°`, x, h - 0.5 * dp); }
-    else if (isCard){ cctx.fillStyle = 'rgba(255, 120, 120, 0.92)'; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
-    else if (isInter){ cctx.fillStyle = 'rgba(255, 120, 120, 0.88)'; cctx.fillText(INTER_MAP[norm], x, h - 0.5 * dp); }
-    else if (norm % 30 === 0){ cctx.fillStyle = 'rgba(255, 120, 120, 0.78)'; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+    if (isCenter){ cctx.fillStyle = `rgb(${TH.core})`; cctx.fillText(`${Math.round(((centerDeg % 360) + 360) % 360)}°`, x, h - 0.5 * dp); }
+    else if (isCard){ cctx.fillStyle = `rgba(${TH.acc}, 0.92)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+    else if (isInter){ cctx.fillStyle = `rgba(${TH.acc}, 0.86)`; cctx.fillText(INTER_MAP[norm], x, h - 0.5 * dp); }
+    else if (norm % 30 === 0){ cctx.fillStyle = `rgba(${TH.acc}, 0.76)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
   }
 
-  cctx.strokeStyle = '#ff3b3b';
+  cctx.strokeStyle = `rgb(${TH.acc})`;
   cctx.lineWidth = 1.5 * dp;
   cctx.beginPath(); cctx.moveTo(cx, 1 * dp); cctx.lineTo(cx, h - 1 * dp); cctx.stroke();
 }
 
-/* ---------- ZOOM & AKILLI EĞİM ---------- */
+/* ---------- ZOOM (HARİTA YÜKSEKLİĞİ) & AKILLI EĞİM ---------- */
 const ZOOM_STEPS = [
   { meters: 150,  label: '150 M' },
   { meters: 300,  label: '300 M' },
@@ -901,7 +877,7 @@ const MAP_MODES = [
   { k: 'arrow',  n: 'Ok akışı' },
   { k: 'plain',  n: 'Sade' }
 ];
-let mapModeIdx = 0;
+let mapModeIdx = 0, arrowTapAt = 0;
 try{ const mv = parseInt(localStorage.getItem('mapmode'), 10); if (mv >= 0 && mv < MAP_MODES.length) mapModeIdx = mv; }catch{}
 
 let roadWays = [], roadAnchorSet = false, ancLat = 0, ancLon = 0, ancMLon = 111320;
@@ -950,7 +926,8 @@ function stepRoadAnim(ts){
   const dHead = ((targetHeading - renderHeading + 540) % 360) - 180;
   const dComp = ((targetHeading - smoothCompassHead + 540) % 360) - 180;
   const dZoom = targetZoomMeters - renderZoomMeters;
-  const settled = Math.abs(dLat) < 1e-7 && Math.abs(dLon) < 1e-7 && Math.abs(dHead) < 0.25 && Math.abs(dComp) < 0.25 && Math.abs(dZoom) < 0.5;
+  const arrowPulsing = (Date.now() - arrowTapAt) < 460;
+  const settled = Math.abs(dLat) < 1e-7 && Math.abs(dLon) < 1e-7 && Math.abs(dHead) < 0.25 && Math.abs(dComp) < 0.25 && Math.abs(dZoom) < 0.5 && !arrowPulsing;
   if (settled){
     renderLat = tl; renderLon = tn; renderHeading = targetHeading;
     smoothCompassHead = targetHeading; renderZoomMeters = targetZoomMeters;
@@ -964,18 +941,49 @@ function stepRoadAnim(ts){
   if (driving || !settled) roadAnimRaf = requestAnimationFrame(stepRoadAnim); else lastStepTs = 0;
 }
 
+/* Haritaya dokunma: Oka basınca yol akış çizgisi değişir, haritaya basınca yükseklik (zoom) değişir */
+function getLocalMapCoords(e){
+  const W = innerWidth, H = innerHeight, mode = getMode();
+  if (H > W && mode !== 'off'){
+    return mode === 'cw'
+      ? { x: e.clientY, y: W - e.clientX }
+      : { x: H - e.clientY, y: e.clientX };
+  }
+  const rect = $('mapStage').getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
 $('mapStage').addEventListener('click', e => {
-  if (e.shiftKey || e.detail === 2){
-    if (autoZoom){ autoZoom = false; manualZoomIdx = 1; targetZoomMeters = ZOOM_STEPS[manualZoomIdx].meters; toast('Ölçek: ' + ZOOM_STEPS[manualZoomIdx].label); }
-    else if (manualZoomIdx < ZOOM_STEPS.length - 1){ manualZoomIdx++; targetZoomMeters = ZOOM_STEPS[manualZoomIdx].meters; toast('Ölçek: ' + ZOOM_STEPS[manualZoomIdx].label); }
-    else { autoZoom = true; targetZoomMeters = computeAutoZoomMeters(fixSpeed, lastDistToTurn); toast('Oto zoom'); }
+  const pt = getLocalMapCoords(e);
+  const stage = $('mapStage');
+  const arrowX = stage.clientWidth * 0.5;
+  const arrowY = stage.clientHeight * 0.66;
+
+  if (Math.hypot(pt.x - arrowX, pt.y - arrowY) <= 48){
+    mapModeIdx = (mapModeIdx + 1) % MAP_MODES.length;
+    try{ localStorage.setItem('mapmode', String(mapModeIdx)); }catch{}
+    arrowTapAt = Date.now();
     kickRoadAnim();
+    drawRoadMap();
+    toast('Yol akışı: ' + MAP_MODES[mapModeIdx].n);
     return;
   }
-  mapModeIdx = (mapModeIdx + 1) % MAP_MODES.length;
-  try{ localStorage.setItem('mapmode', String(mapModeIdx)); }catch{}
-  drawRoadMap();
-  toast('Rota modu: ' + MAP_MODES[mapModeIdx].n);
+
+  if (autoZoom){
+    autoZoom = false;
+    manualZoomIdx = 0;
+    targetZoomMeters = ZOOM_STEPS[manualZoomIdx].meters;
+    toast('Yükseklik: ' + ZOOM_STEPS[manualZoomIdx].label);
+  } else if (manualZoomIdx < ZOOM_STEPS.length - 1){
+    manualZoomIdx++;
+    targetZoomMeters = ZOOM_STEPS[manualZoomIdx].meters;
+    toast('Yükseklik: ' + ZOOM_STEPS[manualZoomIdx].label);
+  } else {
+    autoZoom = true;
+    targetZoomMeters = computeAutoZoomMeters(fixSpeed, lastDistToTurn);
+    toast('Oto yükseklik');
+  }
+  kickRoadAnim();
 });
 
 let idbP = null;
@@ -1638,8 +1646,18 @@ function drawRoadMap(){
   rctx.restore(); rctx.globalCompositeOperation = 'source-over';
 
   const glow = rctx.createRadialGradient(tx, ty, 0, tx, ty, 76 * dp);
-  glow.addColorStop(0, `rgba(56, 189, 248, ${(0.28 * br).toFixed(3)})`); glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+  glow.addColorStop(0, `rgba(${TH.acc}, ${(0.26 * br).toFixed(3)})`); glow.addColorStop(1, `rgba(${TH.acc}, 0)`);
   rctx.fillStyle = glow; rctx.beginPath(); rctx.arc(tx, ty, 76 * dp, 0, Math.PI * 2); rctx.fill();
+
+  const tapAge = Date.now() - arrowTapAt;
+  if (tapAge < 450){
+    const k = tapAge / 450;
+    rctx.strokeStyle = `rgba(${TH.core}, ${(0.75 * (1 - k)).toFixed(3)})`;
+    rctx.lineWidth = 1.8 * dp;
+    rctx.beginPath();
+    rctx.arc(tx, ty, (14 + k * 24) * dp, 0, Math.PI * 2);
+    rctx.stroke();
+  }
 
   rctx.save(); rctx.translate(tx, ty);
   rctx.fillStyle = '#07111e'; rctx.strokeStyle = `rgb(${TH.arrow})`; rctx.lineWidth = 2.2 * dp;
@@ -1758,6 +1776,7 @@ function updateGeo(c){
   fxKick();
   targetLat = c.latitude; targetLon = c.longitude;
   fetchRoadNetwork(targetLat, targetLon, false);
+  fetchTempOnly(c.latitude, c.longitude, false);
   updatePlaceSignature(c.latitude, c.longitude, false);
   kickRoadAnim();
 }
@@ -1772,12 +1791,14 @@ async function ipFallback(){
     if (d && d.latitude){
       targetLat = renderLat = d.latitude; targetLon = renderLon = d.longitude;
       $('sigCity').textContent = (d.city || 'MUĞLA').toUpperCase(); $('sigSub').textContent = (d.country || 'TÜRKİYE').toUpperCase();
-      fetchRoadNetwork(targetLat, targetLon, true); drawRoadMap(); drawTopCompass(); return;
+      fetchRoadNetwork(targetLat, targetLon, true); fetchTempOnly(targetLat, targetLon, true);
+      drawRoadMap(); drawTopCompass(); return;
     }
   }catch{}
   targetLat = renderLat = 37.2153; targetLon = renderLon = 28.3636;
   $('sigCity').textContent = 'MUĞLA'; $('sigSub').textContent = 'TÜRKİYE';
-  fetchRoadNetwork(targetLat, targetLon, true); drawRoadMap(); drawTopCompass();
+  fetchRoadNetwork(targetLat, targetLon, true); fetchTempOnly(targetLat, targetLon, true);
+  drawRoadMap(); drawTopCompass();
 }
 
 /* ---------- DİK TELEFON → YATAY EKRAN ---------- */
@@ -1812,12 +1833,12 @@ if (typeof ResizeObserver !== 'undefined'){
   ro.observe(roadCv);
 }
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden){ lastStepTs = 0; kickRoadAnim(); drawRoadMap(); drawTopCompass(); startEqAnim(); fxKick(); }
+  if (!document.hidden){ lastStepTs = 0; kickRoadAnim(); drawRoadMap(); drawTopCompass(); eqKick(); fxKick(); }
 });
 
 setTheme(themeKey, false, true);
 applyLayout();
-startEqAnim();
+eqKick();
 startGps();
 </script>
 </body>
