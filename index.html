@@ -429,7 +429,11 @@ function tickClock(){
     $('restDate').textContent = `${DAYS[n.getDay()]} · ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
   }
 }
-tickClock(); setInterval(tickClock, 4000);
+tickClock();
+setInterval(() => {
+  tickClock();
+  if (themeKey === 'auto') setTheme('auto', false, false);
+}, 15000);
 
 let lastWxLat = null, lastWxLon = null, lastWxAt = 0;
 async function fetchTempOnly(lat, lon, force=false){
@@ -583,6 +587,14 @@ const STATIONS = [
 let stIdx = 0, radioPlaying = false, metaTimer = null, metaAbort = null;
 const audioEl = $('radioAudio');
 
+audioEl.addEventListener('error', () => {
+  if (!radioPlaying) return;
+  radioPlaying = false;
+  stopMetaPolling();
+  renderStation();
+  toast('Yayın kesildi');
+});
+
 function renderStation(sub){
   eqKick();
   const st = STATIONS[stIdx];
@@ -714,6 +726,7 @@ function eqSize(){
   const dp = window.devicePixelRatio || 1;
   eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * dp));
   eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * dp));
+  eqKick();
 }
 
 function eqFrame(ts){
@@ -1587,7 +1600,7 @@ function drawRoadMap(){
     } else if (m === 'arrow'){
       rctx.beginPath();
       for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = 'rgba(186, 232, 255, 0.55)'; rctx.lineWidth = 2.6 * dp; rctx.stroke();
+      rctx.strokeStyle = `rgba(${TH.core}, 0.55)`; rctx.lineWidth = 2.6 * dp; rctx.stroke();
       for (let d = pulsePhase / 2.5; d < Math.min(Rt.len, range); d += 34){
         const p = routePointAt(Rt, d), p2 = routePointAt(Rt, Math.min(Rt.len, d + 4));
         if (!p || !p2) continue;
