@@ -8,9 +8,7 @@
 <meta name="format-detection" content="telephone=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<title>Kabin Paneli</title>
-<link rel="apple-touch-icon" sizes="180x180" href="icon.png?v=2" />
-<link rel="icon" type="image/png" href="icon.png?v=2" />
+<title>Kabin Harita</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,402 +16,874 @@
 :root{
   color-scheme:dark;
   --vh:1vh;--vw:1vw;
-  --px:max(env(safe-area-inset-left),clamp(18px,calc(3*var(--vw)),40px));
-  --tapeH:clamp(34px,calc(10*var(--vh)),56px);
-  --dockH:clamp(54px,calc(11*var(--vh)),72px);
-  --bg:#000;
-  --card:#1c1c1e;
-  --line:rgba(255,255,255,.09);
+  --px:max(env(safe-area-inset-left),clamp(20px,calc(3.2*var(--vw)),44px));
+  --compass-top:max(env(safe-area-inset-top),2px);
+  --compass-h:clamp(24px,calc(4.1*var(--vh)),34px);
+  --eq-h:clamp(16px,calc(2.8*var(--vh)),24px);
+  --radio-line-h:clamp(18px,calc(3.1*var(--vh)),25px);
+  --bg:#000000;
+  --card:#11161f;
+  --line:rgba(148,197,232,.14);
   --acc:229,72,77;
   --red:rgb(var(--acc));
-  --red-glow:rgba(var(--acc),.55);
-  --tx:#f5f5f7;
-  --tx2:rgba(245,245,247,.62);
-  --tx3:rgba(245,245,247,.38);
+  --ice:#93ddff;
+  --ice-bright:#f2faff;
+  --ice-sub:rgba(224,244,255,.86);
+  --ice-dim:rgba(176,216,245,.62);
+  --amber:#ffb000;
 }
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-html,body{width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#000;color:var(--tx);touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none;
+html,body{
+  width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#000;color:var(--ice-bright);
+  touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;
   font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
-  font-feature-settings:'tnum' 1;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  font-feature-settings:'tnum' 1;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility
+}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
-.bg-photo{position:fixed;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.3;z-index:0;transition:opacity .8s}
-.bg-vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,.25) 0%,rgba(0,0,0,.9) 70%,#000 100%)}
+.screen{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
 
-.screen{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;
-  padding:max(env(safe-area-inset-top),clamp(4px,calc(.8*var(--vh)),8px)) 0 max(env(safe-area-inset-bottom),clamp(6px,calc(1.2*var(--vh)),12px)) 0}
-
-/* ÜST PUSULA ŞERİDİ */
-.tape-cv{display:block;width:100%;height:var(--tapeH);flex-shrink:0;position:relative;z-index:3;pointer-events:none}
-
-/* SOL PANEL: saat, tarih, hava, rakım, rota bilgisi, koordinat */
-.middle{display:flex;justify-content:flex-start;align-items:center;flex:1;min-height:0;padding:0 var(--px)}
-.middle::before{content:'';position:absolute;left:0;top:0;bottom:0;width:36vw;background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.34) 55%,rgba(0,0,0,0));pointer-events:none;z-index:-1}
-.left{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:clamp(4px,calc(1*var(--vh)),9px);min-width:0;position:relative;z-index:2}
-
-.clock{display:flex;align-items:center;font-size:clamp(34px,calc(8.4*var(--vh)),62px);font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;color:var(--clk,var(--tx));cursor:pointer;animation:breathe 5s ease-in-out infinite}
-@keyframes breathe{0%,100%{text-shadow:0 0 6px rgba(var(--acc),.16),0 0 16px rgba(var(--acc),.08)}50%{text-shadow:0 0 12px rgba(var(--acc),.55),0 0 30px rgba(var(--acc),.28)}}
-@keyframes pulse{50%{opacity:.35;transform:scale(.8)}}
-.date-wrap{display:flex;align-items:center;gap:clamp(8px,calc(1.6*var(--vh)),14px);color:var(--clk,var(--tx))}
-.date-wrap b{font-size:clamp(24px,calc(5.6*var(--vh)),42px);font-weight:800;letter-spacing:-.05em;line-height:1}
-.date-r{display:flex;flex-direction:column;gap:clamp(3px,calc(.7*var(--vh)),6px)}
-.date-r span{font-size:clamp(7.5px,calc(1.4*var(--vh)),10.5px);font-weight:600;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
-.date-r u{display:block;height:1px;background:currentColor;opacity:.75}
-
-.temp-row{display:inline-flex;align-items:center;gap:clamp(8px,calc(1.6*var(--vh)),14px);width:fit-content}
-.temp{display:flex;line-height:.9}
-.temp b{font-size:clamp(40px,calc(9*var(--vh)),70px);font-weight:700;letter-spacing:-.05em}
-.temp sup{font-size:clamp(13px,calc(2.3*var(--vh)),20px);font-weight:500;color:var(--tx2);margin:clamp(5px,calc(1*var(--vh)),10px) 0 0 3px}
-.wx-mini{height:clamp(38px,calc(8.4*var(--vh)),64px);width:clamp(44px,calc(9.6*var(--vh)),74px);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;--glow:rgba(243,178,59,.10)}
-.wx-mini::before{content:'';position:absolute;inset:-20%;background:radial-gradient(closest-side,var(--glow),transparent);pointer-events:none}
-.wx-mini svg{position:relative;height:100%;width:auto;max-width:100%;display:block;overflow:visible;transition:transform .18s}
-
-.cond{font-size:clamp(10px,calc(1.8*var(--vh)),14px);font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(245,245,247,.9)}
-.metrics,.nav-metrics{display:grid;grid-template-columns:auto auto;gap:clamp(4px,calc(1*var(--vh)),9px) clamp(14px,calc(2*var(--vw)),26px);justify-content:start}
-.nav-metrics.on .metric b{color:var(--clk,var(--tx))}
-.metric{display:flex;flex-direction:column;gap:2px}
-.metric span{display:inline-flex;align-items:center;gap:4px;font-size:clamp(7px,calc(1.15*var(--vh)),9px);color:var(--tx3);font-weight:600;letter-spacing:.16em;text-transform:uppercase}
-.metric b{font-size:clamp(12px,calc(1.9*var(--vh)),15px);font-weight:600;letter-spacing:.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
-.metric b i{font-style:normal}
-
-.live-coords{display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:clamp(8px,calc(1.5*var(--vh)),11px);font-weight:600;letter-spacing:.1em;white-space:nowrap;color:var(--tx);margin-top:clamp(1px,calc(.4*var(--vh)),4px)}
-.lc-row{display:flex;align-items:center;gap:7px}
-.lc-lon{padding-left:13px}
-.live-coords i{width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 2s infinite}
-
-/* HARİTA — pusula şeridi ile radyo arasındaki tüm alana yayılır */
-.road-wrap{position:absolute;left:0;right:0;top:var(--tapeH);bottom:var(--dockH);z-index:1;overflow:hidden;pointer-events:none}
+/* TAM EKRAN HARİTA KATMANI */
+.map-stage{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:pointer}
 .road-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
-.road-wrap.neon::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 72%,rgba(70,130,220,.30),rgba(20,50,110,.16) 45%,transparent 72%);pointer-events:none}
-.road-hud{position:absolute;right:calc(var(--px) + clamp(38px,calc(6.6*var(--vh)),48px));bottom:12px;display:flex;flex-direction:column;align-items:flex-end;gap:2px;pointer-events:none;z-index:3}
-.road-badge{font-size:clamp(8px,calc(1.3*var(--vh)),10px);font-weight:600;letter-spacing:.16em;color:var(--tx3);text-transform:uppercase}
-.road-status{max-width:calc(24*var(--vw));line-height:1.5;font-size:clamp(7px,calc(1.1*var(--vh)),8.5px);font-weight:600;letter-spacing:.14em;color:rgba(245,245,247,.28);text-transform:uppercase;text-align:right}
-.zoom-hit{pointer-events:auto;padding:14px 8px 8px 22px;margin:-14px -8px -8px -22px;cursor:pointer;display:block}
+.fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 
-/* ŞEHİR ADI — altta ortada */
-.city-box{position:absolute;left:50%;bottom:clamp(4px,calc(1.2*var(--vh)),10px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:clamp(3px,calc(.8*var(--vh)),7px);pointer-events:auto;cursor:pointer;z-index:4;max-width:60vw}
-.city-main{font-size:clamp(18px,calc(4.4*var(--vh)),32px);font-weight:500;letter-spacing:.42em;padding:clamp(2px,calc(.6*var(--vh)),6px) clamp(8px,calc(1.4*var(--vh)),14px) clamp(2px,calc(.6*var(--vh)),6px) calc(clamp(8px,calc(1.4*var(--vh)),14px) + .42em);text-transform:uppercase;color:#fff;background:rgba(0,0,0,.3);text-shadow:0 0 12px rgba(255,255,255,.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
-.city-sub{font-size:clamp(8px,calc(1.55*var(--vh)),11.5px);font-weight:500;letter-spacing:.3em;padding-left:.3em;text-transform:uppercase;color:rgba(255,255,255,.78);white-space:nowrap;text-shadow:0 0 8px rgba(0,0,0,.6)}
+/* EN ÜST: BAR OLMADAN KİBAR PUSULA ŞERİDİ */
+.top-compass{
+  position:absolute;left:0;right:0;top:var(--compass-top);
+  height:var(--compass-h);z-index:7;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 95%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 95%,transparent 100%)
+}
+.compass-cv{width:100%;height:100%;display:block}
 
-/* ROTA BUTONU ve YÖNLENDİRME */
-.road-wrap .nav-btn{position:absolute;right:var(--px);bottom:clamp(6px,calc(1.6*var(--vh)),12px);pointer-events:auto;z-index:4}
-.nav-btn{width:clamp(28px,calc(5.2*var(--vh)),38px);height:clamp(28px,calc(5.2*var(--vh)),38px);border-radius:50%;
-  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--tx2);
-  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s,background .2s}
-.nav-btn:active{transform:scale(.92)}
-.nav-btn.on{border-color:rgba(var(--acc),.65);background:rgba(var(--acc),.16);color:var(--red);box-shadow:0 0 12px rgba(var(--acc),.3)}
-.nav-hud{position:absolute;left:50%;top:clamp(4px,calc(1*var(--vh)),8px);transform:translateX(-50%);
-  display:none;align-items:center;gap:clamp(3px,calc(.5*var(--vw)),5px);
-  padding:2px 4px;z-index:6;pointer-events:auto;cursor:pointer;opacity:0;transition:opacity .3s}
-.nav-hud.on{display:inline-flex;opacity:1}
-.nav-ico{width:clamp(10.5px,calc(2.1*var(--vh)),14.7px);height:clamp(10.5px,calc(2.1*var(--vh)),14.7px);
-  color:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  filter:drop-shadow(0 0 4px rgba(var(--acc),.45))}
+/* SOL ÜST: SAAT & AKILLI EĞİM */
+.top-left-hud{
+  position:absolute;left:var(--px);top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
+  z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(6px,calc(1.2*var(--vh)),12px)
+}
+.mini-clock{
+  font-size:clamp(14px,calc(2.5*var(--vh)),20px);font-weight:700;letter-spacing:.06em;
+  color:var(--clk,var(--ice-bright));cursor:pointer;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 12px rgba(var(--acc),.35)
+}
+.grade-pill{
+  display:none;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:8px;
+  background:rgba(4,9,18,.52);pointer-events:none;
+  font-size:clamp(10px,calc(1.7*var(--vh)),13px);font-weight:600;letter-spacing:.14em;
+  color:var(--ice);font-variant-numeric:tabular-nums
+}
+.grade-pill.on{display:inline-flex}
+
+/* SAĞ ÜST (PUSULANIN ALTINDA): YÖNLENDİRME OKU & MESAFE */
+.top-right-hud{
+  position:absolute;right:var(--px);top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
+  z-index:6;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none
+}
+.nav-hud{
+  display:none;align-items:center;gap:clamp(8px,calc(1.3*var(--vw)),14px);
+  padding:5px 12px 5px 8px;border-radius:12px;
+  background:rgba(4,9,18,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  pointer-events:auto;cursor:pointer;transition:opacity .25s,transform .15s
+}
+.nav-hud:active{transform:scale(.95)}
+.nav-hud.on{display:inline-flex}
+.nav-ico{
+  width:clamp(22px,calc(4.2*var(--vh)),32px);height:clamp(22px,calc(4.2*var(--vh)),32px);
+  color:rgb(var(--acc));display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  filter:drop-shadow(0 0 10px rgba(var(--acc),.55))
+}
 .nav-ico svg{width:100%;height:100%}
-.nav-dist{font-size:clamp(8.9px,calc(1.365*var(--vh)),11.55px);font-weight:700;letter-spacing:.04em;color:var(--tx);font-variant-numeric:tabular-nums;white-space:nowrap}
+.nav-dist{
+  font-size:clamp(14px,calc(2.6*var(--vh)),20px);font-weight:600;letter-spacing:.08em;
+  color:var(--ice-bright);font-variant-numeric:tabular-nums;white-space:nowrap
+}
 
-/* RADYO — şarkı yazısı aşağıda, ekolayzır alçak */
-.dock{width:100%;display:flex;align-items:center;justify-content:center;flex-shrink:0;height:var(--dockH)}
-.player{width:100%;height:100%;background:#000;display:flex;flex-direction:column;justify-content:flex-end;gap:clamp(1px,calc(.4*var(--vh)),4px);padding:0 var(--px) 0 var(--px)}
-.p-top{display:flex;align-items:center;justify-content:space-between;gap:14px;min-width:0}
-.p-meta{flex:1;min-width:0;font-size:clamp(12px,calc(2*var(--vh)),14.5px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--clk,var(--tx))}
-.p-song{color:var(--clk,var(--tx));font-weight:600;letter-spacing:.01em}
-.p-sep{color:var(--clk,var(--tx));opacity:.5;font-weight:400;margin:0 7px}
-.p-chan{color:var(--clk,var(--tx));opacity:.75;font-weight:500;font-size:.82em;letter-spacing:.14em;text-transform:uppercase}
-.p-ctrls{display:flex;align-items:center;gap:clamp(10px,calc(1.6*var(--vw)),18px);flex-shrink:0}
-.play{width:clamp(24px,calc(4.2*var(--vh)),32px);height:clamp(24px,calc(4.2*var(--vh)),32px);color:var(--play,#d97724);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .12s,filter .15s}
-.play:active{transform:scale(.9);filter:brightness(1.2)}
-.play svg{width:100%;height:100%}
-.nxt{width:clamp(20px,calc(3.4*var(--vh)),26px);height:clamp(20px,calc(3.4*var(--vh)),26px);color:rgba(242,242,244,.65);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .12s,color .15s}
-.nxt:active{transform:scale(.9);color:#fff}
-.nxt svg{width:100%;height:100%}
-.eq{display:block;width:100%;height:clamp(16px,calc(3.4*var(--vh)),26px)}
+/* ÜST ORTA: YAKLAŞAN HAVA / YOL UYARISI */
+.ahead-chip{
+  position:absolute;left:50%;top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
+  transform:translateX(-50%) translateY(-6px);z-index:6;
+  display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;
+  background:rgba(5,10,18,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,176,0,.48);color:#ffd275;
+  font-size:clamp(9px,calc(1.5*var(--vh)),11.5px);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .5s,transform .5s
+}
+.ahead-chip.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* MODAL */
-.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:16px}
-.modal.open{display:flex}
-.panel{width:100%;max-width:400px;max-height:92%;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px}
-.search{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--tx);font-size:14px;outline:none}
-.search:focus{border-color:rgba(var(--acc),.6)}
-.res{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow-y:auto}
-.opt{padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.05);font-size:13px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
-.opt:active{background:rgba(var(--acc),.25)}
-.opt-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600;color:var(--tx)}
-.opt-dist{font-size:11px;font-weight:600;color:var(--red);flex-shrink:0}
-.opt-sub{font-size:11px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-input[type=file]{display:none}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* EKOLAYZIRIN HEMEN ÜSTÜ: KUTUSUZ TEK SATIR RADYO */
+.radio-strip{
+  position:absolute;left:var(--px);right:var(--px);
+  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + clamp(4px,calc(.65*var(--vh)),8px));
+  height:var(--radio-line-h);z-index:8;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  pointer-events:auto;background:transparent
+}
+.rs-main{
+  display:flex;align-items:baseline;gap:0;min-width:0;flex:1;
+  font-size:clamp(11px,calc(1.95*var(--vh)),15.5px);letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 8px rgba(0,0,0,.95)
+}
+.rs-track{font-weight:600;color:#e6f6ff;cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+.rs-track.paused{color:rgba(210,235,250,.55)}
+.rs-sep{font-weight:400;color:rgba(176,216,245,.52);margin:0 7px;flex-shrink:0}
+.rs-station{
+  font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(186,225,250,.72);cursor:pointer;flex-shrink:0
+}
+.rs-station:hover{color:#ffffff}
+.rs-controls{display:flex;align-items:center;gap:6px;flex-shrink:0;opacity:.75;transition:opacity .2s}
+.radio-strip:hover .rs-controls{opacity:1}
+.rs-btn{
+  font-size:clamp(9.5px,calc(1.45*var(--vh)),11.5px);font-weight:600;
+  color:var(--ice-dim);padding:2px 4px;line-height:1;transition:color .15s
+}
+.rs-btn:active,.rs-btn.active{color:var(--play,#ff8547)}
 
-.screen>main,.screen>footer{position:relative;z-index:2}
-.toast{position:absolute;left:50%;top:calc(12*var(--vh));transform:translateX(-50%);background:rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  padding:7px 16px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50}
+/* ALT ORTA: ŞEHİR İMZASI + ROTA ÖZETİ */
+.sig-wrap{
+  position:absolute;left:50%;
+  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + var(--radio-line-h) + clamp(8px,calc(1.3*var(--vh)),16px));
+  transform:translateX(-50%);z-index:6;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:4px 20px;cursor:pointer;max-width:88vw
+}
+.sig-city{
+  font-size:clamp(16px,calc(3.0*var(--vh)),25px);font-weight:600;letter-spacing:.30em;
+  text-transform:uppercase;color:#ffffff;
+  text-shadow:0 0 22px rgba(186,232,255,.52), 0 0 8px rgba(255,255,255,.25);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82vw;
+  transition:color .2s
+}
+.sig-wrap:active .sig-city{color:#bae6fd}
+.sig-sub{
+  margin-top:clamp(2px,calc(.55*var(--vh)),5px);
+  font-size:clamp(8.5px,calc(1.35*var(--vh)),10.5px);font-weight:500;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--ice-sub);
+  text-shadow:0 0 12px rgba(148,210,255,.28);
+  white-space:nowrap
+}
+.sig-route{
+  display:none;margin-top:clamp(4px,calc(.8*var(--vh)),7px);
+  font-size:clamp(9px,calc(1.5*var(--vh)),11.5px);font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ice);font-variant-numeric:tabular-nums;white-space:nowrap
+}
+.sig-route.on{display:block}
+
+/* EN ALT: YATAY SPEKTRUM EKOLAYZIRI */
+.bottom-eq{
+  position:absolute;left:var(--px);right:var(--px);
+  bottom:max(env(safe-area-inset-bottom),2px);
+  height:var(--eq-h);z-index:7;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 3%,#000 97%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 3%,#000 97%,transparent 100%)
+}
+.eq-cv{width:100%;height:100%;display:block}
+
+/* MOLA MODU */
+.map-stage,.top-left-hud,.top-compass,.sig-wrap{transition:opacity 1s}
+.screen.rest .map-stage,.screen.rest .top-left-hud,.screen.rest .top-compass,.screen.rest .sig-wrap{opacity:0;pointer-events:none}
+#restBox{
+  position:fixed;inset:0;z-index:5;display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;cursor:pointer;background:rgba(0,0,0,.55)
+}
+.screen.rest #restBox{display:flex}
+.rest-clock{font-size:clamp(54px,calc(22*var(--vh)),150px);font-weight:300;letter-spacing:-.04em;line-height:1;color:var(--clk,#fff)}
+.rest-date{font-size:clamp(10px,calc(2*var(--vh)),15px);letter-spacing:.26em;text-transform:uppercase;color:var(--ice-sub)}
+
+/* BİLDİRİM TOAST */
+.toast{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;
+  background:rgba(6,13,24,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(125,211,252,.22);color:var(--ice-bright);
+  padding:8px 18px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .28s
+}
 .toast.on{opacity:1}
-.fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
-.road-wrap,.left,.tape-cv{transition:opacity 1.2s}
-.screen.rest .road-wrap,.screen.rest .left,.screen.rest .tape-cv{opacity:0;pointer-events:none}
-.screen.rest .zoom-hit,.screen.rest .nav-hud,.screen.rest .city-box,.screen.rest .nav-btn{pointer-events:none}
-#restBox{position:absolute;left:0;right:0;top:46%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:clamp(6px,calc(2*var(--vh)),16px);opacity:0;pointer-events:none;transition:opacity 1.2s;z-index:3;cursor:pointer}
-.screen.rest #restBox{opacity:1;pointer-events:auto}
-.rest-clock{font-size:clamp(70px,calc(34*var(--vh)),240px);font-weight:300;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;color:var(--clk,var(--tx));animation:breathe 6s ease-in-out infinite}
-.rest-date{font-size:clamp(10px,calc(2.3*var(--vh)),17px);font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--tx2)}
-.rest-wx{display:flex;align-items:center;gap:clamp(10px,calc(2*var(--vh)),18px);margin-top:clamp(4px,calc(1.4*var(--vh)),12px)}
-.rest-ico{height:clamp(34px,calc(8*var(--vh)),60px);width:clamp(40px,calc(9.4*var(--vh)),70px);display:flex;align-items:center;justify-content:center}
-.rest-ico svg{height:100%;width:auto;display:block;overflow:visible}
-.rest-wx b{font-size:clamp(22px,calc(5*var(--vh)),38px);font-weight:600;letter-spacing:-.02em}
-.rest-wx span{font-size:clamp(9px,calc(1.8*var(--vh)),13px);font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tx2)}
-.ahead-chip{position:absolute;left:50%;top:clamp(4px,calc(1*var(--vh)),8px);transform:translateX(-50%) translateY(-6px);display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,176,0,.55);color:#ffcf66;font-size:clamp(8px,calc(1.35*var(--vh)),10.5px);font-weight:600;letter-spacing:.14em;white-space:nowrap;opacity:0;transition:opacity .6s,transform .6s,top .4s;z-index:5;pointer-events:none}
-.ahead-chip.on{opacity:1;transform:translateX(-50%)}
-#dimLayer{position:fixed;inset:0;z-index:40;background:#000;opacity:0;pointer-events:none;transition:opacity 1.2s}
+
+/* MODALLAR */
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.panel{width:100%;max-width:410px;max-height:92%;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.search{width:100%;padding:11px 13px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ice-bright);font-size:13.5px;outline:none}
+.search:focus{border-color:rgba(125,211,252,.55)}
+.res{display:flex;flex-direction:column;gap:6px;max-height:210px;overflow-y:auto}
+.opt{padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.04);font-size:13px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.opt:active,.opt.cur{background:rgba(125,211,252,.18);border:1px solid rgba(125,211,252,.35)}
+.opt-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600;color:var(--ice-bright)}
+.opt-dist{font-size:11px;font-weight:600;color:var(--ice);flex-shrink:0}
+.opt-sub{font-size:11px;color:var(--ice-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-ice{border:1px solid rgba(125,211,252,.45);color:var(--ice);padding:5px 12px;border-radius:9px;font-size:11.5px;font-weight:600;letter-spacing:.06em}
+.btn-dim{border:1px solid var(--line);color:var(--ice-sub);padding:5px 12px;border-radius:9px;font-size:11.5px}
+#dimLayer{position:fixed;inset:0;z-index:25;background:#000;opacity:0;pointer-events:none;transition:opacity 1.2s}
 </style>
 </head>
 <body>
 
-<input type="file" id="mp3Input" accept="audio/*" multiple />
-<input type="file" id="photoInput" accept="image/*" multiple />
-<audio id="audioTag" preload="none"></audio>
-<span id="gpsText" hidden></span>
-<div id="barTrack" hidden><i id="barFill"></i></div>
-
-<div class="screen">
-<div id="bgPhoto" class="bg-photo"></div>
-<div class="bg-vignette"></div>
-<canvas class="fx-cv" id="fxCanvas"></canvas>
-
-  <canvas class="tape-cv" id="tapeCv"></canvas>
-
-  <section class="road-wrap" id="roadWrap">
+<div class="screen" id="screen">
+  <div class="map-stage" id="mapStage">
     <canvas class="road-cv" id="roadCanvas"></canvas>
+  </div>
+  <canvas class="fx-cv" id="fxCanvas"></canvas>
 
-    <div class="nav-hud" id="navHud" onclick="openNav()">
+  <!-- EN ÜST: BAR OLMADAN KİBAR PUSULA ŞERİDİ -->
+  <div class="top-compass">
+    <canvas class="compass-cv" id="compassCanvas"></canvas>
+  </div>
+
+  <!-- SOL ÜST: SAAT (TEMA & MOLA) + AKILLI EĞİM -->
+  <div class="top-left-hud">
+    <div class="mini-clock" id="miniClock">--:--</div>
+    <div class="grade-pill" id="gradePill">
+      <span id="gradeText">%0</span>
+    </div>
+  </div>
+
+  <!-- SAĞ ÜST (PUSULANIN ALTINDA): YÖNLENDİRME OKU & MESAFE -->
+  <div class="top-right-hud">
+    <div class="nav-hud" id="navHud" onclick="cancelNav(true)">
       <div class="nav-ico" id="navIcon"></div>
       <span class="nav-dist" id="navTurnDist">--</span>
     </div>
+  </div>
 
-    <div class="ahead-chip" id="aheadChip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffb000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2z"/><path d="M12 10v4.5M12 17.5v.1"/></svg><span id="aheadText"></span></div>
+  <!-- ÜST ORTA: YAKLAŞAN HAVA / YOL UYARISI -->
+  <div class="ahead-chip" id="aheadChip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffb000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2z"/><path d="M12 10v4.5M12 17.5v.1"/></svg>
+    <span id="aheadText"></span>
+  </div>
 
-    <div class="road-hud">
-      <div class="zoom-hit" onclick="handleZoomTap(event)"><span class="road-badge" id="roadZoomLbl">300 M</span></div>
-      <span class="road-status" id="roadStatus"></span>
+  <!-- EKOLAYZIRIN HEMEN ÜSTÜ: KUTUSUZ TEK SATIR RADYO -->
+  <div class="radio-strip" id="radioStrip">
+    <div class="rs-main">
+      <span class="rs-track paused" id="rsTrack" onclick="toggleRadio()">StockXL - Lunar Radio (Spacesynth 80)</span>
+      <span class="rs-sep">-</span>
+      <span class="rs-station" id="rsStation" onclick="openRadioModal()">NIGHTRIDE FM</span>
     </div>
-
-    <div class="loc city-box" onclick="openCity()">
-      <div class="city-main" id="cityMain">KONUM</div>
-      <div class="city-sub" id="citySub"></div>
+    <div class="rs-controls">
+      <button class="rs-btn" id="rsPlayBtn" onclick="toggleRadio()" title="Oynat / Durdur">▶</button>
+      <button class="rs-btn" onclick="prevStation()" title="Önceki kanal">◀</button>
+      <button class="rs-btn" onclick="nextStation()" title="Sonraki kanal">▶</button>
+      <button class="rs-btn" onclick="openRadioModal()" title="Kanallar">≡</button>
     </div>
+  </div>
 
-    <button class="nav-btn" id="navOpenBtn" aria-label="Rota ara" onclick="openNav()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-    </button>
-  </section>
+  <!-- ALT ORTA: ŞEHİR İMZASI + ROTA ÖZETİ -->
+  <div class="sig-wrap" id="sigBox" onclick="openNav()">
+    <div class="sig-city" id="sigCity">KONUM ALINIYOR</div>
+    <div class="sig-sub" id="sigSub">TÜRKİYE</div>
+    <div class="sig-route" id="sigRoute">--</div>
+  </div>
 
-  <main class="middle">
-    <section class="left">
-      <div class="clock" id="clockT">--:--</div>
-      <div class="date-wrap">
-        <b id="bigDay">--</b>
-        <div class="date-r"><span id="dayLine"></span><u></u><span id="monthLine"></span></div>
-      </div>
-      <div class="temp-row">
-        <div class="temp"><b id="mainTemp">--</b><sup>°c</sup></div>
-        <div class="wx-mini" id="art"></div>
-      </div>
-      <div class="cond" id="mainCond">Yükleniyor</div>
-      <div class="metrics">
-        <div class="metric"><span>Rüzgar</span><b id="windText">--</b></div>
-        <div class="metric"><span>Nem</span><b id="humText">--</b></div>
-        <div class="metric"><span>Rakım</span><b><i id="altVal">--</i> m</b></div>
-      </div>
-      <div class="nav-metrics" id="navMetrics">
-        <div class="metric"><span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 1 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg> Kalan km</span><b id="remDist">--</b></div>
-        <div class="metric"><span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg> Tahmini varış</span><b id="remEta">--</b></div>
-      </div>
-      <div class="live-coords">
-        <div class="lc-row"><i></i><span id="latDms">--</span></div>
-        <span class="lc-lon" id="lonDms">--</span>
-      </div>
-    </section>
-  </main>
+  <!-- EN ALT: YATAY SPEKTRUM EKOLAYZIRI -->
+  <div class="bottom-eq">
+    <canvas class="eq-cv" id="eqCanvas"></canvas>
+  </div>
 
-  <footer class="dock">
-    <div class="player">
-      <div class="p-top">
-        <div class="p-meta"><span class="p-song" id="songLabel"></span><span class="p-sep">-</span><span class="p-chan" id="artistLabel"></span></div>
-        <div class="p-ctrls">
-          <button class="play" aria-label="Oynat / duraklat" onclick="togglePlay()"><svg id="ppSvg" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg></button>
-          <button class="nxt" aria-label="Sonraki kanal" onclick="nextSong()"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="4 5 15 12 4 19"/><rect x="17" y="5" width="2.5" height="14" rx="1"/></svg></button>
-        </div>
-      </div>
-      <canvas class="eq" id="eq"></canvas>
-    </div>
-  </footer>
-<div id="restBox" onclick="exitRest(true)">
-  <div class="rest-clock" id="restClock">--:--</div>
-  <div class="rest-date" id="restDate"></div>
-  <div class="rest-wx"><div class="rest-ico" id="restIco"></div><b id="restTemp">--°</b><span id="restCond"></span></div>
+  <div id="restBox" onclick="exitRest(true)">
+    <div class="rest-clock" id="restClock">--:--</div>
+    <div class="rest-date" id="restDate"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
 </div>
+<div id="dimLayer"></div>
 
-<!-- HAVA DURUMU KONUM & ÇEVRİMDIŞI HARİTA MODALI -->
-<div class="modal" id="cityModal" onclick="closeCity()">
+<!-- RADYO KANAL SEÇİCİ MODALI -->
+<div class="modal" id="radioModal" onclick="closeRadioModal()">
   <div class="panel" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <strong style="font-size:14px;font-weight:500">Konum seç</strong>
-      <button onclick="forceGps();closeCity()" style="border:1px solid var(--red);color:var(--red);padding:5px 12px;border-radius:9px;font-size:12px">GPS'e dön</button>
+      <strong style="font-size:13.5px;font-weight:600;letter-spacing:.08em;color:var(--ice-bright)">RADYO İSTASYONLARI</strong>
+      <button class="btn-dim" onclick="closeRadioModal()">Kapat</button>
     </div>
-    <input id="cityInput" class="search" placeholder="Şehir yazın (Bolu, Ankara, Edirne…)" />
-    <div class="res" id="cityRes"></div>
-    <div style="border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px">
-      <strong style="font-size:13px;font-weight:500">Çevrimdışı harita</strong>
-      <div id="dlText" style="font-size:12px;color:var(--tx2)">İzmir · Aydın · Muğla: ana yollar, demiryolu, nehir ve kıyı</div>
-      <div style="height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><i id="dlBar" style="display:block;height:100%;width:0;background:var(--red)"></i></div>
-      <div id="dlInfo" style="font-size:11px;color:var(--tx3)"></div>
-      <div style="display:flex;gap:8px">
-        <button id="dlBtn" onclick="toggleDownload()" style="border:1px solid var(--red);color:var(--red);padding:6px 14px;border-radius:9px;font-size:12px">İndir</button>
-        <button onclick="clearOffline()" style="border:1px solid var(--line);color:var(--tx2);padding:6px 14px;border-radius:9px;font-size:12px">Sil</button>
-      </div>
-    </div>
+    <div class="res" id="stationList" style="max-height:310px"></div>
   </div>
 </div>
 
-<!-- ROTA / ADRES ARAMA MODALI -->
+<!-- ROTA ARAMA & ÇEVRİMDIŞI HARİTA MODALI -->
 <div class="modal" id="navModal" onclick="closeNav()">
   <div class="panel" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-      <strong style="font-size:14px;font-weight:600">Hedefe rota oluştur</strong>
-      <button id="navCancelModalBtn" onclick="cancelNav(true);closeNav()" style="display:none;border:1px solid var(--red);color:var(--red);padding:5px 12px;border-radius:9px;font-size:12px">Rotayı iptal et</button>
+      <strong style="font-size:13.5px;font-weight:600;letter-spacing:.06em;color:var(--ice-bright)">HEDEF & HARİTA</strong>
+      <div style="display:flex;gap:6px">
+        <button id="navCancelModalBtn" class="btn-ice" onclick="cancelNav(true);closeNav()" style="display:none">Rotayı iptal et</button>
+        <button class="btn-dim" onclick="toggleRotMode()">Ekran yönü</button>
+      </div>
     </div>
-    <input id="navInput" class="search" placeholder="Adres, cadde, ilçe veya yer yazın…" />
-    <div id="navHint" style="font-size:11px;color:var(--tx3)">Bulunduğun konumdan araç rotası çizilir</div>
+    <input id="navInput" class="search" placeholder="Adres, cadde, ilçe veya şehir yazın…" />
+    <div id="navHint" style="font-size:11px;color:var(--ice-sub)">Bulunduğun konumdan araç rotası çizilir</div>
     <div class="res" id="navRes"></div>
+
+    <div style="border-top:1px solid var(--line);padding-top:11px;display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong style="font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--ice-bright)">ÇEVRİMDIŞI HARİTA</strong>
+        <span id="dlInfo" style="font-size:10.5px;color:var(--ice-dim)"></span>
+      </div>
+      <div id="dlText" style="font-size:11.5px;color:var(--ice-sub)">İzmir · Aydın · Muğla ana yollar, demiryolu, nehir ve kıyı</div>
+      <div style="height:2px;background:rgba(125,211,252,.12);border-radius:2px;overflow:hidden"><i id="dlBar" style="display:block;height:100%;width:0;background:var(--ice)"></i></div>
+      <div style="display:flex;gap:8px;margin-top:2px">
+        <button id="dlBtn" class="btn-ice" onclick="toggleDownload()">İndir</button>
+        <button class="btn-dim" onclick="clearOffline()">Sil</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-</div>
+<audio id="radioAudio" crossorigin="anonymous" preload="none"></audio>
 
-
-<div id="dimLayer"></div>
 <script>
 const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const M_LAT = 110540;
+const DAYS = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
-/* ---------- ARKA PLAN FOTOĞRAFLARI ---------- */
-const BG_FILES = ["arka-plan-1.jpg","arka-plan-2.jpg","arka-plan-3.jpg"];
-let bgList = [], bgIdx = 0;
-BG_FILES.forEach(f => { const i = new Image(); i.onload = () => { bgList.push(`url("${f}")`); if (bgList.length === 1) $('bgPhoto').style.backgroundImage = bgList[0]; }; i.src = f; });
-function switchBg(){ if (bgList.length){ bgIdx = (bgIdx+1)%bgList.length; $('bgPhoto').style.backgroundImage = bgList[bgIdx]; } else $('photoInput').click(); }
-$('photoInput').addEventListener('change', e => {
-  const fs = [...e.target.files]; if (!fs.length) return;
-  bgList = fs.map(f => `url("${URL.createObjectURL(f)}")`); bgIdx = 0; $('bgPhoto').style.backgroundImage = bgList[0];
-});
-
-/* ---------- HAVA DURUMU ÇİZGİ İKONLARI ---------- */
-const C_CLOSED = "M 74 128 A 26 26 0 1 1 80.4 76.8 A 38 38 0 0 1 156.0 80.1 A 24 24 0 1 1 154 128 Z";
-const C_OPEN   = "M 92 128 L 74 128 A 26 26 0 1 1 80.4 76.8 A 38 38 0 0 1 156.0 80.1 A 24 24 0 1 1 154 128 L 136 128";
-const cloudClosed = (tr="") => `<path d="${C_CLOSED}" fill="#000" stroke="#f5f5f7" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" transform="${tr}"/>`;
-const cloudOpen   = (tr="") => `<g transform="${tr}"><path d="${C_CLOSED}" fill="#000" stroke="none"/><path d="${C_OPEN}" fill="none" stroke="#f5f5f7" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
-
-function sunLines(cx, cy, r, r1, r2, sw=6.5){
-  let rays = "";
-  for (let i=0; i<8; i++){
-    const a = i * Math.PI / 4, ca = Math.cos(a), sa = Math.sin(a);
-    rays += `<line x1="${(cx+r1*ca).toFixed(1)}" y1="${(cy+r1*sa).toFixed(1)}" x2="${(cx+r2*ca).toFixed(1)}" y2="${(cy+r2*sa).toFixed(1)}"/>`;
-  }
-  return `<g stroke="#f3b23b" stroke-width="${sw}" stroke-linecap="round" fill="none"><circle cx="${cx}" cy="${cy}" r="${r}"/>${rays}</g>`;
-}
-function moonLines(cx, cy, s=1){
-  return `<g transform="translate(${cx},${cy}) scale(${s})" stroke="#f3b23b" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="#000">`+
-    `<path d="M 6 -27.3 A 28 28 0 1 0 27.3 6 A 22 22 0 0 1 6 -27.3 Z"/>`+
-    `<path d="M 16 -21 v 10 M 11 -16 h 10" stroke-width="4.5"/></g>`;
-}
-function bigSnowflake(cx, cy){
-  let g = "";
-  for (let i=0; i<6; i++){
-    g += `<g transform="rotate(${i*60} ${cx} ${cy})">`+
-         `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-46}"/>`+
-         `<polyline points="${cx-11},${cy-35} ${cx},${cy-25} ${cx+11},${cy-35}"/>`+
-         `</g>`;
-  }
-  return `<g stroke="#63a7cf" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">${g}</g>`;
+function toast(t){
+  const el = $('toast');
+  el.textContent = t;
+  el.classList.add('on');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => el.classList.remove('on'), 1600);
 }
 
-const GLOW = {
-  sun:'rgba(243,178,59,.11)', msunny:'rgba(243,178,59,.09)', pcloud:'rgba(243,178,59,.07)',
-  cloud:'rgba(245,245,247,.06)', fog:'rgba(245,245,247,.06)',
-  crain:'rgba(99,167,207,.09)', rain:'rgba(99,167,207,.10)', sleet:'rgba(99,167,207,.10)',
-  csnow:'rgba(99,167,207,.10)', snow:'rgba(99,167,207,.11)',
-  ctstorm:'rgba(243,178,59,.10)', tstorm:'rgba(243,178,59,.10)'
+/* ---------- RENK TEMALARI ---------- */
+const THEMES = {
+  red:   { n:'Kırmızı',    acc:[229,72,77],   core:[255,112,96],  far:[200,50,90],   arrow:[240,138,69], play:[217,119,36], clk:[245,245,247] },
+  amber: { n:'Kehribar',   acc:[255,176,0],   core:[255,205,100], far:[255,130,0],   arrow:[255,176,0],  play:[255,176,0],  clk:[255,191,71] },
+  ice:   { n:'Buz mavisi', acc:[64,196,255],  core:[150,225,255], far:[60,140,255],  arrow:[95,208,255], play:[76,195,255], clk:[191,234,255] },
+  green: { n:'Neon yeşil', acc:[57,255,120],  core:[150,255,185], far:[20,200,160],  arrow:[57,255,120], play:[57,255,120], clk:[168,255,198] },
+  synth: { n:'Synthwave',  acc:[255,60,200],  core:[255,140,230], far:[150,90,255],  arrow:[255,79,216], play:[182,107,255],clk:[255,155,236] },
+  white: { n:'Beyaz',      acc:[245,245,247], core:[255,255,255], far:[190,190,205], arrow:[255,255,255],play:[255,255,255],clk:[255,255,255] }
+};
+const THEME_ORDER = ['ice', 'red', 'amber', 'green', 'synth', 'white', 'auto'];
+const THEME_KEYS = ['acc', 'core', 'far', 'arrow', 'play', 'clk'];
+const cloneTheme = th => { const o = {}; THEME_KEYS.forEach(k => { o[k] = th[k].slice(); }); return o; };
+let themeKey = 'ice';
+try{ const sv = localStorage.getItem('theme'); if (sv && THEME_ORDER.includes(sv)) themeKey = sv; }catch{}
+let curTheme = cloneTheme(THEMES.ice), tweenRaf = 0;
+const TH = {
+  acc: '64,196,255', core: '150,225,255', far: '60,140,255', arrow: '245,158,11', clk: '191,234,255',
+  accA: [64,196,255], coreA: [150,225,255], farA: [60,140,255]
 };
 
-function bigArt(t, night){
-  const bolt = `<polyline points="122,102 106,129 122,129 108,156" fill="none" stroke="#f3b23b" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>`;
-  const b = {
-    sun: night ? moonLines(110, 95, 1.1) : sunLines(110, 95, 24, 35, 47, 6.5),
-    msunny: (night ? moonLines(134, 72, 0.85) : sunLines(134, 72, 22, 32, 42, 6)) + cloudClosed("translate(-12 22) scale(.76)"),
-    pcloud: (night ? moonLines(154, 66, 0.72) : sunLines(154, 66, 17, 25, 33, 5.5)) + cloudClosed("translate(-4 10)"),
-    cloud: cloudClosed("translate(-4 8)"),
-    fog: `<g stroke="#f5f5f7" stroke-width="6.5" stroke-linecap="round" fill="none">`+
-         `<path d="M 62 74 Q 86 64 110 74 T 158 74"/>`+
-         `<path d="M 62 96 Q 86 86 110 96 T 158 96"/>`+
-         `<path d="M 62 118 Q 86 108 110 118 T 158 118"/></g>`,
-    crain: cloudOpen("translate(-4 -4)") +
-           `<g stroke="#63a7cf" stroke-width="5.8" stroke-linecap="round">`+
-           `<line x1="94" y1="118" x2="89" y2="129"/><line x1="112" y1="118" x2="107" y2="129"/><line x1="130" y1="118" x2="125" y2="129"/>`+
-           `<line x1="88" y1="139" x2="83" y2="150"/><line x1="106" y1="139" x2="101" y2="150"/><line x1="124" y1="139" x2="119" y2="150"/></g>`,
-    rain: cloudOpen("translate(-4 -4)") +
-          `<g stroke="#63a7cf" stroke-width="6" stroke-linecap="round">`+
-          `<line x1="96" y1="116" x2="82" y2="152"/><line x1="114" y1="116" x2="100" y2="152"/><line x1="132" y1="116" x2="118" y2="152"/></g>`,
-    sleet: cloudOpen("translate(-4 -4)") +
-           `<g stroke="#63a7cf" stroke-width="5.8" stroke-linecap="round">`+
-           `<line x1="96" y1="116" x2="87" y2="138"/><line x1="114" y1="116" x2="105" y2="138"/><line x1="132" y1="116" x2="123" y2="138"/></g>`+
-           `<g fill="#63a7cf"><circle cx="83" cy="149" r="3.3"/><circle cx="101" cy="149" r="3.3"/><circle cx="119" cy="149" r="3.3"/></g>`,
-    csnow: cloudOpen("translate(-4 -4)") +
-           `<g stroke="#63a7cf" stroke-width="5.5" stroke-linecap="round" transform="translate(110 128)">`+
-           `<line x1="0" y1="-16" x2="0" y2="16"/><line x1="-13.9" y1="-8" x2="13.9" y2="8"/><line x1="-13.9" y1="8" x2="13.9" y2="-8"/></g>`,
-    snow: bigSnowflake(110, 95),
-    ctstorm: cloudOpen("translate(-4 -4)") + bolt,
-    tstorm: cloudOpen("translate(-4 -4)") + bolt +
-            `<g stroke="#63a7cf" stroke-width="5.5" stroke-linecap="round">`+
-            `<line x1="86" y1="128" x2="81" y2="140"/><line x1="98" y1="128" x2="93" y2="140"/>`+
-            `<line x1="130" y1="128" x2="125" y2="140"/><line x1="142" y1="128" x2="137" y2="140"/></g>`
-  }[t] || cloudClosed("translate(-4 8)");
-  return `<svg viewBox="0 0 220 185" width="220" height="185">${b}</svg>`;
+function applyThemeColors(c){
+  const r = a => a.map(v => Math.round(v)).join(',');
+  const root = document.documentElement.style;
+  root.setProperty('--acc', r(c.acc));
+  root.setProperty('--play', 'rgb(' + r(c.play) + ')');
+  root.setProperty('--clk', 'rgb(' + r(c.clk) + ')');
+  TH.acc = r(c.acc); TH.core = r(c.core); TH.far = r(c.far); TH.arrow = r(c.arrow); TH.clk = r(c.clk);
+  TH.accA = c.acc.slice(); TH.coreA = c.core.slice(); TH.farA = c.far.slice();
+  if (typeof drawTopCompass === 'function') drawTopCompass();
+  if (typeof drawRoadMap === 'function') drawRoadMap();
+}
+function resolveTheme(){
+  if (themeKey !== 'auto') return { t: THEMES[themeKey], night: false, label: THEMES[themeKey].n };
+  const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+  if (h >= 6.5 && h < 17.5) return { t: THEMES.ice, night: false, label: 'Buz mavisi' };
+  if (h >= 17.5 && h < 20.5) return { t: THEMES.amber, night: false, label: 'Kehribar' };
+  return { t: THEMES.amber, night: true, label: 'Kehribar' };
+}
+function setTheme(key, announce, instant){
+  themeKey = key;
+  try{ localStorage.setItem('theme', key); }catch{}
+  const r = resolveTheme();
+  $('dimLayer').style.opacity = r.night ? '0.20' : '0';
+  const target = r.t;
+  cancelAnimationFrame(tweenRaf);
+  if (instant){ curTheme = cloneTheme(target); applyThemeColors(curTheme); }
+  else {
+    const from = cloneTheme(curTheme), t0 = performance.now();
+    const step = () => {
+      const k = Math.min(1, (performance.now() - t0) / 650);
+      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      THEME_KEYS.forEach(n => { curTheme[n] = from[n].map((v, i) => v + (target[n][i] - v) * e); });
+      applyThemeColors(curTheme);
+      if (k < 1) tweenRaf = requestAnimationFrame(step);
+    };
+    tweenRaf = requestAnimationFrame(step);
+  }
+  if (announce) toast('Renk: ' + (key === 'auto' ? 'Otomatik (' + r.label + ')' : THEMES[key].n));
 }
 
-function setArt(t, night){
-  const a = $('art');
-  a.innerHTML = bigArt(t, night);
-  a.style.setProperty('--glow', night && t==='sun' ? 'rgba(243,178,59,.08)' : (GLOW[t] || GLOW.cloud));
+/* ---------- SAAT & MOLA MODU ---------- */
+let restMode = false, lastMoveAt = Date.now(), restRef = null, restSnoozeUntil = 0, clkLong = false, clkPress = 0;
+function tickClock(){
+  const n = new Date(), s = `${pad(n.getHours())}:${pad(n.getMinutes())}`;
+  $('miniClock').textContent = s;
+  if (restMode){
+    $('restClock').textContent = s;
+    $('restDate').textContent = `${DAYS[n.getDay()]} · ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
+  }
+}
+tickClock(); setInterval(tickClock, 4000);
+
+function enterRest(){
+  if (restMode) return;
+  restMode = true;
+  $('screen').classList.add('rest');
+  tickClock(); setFxState(); toast('Mola modu');
+}
+function exitRest(manual){
+  if (!restMode) return;
+  restMode = false;
+  $('screen').classList.remove('rest');
+  if (manual) restSnoozeUntil = Date.now() + 10 * 60 * 1000;
+  lastMoveAt = Date.now();
+  setFxState(); drawRoadMap();
+}
+{
+  const ck = $('miniClock');
+  ck.addEventListener('touchstart', () => {
+    clkLong = false; clearTimeout(clkPress);
+    clkPress = setTimeout(() => { clkLong = true; restMode ? exitRest(true) : enterRest(); }, 650);
+  }, { passive: true });
+  ['touchend','touchcancel','touchmove'].forEach(ev => ck.addEventListener(ev, () => clearTimeout(clkPress), { passive: true }));
+  ck.addEventListener('click', () => {
+    if (clkLong){ clkLong = false; return; }
+    setTheme(THEME_ORDER[(THEME_ORDER.indexOf(themeKey) + 1) % THEME_ORDER.length], true, false);
+  });
 }
 
-function wx(code){
-  if (code===0) return {label:"Açık ve güneşli", type:"sun"};
-  if (code===1) return {label:"Az bulutlu", type:"msunny"};
-  if (code===2) return {label:"Parçalı bulutlu", type:"pcloud"};
-  if (code===3) return {label:"Çok bulutlu", type:"cloud"};
-  if ([45,48].includes(code)) return {label:"Sisli", type:"fog"};
-  if ([51,53,55,61,80].includes(code)) return {label:"Hafif yağmurlu", type:"crain"};
-  if ([63,65,81,82].includes(code)) return {label:"Yağmurlu", type:"rain"};
-  if ([56,57,66,67].includes(code)) return {label:"Sulu kar", type:"sleet"};
-  if ([71,77,85].includes(code)) return {label:"Hafif kar yağışlı", type:"csnow"};
-  if ([73,75,86].includes(code)) return {label:"Kar yağışlı", type:"snow"};
-  if (code===95) return {label:"Gök gürültülü fırtına", type:"ctstorm"};
-  if ([96,99].includes(code)) return {label:"Fırtına ve sağanak", type:"tstorm"};
-  return {label:"Bulutlu", type:"cloud"};
+/* ---------- ARKA PLAN EFEKTLERİ (MOLA GÖKYÜZÜ & HIZ ÇİZGİLERİ) ---------- */
+const fxCv = $('fxCanvas'), fxCtx = fxCv.getContext('2d');
+const FDPR = Math.min(2, window.devicePixelRatio || 1);
+let fxCur = {}, fxSig = '', fxL = { stars: [], streaks: [] }, fxRaf = 0, fxLast = 0, speedLvl = 0, speedFlag = false;
+const fxT0 = performance.now();
+
+function fxSize(){
+  fxCv.width = Math.max(1, Math.round(fxCv.clientWidth * FDPR));
+  fxCv.height = Math.max(1, Math.round(fxCv.clientHeight * FDPR));
+  fxBuild(); fxKick();
+}
+function computeFx(){
+  const f = {};
+  if (restMode){ f.stars = { n: 110 }; f.aurora = true; }
+  return f;
+}
+function setFxState(){
+  const f = computeFx(), sig = JSON.stringify(f);
+  if (sig !== fxSig){ fxSig = sig; fxCur = f; fxBuild(); }
+  fxKick();
+}
+function newStreak(init){
+  const w = fxCv.width, side = Math.random() < 0.5 ? -1 : 1, ang = -0.6 + Math.random() * 1.5;
+  return { dx: side * Math.cos(ang), dy: Math.sin(ang), r: (init ? 0.15 + Math.random() * 0.6 : 0.15 + Math.random() * 0.1) * w,
+    v: (170 + Math.random() * 230) * FDPR, len: (30 + Math.random() * 60) * FDPR, a: 0.10 + Math.random() * 0.14 };
+}
+function fxBuild(){
+  const w = fxCv.width, h = fxCv.height, dp = FDPR, f = fxCur;
+  fxL = { stars: [], streaks: [] };
+  fxCtx.clearRect(0, 0, w, h);
+  if (f.stars){
+    for (let i = 0; i < f.stars.n; i++){
+      const vx = (1 + Math.random() * 3) * dp;
+      fxL.stars.push({ x: Math.random() * w, y: Math.random() * h, r: (0.5 + Math.random()) * dp, a: 0.25 + Math.random() * 0.35,
+        ph: Math.random() * 6.28, sp: 0.5 + Math.random() * 1.5, vx, vy: vx * 0.3 });
+    }
+  }
+  for (let i = 0; i < 24; i++) fxL.streaks.push(newStreak(true));
+}
+function fxHasLayers(){ return !!(fxCur.stars || fxCur.aurora); }
+function fxSpeedWanted(){
+  const fresh = Date.now() - fixTime < 6000;
+  if (fixSpeed >= 22.2 && fresh) speedFlag = true; else if (fixSpeed < 19 || !fresh) speedFlag = false;
+  return speedFlag;
+}
+function fxKick(){
+  if (fxRaf || document.hidden) return;
+  if (fxHasLayers() || speedLvl > 0.01 || fxSpeedWanted()) fxRaf = requestAnimationFrame(fxFrame);
+}
+function fxFrame(ts){
+  fxRaf = 0;
+  if (document.hidden) return;
+  if (fxLast && ts - fxLast < 33){ fxRaf = requestAnimationFrame(fxFrame); return; }
+  const dt = fxLast ? Math.min(0.1, (ts - fxLast) / 1000) : 0.033;
+  fxLast = ts;
+  const w = fxCv.width, h = fxCv.height, dp = FDPR, f = fxCur;
+  const t = (performance.now() - fxT0) / 1000;
+  speedLvl += ((fxSpeedWanted() ? 1 : 0) - speedLvl) * Math.min(1, dt * 0.9);
+  if (!fxHasLayers() && speedLvl < 0.01){ fxCtx.clearRect(0, 0, w, h); fxLast = 0; return; }
+  fxCtx.clearRect(0, 0, w, h);
+  if (f.aurora){
+    const g = fxCtx.createLinearGradient(0, h * 0.1, 0, h * 0.55);
+    g.addColorStop(0, `rgba(${TH.acc},0)`); g.addColorStop(0.5, `rgba(${TH.acc},0.10)`); g.addColorStop(1, `rgba(${TH.acc},0)`);
+    fxCtx.fillStyle = g; fxCtx.fillRect(0, h * 0.1, w, h * 0.45);
+  }
+  if (f.stars){
+    for (const s of fxL.stars){
+      s.x += s.vx * dt; s.y += s.vy * dt;
+      if (s.x > w + 2) s.x = -2; if (s.y > h + 2) s.y = -2;
+      fxCtx.fillStyle = `rgba(255,255,255,${(s.a * (0.55 + 0.45 * Math.sin(t * s.sp + s.ph))).toFixed(3)})`;
+      fxCtx.beginPath(); fxCtx.arc(s.x, s.y, s.r, 0, 6.2832); fxCtx.fill();
+    }
+  }
+  if (speedLvl > 0.01){
+    const cx = w * 0.5, cy = h * 0.48, maxR = Math.hypot(w, h) * 0.55;
+    fxCtx.lineCap = 'round'; fxCtx.lineWidth = 1.1 * dp;
+    for (const s of fxL.streaks){
+      s.r += s.v * dt;
+      const x1 = cx + s.dx * s.r, y1 = cy + s.dy * s.r;
+      if (x1 < -40 || x1 > w + 40 || y1 > h + 40 || y1 < -40 || s.r > maxR * 1.3){ Object.assign(s, newStreak(false)); continue; }
+      const len = s.len * (0.4 + s.r / maxR), fadeIn = Math.min(1, Math.max(0, (s.r - 0.18 * w) / (0.3 * w)));
+      fxCtx.strokeStyle = `rgba(${TH.core},${(s.a * speedLvl * fadeIn).toFixed(3)})`;
+      fxCtx.beginPath(); fxCtx.moveTo(x1, y1); fxCtx.lineTo(x1 + s.dx * len, y1 + s.dy * len); fxCtx.stroke();
+    }
+  }
+  fxRaf = requestAnimationFrame(fxFrame);
 }
 
-/* ---------- HARİTA (kuşbakışı, çevrimdışı destekli) ---------- */
+/* ---------- RADYO OYNATICI (GÖRSELDEKİ GİBİ TEK SATIR: ŞARKI - KANAL) ---------- */
+const SW = "https://playerservices.streamtheworld.com/api/livestream-redirect/";
+const STATIONS = [
+  { name: 'NIGHTRIDE FM',        defaultTrack: 'StockXL - Lunar Radio (Spacesynth 80)', url: 'https://stream.nightride.fm/nightride.mp3',   metaType: 'nightride', metaKey: 'nightride' },
+  { name: 'CHILLSYNTH FM',       defaultTrack: 'Midnight Horizon - Sunset Drift',         url: 'https://stream.nightride.fm/chillsynth.mp3',  metaType: 'nightride', metaKey: 'chillsynth' },
+  { name: 'DARKSYNTH FM',        defaultTrack: 'Neon Sector - Chrome Pulse',            url: 'https://stream.nightride.fm/darksynth.mp3',   metaType: 'nightride', metaKey: 'darksynth' },
+  { name: 'DATAWAVE FM',         defaultTrack: 'Vector Grid - Signal 84',               url: 'https://stream.nightride.fm/datawave.mp3',    metaType: 'nightride', metaKey: 'datawave' },
+  { name: 'SPACESYNTH FM',       defaultTrack: 'Starlight Cruiser - Orbit',             url: 'https://stream.nightride.fm/spacesynth.mp3',  metaType: 'nightride', metaKey: 'spacesynth' },
+  { name: 'NIGHTWAVE PLAZA',     defaultTrack: 'Vaporwave & Late Night Drive',          url: 'https://radio.plaza.one/mp3',                 metaType: 'plaza' },
+  { name: 'RADIO PARADISE',      defaultTrack: 'Eclectic Main Stream',                  url: 'https://stream.radioparadise.com/mp3-128',    metaType: 'rp',        metaKey: 0 },
+  { name: 'RP MELLOW MIX',       defaultTrack: 'Mellow & Chill Stream',                 url: 'https://stream.radioparadise.com/mellow-128', metaType: 'rp',        metaKey: 1 },
+  { name: 'RP ROCK MIX',         defaultTrack: 'Rock Mix Stream',                       url: 'https://stream.radioparadise.com/rock-128',   metaType: 'rp',        metaKey: 2 },
+  { name: 'FIP RADIO',           defaultTrack: 'Jazz, Soul & World Grooves',            url: 'https://icecast.radiofrance.fr/fip-midfi.mp3' },
+  { name: 'FIP ELECTRO',         defaultTrack: 'Downtempo & Electronic',                url: 'https://icecast.radiofrance.fr/fipelectro-midfi.mp3' },
+  { name: 'POWER FM',            defaultTrack: 'Türkiye · Yabancı Hit',                 url: 'https://listen.powerapp.com.tr/powerfm/mpeg/icecast.audio' },
+  { name: 'POWER TÜRK',          defaultTrack: 'Türkiye · Türkçe Pop',                  url: 'https://listen.powerapp.com.tr/powerturk/mpeg/icecast.audio' },
+  { name: 'VIRGIN RADIO TR',     defaultTrack: 'Türkiye · Pop & Hit',                   url: SW + 'VIRGIN_RADIO_TR.mp3' },
+  { name: 'METRO FM',            defaultTrack: 'Türkiye · Hit Müzik',                   url: SW + 'METRO_FM.mp3' },
+  { name: 'JOY TÜRK',            defaultTrack: 'Türkiye · Türkçe Slow',                 url: SW + 'JOY_TURK.mp3' }
+];
+
+let stIdx = 0, radioPlaying = false, metaTimer = null, metaAbort = null;
+const audioEl = $('radioAudio');
+let eqCtx = null, eqSrc = null, analyserNode = null, freqBuf = null;
+
+function renderStation(sub){
+  const st = STATIONS[stIdx];
+  const trk = $('rsTrack');
+  trk.textContent = sub || st.currentTrack || st.defaultTrack;
+  trk.classList.toggle('paused', !radioPlaying);
+  $('rsStation').textContent = st.name;
+  $('rsPlayBtn').textContent = radioPlaying ? '❚❚' : '▶';
+  $('rsPlayBtn').classList.toggle('active', radioPlaying);
+}
+renderStation();
+
+function cleanTrackTitle(raw, stationName){
+  if (!raw) return '';
+  const s = String(raw).replace(/\s+/g, ' ').trim();
+  if (!s || s.length < 2) return '';
+  const low = s.toLowerCase();
+  if (low === 'unknown' || low === '-' || low === stationName.toLowerCase()) return '';
+  return s;
+}
+
+async function fetchNowPlaying(){
+  const idx = stIdx, st = STATIONS[idx];
+  if (!radioPlaying || !st) return;
+  if (metaAbort) metaAbort.abort();
+  const ctrl = new AbortController();
+  metaAbort = ctrl;
+  let found = '';
+  try{
+    if (st.metaType === 'plaza'){
+      const d = await (await fetch('https://api.plaza.one/status', { signal: ctrl.signal })).json();
+      const s = d && d.song;
+      if (s && (s.artist || s.title)) found = [s.artist, s.title].filter(Boolean).join(' - ');
+    } else if (st.metaType === 'rp'){
+      const d = await (await fetch(`https://api.radioparadise.com/api/now_playing?chan=${st.metaKey ?? 0}`, { signal: ctrl.signal })).json();
+      if (d && (d.artist || d.title)) found = [d.artist, d.title].filter(Boolean).join(' - ');
+    } else if (st.metaType === 'nightride'){
+      const d = await (await fetch('https://stream.nightride.fm/status-json.xsl', { signal: ctrl.signal })).json();
+      const src = d && d.icestats && d.icestats.source;
+      const list = Array.isArray(src) ? src : (src ? [src] : []);
+      const hit = list.find(x => x.listenurl && x.listenurl.includes(`/${st.metaKey}.mp3`));
+      if (hit && hit.title) found = hit.title;
+    }
+  }catch{}
+  finally{ ctrl.abort(); }
+  const cleaned = cleanTrackTitle(found, st.name);
+  if (cleaned && idx === stIdx && radioPlaying){
+    st.currentTrack = cleaned;
+    renderStation();
+  }
+}
+
+function startMetaPolling(){
+  clearInterval(metaTimer);
+  fetchNowPlaying();
+  metaTimer = setInterval(fetchNowPlaying, 18000);
+}
+function stopMetaPolling(){
+  clearInterval(metaTimer);
+  if (metaAbort){ metaAbort.abort(); metaAbort = null; }
+}
+
+function ensureAudioAnalyser(){
+  try{
+    if (eqCtx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    eqCtx = new AC();
+    eqSrc = eqCtx.createMediaElementSource(audioEl);
+    analyserNode = eqCtx.createAnalyser();
+    analyserNode.fftSize = 256;
+    analyserNode.smoothingTimeConstant = 0.78;
+    freqBuf = new Uint8Array(analyserNode.frequencyBinCount);
+    eqSrc.connect(analyserNode);
+    analyserNode.connect(eqCtx.destination);
+  }catch{}
+}
+
+async function playCurrentStation(){
+  const st = STATIONS[stIdx];
+  stopMetaPolling();
+  ensureAudioAnalyser();
+  if (eqCtx && eqCtx.state === 'suspended') eqCtx.resume().catch(() => {});
+  audioEl.pause();
+  audioEl.src = st.url;
+  radioPlaying = true;
+  renderStation('Yayına bağlanıyor…');
+  try{
+    await audioEl.play();
+    renderStation();
+    startMetaPolling();
+    toast(st.name);
+  }catch{
+    radioPlaying = false;
+    stopMetaPolling();
+    renderStation();
+    toast('Yayın bağlanamadı');
+  }
+}
+
+function toggleRadio(){
+  if (radioPlaying){
+    audioEl.pause();
+    radioPlaying = false;
+    stopMetaPolling();
+    renderStation();
+    toast('Radyo durdu');
+  } else {
+    playCurrentStation();
+  }
+}
+
+function nextStation(){
+  stIdx = (stIdx + 1) % STATIONS.length;
+  renderStation();
+  if (radioPlaying) playCurrentStation();
+  else toast(STATIONS[stIdx].name);
+}
+
+function prevStation(){
+  stIdx = (stIdx - 1 + STATIONS.length) % STATIONS.length;
+  renderStation();
+  if (radioPlaying) playCurrentStation();
+  else toast(STATIONS[stIdx].name);
+}
+
+function openRadioModal(){
+  const list = $('stationList');
+  list.innerHTML = '';
+  STATIONS.forEach((st, idx) => {
+    const o = document.createElement('div');
+    o.className = 'opt' + (idx === stIdx ? ' cur' : '');
+    o.innerHTML = `<div class="opt-top"><span>${idx + 1}. ${st.name}</span><span class="opt-dist">${idx === stIdx && radioPlaying ? 'ÇALIYOR' : 'SEÇ'}</span></div><div class="opt-sub">${st.currentTrack || st.defaultTrack}</div>`;
+    o.onclick = () => { stIdx = idx; closeRadioModal(); playCurrentStation(); };
+    list.appendChild(o);
+  });
+  $('radioModal').classList.add('open');
+}
+function closeRadioModal(){ $('radioModal').classList.remove('open'); }
+
+/* ---------- EN ALT: YATAY SPEKTRUM EKOLAYZIRI ---------- */
+const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d');
+let eqRaf = null;
+const EQ_BARS = 88;
+const barLevels = new Float32Array(EQ_BARS);
+
+function eqSize(){
+  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * DPR));
+  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * DPR));
+}
+
+function renderEqLoop(ts){
+  if (document.hidden){ eqRaf = null; return; }
+  const w = eqCv.width, h = eqCv.height;
+  if (w && h){
+    const dp = DPR, t = (ts || performance.now()) * 0.001;
+    ectx.clearRect(0, 0, w, h);
+
+    let hasAudio = false;
+    if (radioPlaying && analyserNode && freqBuf){
+      analyserNode.getByteFrequencyData(freqBuf);
+      for (let i = 0; i < EQ_BARS; i++){
+        if (freqBuf[i % freqBuf.length] > 6){ hasAudio = true; break; }
+      }
+    }
+
+    const baseLineY = h * 0.48, maxUp = h * 0.40;
+    const cellW = w / EQ_BARS;
+    const barW = Math.max(1.4 * dp, cellW * 0.42);
+    const dotSize = Math.max(1.5 * dp, barW);
+
+    for (let i = 0; i < EQ_BARS; i++){
+      const nx = (i / (EQ_BARS - 1)) * 2 - 1;
+      const env = 0.55 + 0.45 * Math.cos(nx * Math.PI * 0.5);
+
+      let targetH = 0;
+      if (hasAudio){
+        const binIdx = Math.min(freqBuf.length - 1, Math.floor((i / EQ_BARS) * (freqBuf.length * 0.72)));
+        targetH = (freqBuf[binIdx] / 255) * maxUp * env;
+      } else if (radioPlaying){
+        const w1 = 0.5 + 0.5 * Math.sin(i * 0.42 - t * 6.5);
+        const w2 = 0.5 + 0.5 * Math.cos(i * 0.19 + t * 3.8);
+        const beat = 0.45 + 0.55 * Math.pow(0.5 + 0.5 * Math.sin(t * 7.4), 2);
+        targetH = (0.12 + 0.88 * w1 * w2 * beat) * maxUp * env;
+      } else {
+        const calm = 0.5 + 0.5 * Math.sin(i * 0.26 + t * 1.4);
+        targetH = (0.04 + 0.14 * calm) * maxUp * env;
+      }
+
+      barLevels[i] += (targetH - barLevels[i]) * (radioPlaying ? 0.26 : 0.12);
+      const val = Math.max(0, barLevels[i]);
+      const cx = (i + 0.5) * cellW;
+
+      ectx.fillStyle = `rgba(215, 238, 255, ${(radioPlaying ? 0.35 + 0.45 * (val / Math.max(1, maxUp)) : 0.24).toFixed(3)})`;
+      ectx.fillRect(cx - dotSize * 0.5, baseLineY - maxUp * 0.82 - dotSize * 0.5, dotSize, dotSize);
+
+      if (val > 0.6 * dp){
+        const barH = Math.min(maxUp, val);
+        ectx.fillStyle = `rgba(186, 232, 255, ${Math.min(0.95, 0.28 + (barH / maxUp) * 0.67).toFixed(3)})`;
+        ectx.fillRect(cx - barW * 0.5, baseLineY - barH * 0.35, barW, barH);
+      }
+
+      ectx.fillStyle = radioPlaying ? 'rgba(147, 221, 255, 0.36)' : 'rgba(147, 221, 255, 0.16)';
+      ectx.fillRect(cx - dotSize * 0.45, baseLineY + maxUp * 0.72 - dotSize * 0.45, dotSize * 0.9, dotSize * 0.9);
+    }
+  }
+  eqRaf = requestAnimationFrame(renderEqLoop);
+}
+function startEqAnim(){ if (!eqRaf) eqRaf = requestAnimationFrame(renderEqLoop); }
+
+/* ---------- ÜST PUSULA ŞERİDİ ---------- */
+const compCv = $('compassCanvas'), cctx = compCv.getContext('2d');
+const CARDINAL_MAP = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
+const INTER_MAP = { 45: 'NE', 135: 'SE', 225: 'SW', 315: 'NW' };
+let smoothCompassHead = 0;
+
+function compassSize(){
+  compCv.width = Math.max(1, Math.round(compCv.clientWidth * DPR));
+  compCv.height = Math.max(1, Math.round(compCv.clientHeight * DPR));
+  drawTopCompass();
+}
+
+function drawTopCompass(){
+  const w = compCv.width, h = compCv.height;
+  if (!w || !h) return;
+  const dp = DPR;
+  cctx.clearRect(0, 0, w, h);
+
+  const cx = w * 0.5;
+  const pxPerDeg = Math.max(3.1 * dp, w / 195);
+  const halfSpanDeg = Math.ceil((w * 0.5) / pxPerDeg) + 12;
+  const centerDeg = smoothCompassHead;
+  const startDeg = Math.floor((centerDeg - halfSpanDeg) / 5) * 5;
+  const endDeg = Math.ceil((centerDeg + halfSpanDeg) / 5) * 5;
+
+  const topFontPx = Math.max(8.5 * dp, h * 0.34);
+  const botFontPx = Math.max(6.8 * dp, h * 0.25);
+  const tickTopBase = topFontPx + 2.5 * dp;
+  const tickBotBase = h - botFontPx - 2.2 * dp;
+
+  cctx.lineCap = 'round';
+  cctx.textAlign = 'center';
+
+  for (let d = startDeg; d <= endDeg; d += 5){
+    const norm = ((d % 360) + 360) % 360;
+    const x = cx + (d - centerDeg) * pxPerDeg;
+    if (x < -28 * dp || x > w + 28 * dp) continue;
+
+    const isCard = norm in CARDINAL_MAP;
+    const isInter = norm in INTER_MAP;
+    const is15 = norm % 15 === 0;
+    const isCenter = Math.abs(d - centerDeg) < 2.6;
+
+    if (isCenter){
+      cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
+      cctx.textBaseline = 'top';
+      cctx.fillStyle = '#ff5252';
+      cctx.fillText('0', x, 0.5 * dp);
+    } else if (isCard){
+      cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
+      cctx.textBaseline = 'top';
+      cctx.fillStyle = '#f87171';
+      cctx.fillText(CARDINAL_MAP[norm], x, 0.5 * dp);
+    }
+
+    const tTop = (isCard || is15) ? tickTopBase : tickTopBase + 1.8 * dp;
+    const tBot = (isCard || is15) ? tickBotBase : tickBotBase - 1.2 * dp;
+    cctx.strokeStyle = isCard ? 'rgba(255, 105, 105, 0.85)' : (is15 ? 'rgba(235, 246, 255, 0.58)' : 'rgba(210, 234, 252, 0.30)');
+    cctx.lineWidth = (isCard ? 1.25 : (is15 ? 1.05 : 0.85)) * dp;
+    cctx.beginPath(); cctx.moveTo(x, tTop); cctx.lineTo(x, tBot); cctx.stroke();
+
+    cctx.font = `600 ${botFontPx}px 'Montserrat', sans-serif`;
+    cctx.textBaseline = 'bottom';
+    if (isCenter){ cctx.fillStyle = '#ff6b6b'; cctx.fillText(`${Math.round(((centerDeg % 360) + 360) % 360)}°`, x, h - 0.5 * dp); }
+    else if (isCard){ cctx.fillStyle = 'rgba(255, 120, 120, 0.92)'; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+    else if (isInter){ cctx.fillStyle = 'rgba(255, 120, 120, 0.88)'; cctx.fillText(INTER_MAP[norm], x, h - 0.5 * dp); }
+    else if (norm % 30 === 0){ cctx.fillStyle = 'rgba(255, 120, 120, 0.78)'; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+  }
+
+  cctx.strokeStyle = '#ff3b3b';
+  cctx.lineWidth = 1.5 * dp;
+  cctx.beginPath(); cctx.moveTo(cx, 1 * dp); cctx.lineTo(cx, h - 1 * dp); cctx.stroke();
+}
+
+/* ---------- ZOOM & AKILLI EĞİM ---------- */
+const ZOOM_STEPS = [
+  { meters: 150,  label: '150 M' },
+  { meters: 300,  label: '300 M' },
+  { meters: 500,  label: '500 M' },
+  { meters: 1000, label: '1.0 KM' },
+  { meters: 1500, label: '1.5 KM' },
+  { meters: 3000, label: '3.0 KM' }
+];
+let autoZoom = true, manualZoomIdx = 1, targetZoomMeters = 350, renderZoomMeters = 350;
+
+function computeAutoZoomMeters(speedMs, distToNextTurn){
+  const kmh = (speedMs || 0) * 3.6;
+  if (distToNextTurn != null && distToNextTurn < 260) return 260;
+  if (kmh < 35) return 320;
+  if (kmh < 65) return 550;
+  if (kmh < 88) return 1400;
+  return 2600;
+}
+
+let slopeRefLat = null, slopeRefLon = null, slopeRefAlt = null, smoothGrade = 0;
+function updateSlope(lat, lon, alt){
+  if (alt == null || !isFinite(alt)) return;
+  if (slopeRefLat === null){ slopeRefLat = lat; slopeRefLon = lon; slopeRefAlt = alt; return; }
+  const dMeters = distKm(slopeRefLat, slopeRefLon, lat, lon) * 1000;
+  if (dMeters >= 38){
+    const rawPct = Math.max(-25, Math.min(25, ((alt - slopeRefAlt) / dMeters) * 100));
+    smoothGrade = smoothGrade * 0.55 + rawPct * 0.45;
+    slopeRefLat = lat; slopeRefLon = lon; slopeRefAlt = alt;
+    const pill = $('gradePill');
+    if (Math.abs(smoothGrade) >= 3){
+      $('gradeText').textContent = `%${Math.round(Math.abs(smoothGrade))} ${smoothGrade > 0 ? '↑' : '↓'}`;
+      pill.classList.add('on');
+    } else pill.classList.remove('on');
+  }
+}
+
+/* ---------- HARİTA MOTORU + ÇEVRİMDIŞI DEPO ---------- */
 const roadCv = $('roadCanvas'), rctx = roadCv.getContext('2d');
 const DPR = Math.min(3, window.devicePixelRatio || 1);
-const ZOOM_STEPS = [
-  { meters: 150, label: '150 M' },
-  { meters: 300, label: '300 M' },
-  { meters: 500, label: '500 M' },
-  { meters: 750, label: '750 M' },
-  { meters: 1500, label: '1.5 KM' }
-];
-let zoomIdx = 1;
-const M_LAT = 110540;
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 const OVERPASS = [
   'https://overpass-api.de/api/interpreter',
   'https://z.overpass-api.de/api/interpreter',
@@ -425,9 +895,18 @@ const OVERPASS = [
 const HW_ALL  = 'motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|living_street';
 const HW_MAIN = 'motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link';
 
+const MAP_MODES = [
+  { k: 'aurora', n: 'Aurora + enerji' },
+  { k: 'plasma', n: 'Plazma' },
+  { k: 'arrow',  n: 'Ok akışı' },
+  { k: 'plain',  n: 'Sade' }
+];
+let mapModeIdx = 0;
+try{ const mv = parseInt(localStorage.getItem('mapmode'), 10); if (mv >= 0 && mv < MAP_MODES.length) mapModeIdx = mv; }catch{}
+
 let roadWays = [], roadAnchorSet = false, ancLat = 0, ancLon = 0, ancMLon = 111320;
-let roadFetchLat = null, roadFetchLon = null, roadFetchAt = 0, roadFetchRadiusKm = 1.3;
-let roadLastTryAt = 0, roadLoading = false, roadLoadStart = 0, roadRetryTimer = null, roadLastErr = '';
+let roadFetchLat = null, roadFetchLon = null, roadFetchAt = 0, roadFetchRadiusKm = 2.6;
+let roadLastTryAt = 0, roadLoading = false, roadLoadStart = 0, roadRetryTimer = null;
 let liveRaw = [], liveIndex = null;
 const loadedCells = new Map(), loadedLive = new Map();
 let targetLat = null, targetLon = null, renderLat = null, renderLon = null;
@@ -438,57 +917,67 @@ let pulsePhase = 0, lastDrawT = performance.now();
 function roadSize(){
   roadCv.width = Math.max(1, Math.round(roadCv.clientWidth * DPR));
   roadCv.height = Math.max(1, Math.round(roadCv.clientHeight * DPR));
+  fadeCache.w = 0;
   drawRoadMap();
+  compassSize();
+  eqSize();
+  fxSize();
 }
 
-/* --- Akıcı hareket: GPS saniyede 1 kez gelir, aradaki kareleri hız ve yönden tahmin ederek 60 fps çizer --- */
 function kickRoadAnim(){ if (!roadAnimRaf) roadAnimRaf = requestAnimationFrame(stepRoadAnim); }
 function stepRoadAnim(ts){
   roadAnimRaf = null;
   if (targetLat === null || targetLon === null) return;
   let tl = targetLat, tn = targetLon;
   const age = (Date.now() - fixTime) / 1000;
-  const driving = !manual && fixLat !== null && fixSpeed > 0.8 && age < 6;
+  const driving = fixLat !== null && fixSpeed > 0.8 && age < 6;
   if (driving){
     const a = Math.min(age, 3), hr = fixHead * Math.PI / 180;
     tl = fixLat + fixSpeed * a * Math.cos(hr) / M_LAT;
     tn = fixLon + fixSpeed * a * Math.sin(hr) / (111320 * Math.cos(tl * Math.PI / 180));
   }
   if (renderLat === null){
-    renderLat = tl; renderLon = tn; renderHeading = targetHeading; lastStepTs = ts || 0;
-    drawRoadMap();
+    renderLat = tl; renderLon = tn; renderHeading = targetHeading;
+    smoothCompassHead = targetHeading; renderZoomMeters = targetZoomMeters;
+    lastStepTs = ts || 0; drawRoadMap(); drawTopCompass();
     if (driving) kickRoadAnim();
     return;
   }
   const dt = lastStepTs ? Math.min(0.1, Math.max(0.001, (ts - lastStepTs) / 1000)) : 0.016;
   lastStepTs = ts || 0;
-  const k = 1 - Math.exp(-dt * 9), kh = 1 - Math.exp(-dt * 7);
+  const k = 1 - Math.exp(-dt * 9), kh = 1 - Math.exp(-dt * 7), kz = 1 - Math.exp(-dt * 3.2);
   const dLat = tl - renderLat, dLon = tn - renderLon;
   const dHead = ((targetHeading - renderHeading + 540) % 360) - 180;
-  const settled = Math.abs(dLat) < 1e-7 && Math.abs(dLon) < 1e-7 && Math.abs(dHead) < 0.25;
-  if (settled){ renderLat = tl; renderLon = tn; renderHeading = targetHeading; }
-  else {
+  const dComp = ((targetHeading - smoothCompassHead + 540) % 360) - 180;
+  const dZoom = targetZoomMeters - renderZoomMeters;
+  const settled = Math.abs(dLat) < 1e-7 && Math.abs(dLon) < 1e-7 && Math.abs(dHead) < 0.25 && Math.abs(dComp) < 0.25 && Math.abs(dZoom) < 0.5;
+  if (settled){
+    renderLat = tl; renderLon = tn; renderHeading = targetHeading;
+    smoothCompassHead = targetHeading; renderZoomMeters = targetZoomMeters;
+  } else {
     renderLat += dLat * k; renderLon += dLon * k;
     renderHeading = (renderHeading + dHead * kh + 360) % 360;
+    smoothCompassHead = (smoothCompassHead + dComp * kh + 360) % 360;
+    renderZoomMeters += dZoom * kz;
   }
-  drawRoadMap();
+  drawRoadMap(); drawTopCompass();
   if (driving || !settled) roadAnimRaf = requestAnimationFrame(stepRoadAnim); else lastStepTs = 0;
 }
 
-function handleZoomTap(e){
-  if (e) e.stopPropagation();
-  if (!roadWays.length && targetLat !== null && !roadLoading){
-    fetchRoadNetwork(targetLat, targetLon, true);
-    toast(roadLastErr ? 'Son hata: ' + roadLastErr : 'Yol yenileniyor…');
+$('mapStage').addEventListener('click', e => {
+  if (e.shiftKey || e.detail === 2){
+    if (autoZoom){ autoZoom = false; manualZoomIdx = 1; targetZoomMeters = ZOOM_STEPS[manualZoomIdx].meters; toast('Ölçek: ' + ZOOM_STEPS[manualZoomIdx].label); }
+    else if (manualZoomIdx < ZOOM_STEPS.length - 1){ manualZoomIdx++; targetZoomMeters = ZOOM_STEPS[manualZoomIdx].meters; toast('Ölçek: ' + ZOOM_STEPS[manualZoomIdx].label); }
+    else { autoZoom = true; targetZoomMeters = computeAutoZoomMeters(fixSpeed, lastDistToTurn); toast('Oto zoom'); }
+    kickRoadAnim();
     return;
   }
-  zoomIdx = (zoomIdx + 1) % ZOOM_STEPS.length;
-  $('roadZoomLbl').textContent = ZOOM_STEPS[zoomIdx].label;
+  mapModeIdx = (mapModeIdx + 1) % MAP_MODES.length;
+  try{ localStorage.setItem('mapmode', String(mapModeIdx)); }catch{}
   drawRoadMap();
-  toast('Görüş: ' + ZOOM_STEPS[zoomIdx].label);
-}
+  toast('Rota modu: ' + MAP_MODES[mapModeIdx].n);
+});
 
-/* --- Telefon deposu (IndexedDB) --- */
 let idbP = null;
 function idb(){
   if (idbP) return idbP;
@@ -518,7 +1007,6 @@ const idbDel = (s, k) => idbOp(s, 'readwrite', o => o.delete(k));
 const idbKeys = s => idbOp(s, 'readonly', o => o.getAllKeys());
 const idbClear = s => idbOp(s, 'readwrite', o => o.clear());
 
-/* --- Yol verisi: ham biçim (enlem/boylam düz dizi) ve yerel (metre) biçim --- */
 function rawFromElements(els){
   const out = [];
   for (const el of els){
@@ -554,7 +1042,7 @@ function toLocal(w, lat, lon, mLon){
 }
 function rebuildLocal(lat, lon){
   const cosL = Math.max(0.2, Math.cos(lat * Math.PI / 180)), mLon = 111320 * cosL;
-  const R = 0.03, RL = R / cosL;
+  const R = 0.055, RL = R / cosL;
   const seen = new Set(), out = [];
   const add = arr => {
     for (const w of arr){
@@ -569,18 +1057,14 @@ function rebuildLocal(lat, lon){
   for (const a of loadedLive.values()) add(a);
   for (const a of loadedCells.values()) add(a);
   ancLat = lat; ancLon = lon; ancMLon = mLon; roadAnchorSet = true;
-  roadWays = out;
-  projectNavRoute();
-  drawRoadMap();
+  roadWays = out; projectNavRoute(); drawRoadMap();
 }
 
-/* --- Önbellekten yükleme --- */
 const CELL = 0.25;
 let lastCacheLat = null, lastCacheLon = null, cacheBusy = false;
 async function loadCaches(lat, lon){
   let changed = false;
-  const iy0 = Math.floor(lat / CELL), ix0 = Math.floor(lon / CELL);
-  const need = new Set();
+  const iy0 = Math.floor(lat / CELL), ix0 = Math.floor(lon / CELL), need = new Set();
   for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) need.add((iy0 + dy) + '_' + (ix0 + dx));
   for (const k of [...loadedCells.keys()]) if (!need.has(k)){ loadedCells.delete(k); changed = true; }
   for (const k of need){
@@ -591,24 +1075,19 @@ async function loadCaches(lat, lon){
   const keep = new Set();
   for (const e of liveIndex){
     const [a, b] = e.k.split('_').map(Number);
-    if (Math.abs(a - lat) < 0.03 && Math.abs(b - lon) < 0.04){
+    if (Math.abs(a - lat) < 0.055 && Math.abs(b - lon) < 0.07){
       keep.add(e.k);
-      if (!loadedLive.has(e.k)){
-        try{ const r = await idbGet('live', e.k); if (r && r.ways){ loadedLive.set(e.k, r.ways); changed = true; } }catch{}
-      }
+      if (!loadedLive.has(e.k)){ try{ const r = await idbGet('live', e.k); if (r && r.ways){ loadedLive.set(e.k, r.ways); changed = true; } }catch{} }
     }
   }
   for (const k of [...loadedLive.keys()]) if (!keep.has(k)){ loadedLive.delete(k); changed = true; }
   return changed;
 }
 function ensureLocal(lat, lon){
-  if (!roadAnchorSet || distKm(ancLat, ancLon, lat, lon) > 1.2) rebuildLocal(lat, lon);
-  if (!cacheBusy && (lastCacheLat === null || distKm(lastCacheLat, lastCacheLon, lat, lon) > 0.5)){
+  if (!roadAnchorSet || distKm(ancLat, ancLon, lat, lon) > 1.8) rebuildLocal(lat, lon);
+  if (!cacheBusy && (lastCacheLat === null || distKm(lastCacheLat, lastCacheLon, lat, lon) > 0.7)){
     cacheBusy = true; lastCacheLat = lat; lastCacheLon = lon;
-    loadCaches(lat, lon)
-      .then(ch => { if (ch) rebuildLocal(targetLat !== null ? targetLat : lat, targetLon !== null ? targetLon : lon); })
-      .catch(() => {})
-      .then(() => { cacheBusy = false; });
+    loadCaches(lat, lon).then(ch => { if (ch) rebuildLocal(targetLat !== null ? targetLat : lat, targetLon !== null ? targetLon : lon); }).catch(() => {}).then(() => { cacheBusy = false; });
   }
 }
 async function saveLive(lat, lon, raw){
@@ -618,12 +1097,11 @@ async function saveLive(lat, lon, raw){
     if (liveIndex === null) liveIndex = (await idbGet('meta', 'liveIndex')) || [];
     liveIndex = liveIndex.filter(e => e.k !== k);
     liveIndex.push({ k, t: Date.now() });
-    while (liveIndex.length > 120){ const old = liveIndex.shift(); await idbDel('live', old.k); loadedLive.delete(old.k); }
+    while (liveIndex.length > 140){ const old = liveIndex.shift(); await idbDel('live', old.k); loadedLive.delete(old.k); }
     await idbPut('meta', 'liveIndex', liveIndex);
   }catch{}
 }
 
-/* --- Overpass --- */
 function firstOk(list){
   return new Promise((resolve, reject) => {
     let left = list.length; const errs = [];
@@ -631,32 +1109,20 @@ function firstOk(list){
   });
 }
 function overpassQuery(lat, lon, kinds, d, extras){
-  const cosLat = Math.max(0.2, Math.cos(lat * Math.PI / 180));
-  const dLon = d / cosLat;
+  const cosLat = Math.max(0.2, Math.cos(lat * Math.PI / 180)), dLon = d / cosLat;
   const box = `${(lat-d).toFixed(5)},${(lon-dLon).toFixed(5)},${(lat+d).toFixed(5)},${(lon+dLon).toFixed(5)}`;
   let body = `way["highway"~"^(${kinds})$"](${box});`;
   if (extras) body += `way["railway"="rail"](${box});way["waterway"="river"](${box});way["natural"="coastline"](${box});`;
-  return `[out:json][timeout:20];(${body});out body geom;`;
+  return `[out:json][timeout:22];(${body});out body geom;`;
 }
 async function overpassGet(q){
   const ctrls = OVERPASS.map(() => new AbortController());
-  const killer = setTimeout(() => ctrls.forEach(c => c.abort()), 18000);
+  const killer = setTimeout(() => ctrls.forEach(c => c.abort()), 19000);
   try{
-    return await firstOk(OVERPASS.map((ep, i) => {
-      const hp = ep.split('/')[2].split('.'); const host = hp[0] === 'overpass' ? hp[1] : hp[0];
-      return fetch(`${ep}?data=${encodeURIComponent(q)}`, { signal: ctrls[i].signal })
-        .then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
-        .then(d => {
-          if (!d || !Array.isArray(d.elements)) throw new Error('bozuk cevap');
-          if (!d.elements.length && d.remark) throw new Error('sunucu zaman aşımı');
-          return d;
-        })
-        .catch(e => { throw new Error(host + ': ' + (e && e.name === 'AbortError' ? 'süre doldu' : (e && e.message) || 'hata')); });
-    }));
-  } finally {
-    clearTimeout(killer);
-    ctrls.forEach(c => c.abort());
-  }
+    return await firstOk(OVERPASS.map((ep, i) => fetch(`${ep}?data=${encodeURIComponent(q)}`, { signal: ctrls[i].signal })
+      .then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+      .then(d => { if (!d || !Array.isArray(d.elements)) throw new Error('bozuk cevap'); if (!d.elements.length && d.remark) throw new Error('sunucu zaman aşımı'); return d; })));
+  } finally { clearTimeout(killer); ctrls.forEach(c => c.abort()); }
 }
 let dlRot = 0;
 async function overpassSeq(q, ms){
@@ -670,9 +1136,8 @@ async function overpassSeq(q, ms){
       const d = await r.json();
       if (!d || !Array.isArray(d.elements)) throw new Error('bozuk cevap');
       if (!d.elements.length && d.remark) throw new Error('zaman aşımı');
-      clearTimeout(tm); dlRot = (dlRot + i) % OVERPASS.length;
-      return d;
-    }catch(e){ clearTimeout(tm); errs.push(e && e.name === 'AbortError' ? 'süre doldu' : (e && e.message) || 'hata'); }
+      clearTimeout(tm); dlRot = (dlRot + i) % OVERPASS.length; return d;
+    }catch(e){ clearTimeout(tm); errs.push(e && e.message); }
   }
   throw new Error(errs.join(' | '));
 }
@@ -680,89 +1145,61 @@ async function overpassSeq(q, ms){
 async function fetchRoadNetwork(lat, lon, force=false){
   if (lat == null || lon == null) return;
   ensureLocal(lat, lon);
-  const now = Date.now();
-  const moved = roadFetchLat !== null ? distKm(roadFetchLat, roadFetchLon, lat, lon) : 99;
+  const now = Date.now(), moved = roadFetchLat !== null ? distKm(roadFetchLat, roadFetchLon, lat, lon) : 99;
   if (!force && liveRaw.length && moved < roadFetchRadiusKm * 0.45 && now - roadFetchAt < 300000) return;
   if (roadLoading && now - roadLoadStart < 60000) return;
   if (!force && now - roadLastTryAt < 8000) return;
-
   clearTimeout(roadRetryTimer);
   roadLoading = true; roadLoadStart = now; roadLastTryAt = now;
-  if (!roadWays.length) $('roadStatus').textContent = 'YÜKLENİYOR';
 
-  let data = null, radius = 1.3;
-  const tiers = [[HW_ALL + '|service', 0.018, 2, true], [HW_ALL, 0.012, 1.3, true], [HW_MAIN, 0.018, 2, true], [HW_MAIN, 0.008, 0.9, false]];
-  const errs = [];
-  for (const [kinds, d, r, ex] of tiers){
-    try{ data = await overpassGet(overpassQuery(lat, lon, kinds, d, ex)); radius = r; break; }
-    catch(e){ errs.push(e.message); }
+  let data = null, radius = 2.6;
+  for (const [kinds, d, r, ex] of [[HW_ALL, 0.024, 2.6, true], [HW_MAIN, 0.032, 3.5, true], [HW_MAIN, 0.014, 1.5, false]]){
+    try{ data = await overpassGet(overpassQuery(lat, lon, kinds, d, ex)); radius = r; break; }catch{}
   }
-
   if (!data){
-    roadLastErr = errs[errs.length - 1] || 'bilinmeyen';
-    $('roadStatus').textContent = roadWays.length ? 'ÇEVRİMDIŞI' : ('AĞ ' + roadLastErr.replace(/ \| /g, ' · ')).slice(0, 110);
-    roadRetryTimer = setTimeout(() => {
-      if (targetLat !== null && targetLon !== null) fetchRoadNetwork(targetLat, targetLon, true);
-    }, 15000);
-    roadLoading = false;
-    return;
+    roadRetryTimer = setTimeout(() => { if (targetLat !== null && targetLon !== null) fetchRoadNetwork(targetLat, targetLon, true); }, 15000);
+    roadLoading = false; return;
   }
-
   try{
     const raw = rawFromElements(data.elements);
-    liveRaw = raw;
-    roadFetchLat = lat; roadFetchLon = lon; roadFetchAt = Date.now(); roadFetchRadiusKm = radius;
-    roadLastErr = '';
+    liveRaw = raw; roadFetchLat = lat; roadFetchLon = lon; roadFetchAt = Date.now(); roadFetchRadiusKm = radius;
     rebuildLocal(targetLat !== null ? targetLat : lat, targetLon !== null ? targetLon : lon);
-    $('roadStatus').textContent = roadWays.length ? '' : 'YOL BULUNAMADI';
     saveLive(lat, lon, raw);
-  }catch(e){
-    roadLastErr = 'işleme: ' + (e && e.message);
-    $('roadStatus').textContent = ('HATA ' + roadLastErr).slice(0, 60);
-  }finally{
-    roadLoading = false;
-  }
+  }finally{ roadLoading = false; }
 }
 
 /* --- Çevrimdışı indirme: İzmir · Aydın · Muğla --- */
 const REGION_BOX = [[37.8, 39.4, 26.1, 28.4], [37.5, 38.2, 27.2, 28.9], [36.5, 37.6, 27.3, 29.5]];
 function regionCells(){
   const seen = new Set(), list = [];
-  for (const [a, b, c, d] of REGION_BOX){
+  for (const [a, b, c, d] of REGION_BOX)
     for (let iy = Math.floor(a / CELL); iy <= Math.floor(b / CELL); iy++)
       for (let ix = Math.floor(c / CELL); ix <= Math.floor(d / CELL); ix++){
         const k = iy + '_' + ix;
         if (!seen.has(k)){ seen.add(k); list.push([iy, ix]); }
       }
-  }
   return list;
 }
 function cellQuery(iy, ix){
-  const s = (iy * CELL).toFixed(4), w = (ix * CELL).toFixed(4), n = ((iy + 1) * CELL).toFixed(4), e = ((ix + 1) * CELL).toFixed(4);
-  const box = `${s},${w},${n},${e}`;
+  const box = `${(iy * CELL).toFixed(4)},${(ix * CELL).toFixed(4)},${((iy + 1) * CELL).toFixed(4)},${((ix + 1) * CELL).toFixed(4)}`;
   return `[out:json][timeout:80];(way["highway"~"^(${HW_MAIN})$"](${box});way["railway"="rail"](${box});way["waterway"="river"](${box});way["natural"="coastline"](${box}););out body geom;`;
 }
 let dlRunning = false, dlCancel = false;
-function setDl(text, frac){
-  $('dlText').textContent = text;
-  if (frac != null) $('dlBar').style.width = Math.round(frac * 100) + '%';
-}
+function setDl(text, frac){ $('dlText').textContent = text; if (frac != null) $('dlBar').style.width = Math.round(frac * 100) + '%'; }
 async function storageInfo(){
   try{
     const n = (await idbKeys('cells')).length, tot = regionCells().length;
     let mb = '';
     if (navigator.storage && navigator.storage.estimate){ const e = await navigator.storage.estimate(); mb = ' · ' + Math.round((e.usage || 0) / 1048576) + ' MB'; }
-    $('dlInfo').textContent = `Telefonda: ${n}/${tot} bölge${mb}`;
+    $('dlInfo').textContent = `${n}/${tot} bölge${mb}`;
     if (!dlRunning) $('dlBar').style.width = Math.round(n / tot * 100) + '%';
-  }catch{ $('dlInfo').textContent = 'Telefon deposu kullanılamıyor'; }
+  }catch{ $('dlInfo').textContent = 'Depo kapalı'; }
 }
 async function toggleDownload(){
   if (dlRunning){ dlCancel = true; setDl('Durduruluyor…'); return; }
   let have;
-  try{ have = new Set(await idbKeys('cells')); }
-  catch{ setDl('Telefon deposu kullanılamıyor (Özel gezinme açık olabilir)'); return; }
+  try{ have = new Set(await idbKeys('cells')); }catch{ setDl('Telefon deposu kullanılamıyor'); return; }
   dlRunning = true; dlCancel = false; $('dlBtn').textContent = 'Durdur';
-  try{ if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch{}
   const cells = regionCells();
   let done = cells.filter(([y, x]) => have.has(y + '_' + x)).length, failed = 0;
   setDl(`${done}/${cells.length} hazır`, done / cells.length);
@@ -773,7 +1210,7 @@ async function toggleDownload(){
     let ok = false;
     for (let tries = 0; tries < 3 && !ok && !dlCancel; tries++){
       try{
-        setDl(`İndiriliyor ${done + 1}/${cells.length}` + (tries ? ` (deneme ${tries + 1})` : ''), done / cells.length);
+        setDl(`İndiriliyor ${done + 1}/${cells.length}`, done / cells.length);
         const data = await overpassSeq(cellQuery(iy, ix), 90000);
         await idbPut('cells', key, { t: Date.now(), ways: rawFromElements(data.elements) });
         ok = true; done++;
@@ -783,11 +1220,8 @@ async function toggleDownload(){
     await sleep(400);
   }
   dlRunning = false; $('dlBtn').textContent = 'İndir';
-  if (dlCancel) setDl(`Durduruldu: ${done}/${cells.length} hazır`, done / cells.length);
-  else if (failed) setDl(`${done}/${cells.length} hazır, ${failed} bölge inmedi. Tekrar İndir'e bas`, done / cells.length);
-  else setDl(`İndirme tamam: ${done}/${cells.length} bölge`, 1);
-  storageInfo();
-  lastCacheLat = null;
+  setDl(dlCancel ? `Durduruldu: ${done}/${cells.length} hazır` : (failed ? `${done}/${cells.length} hazır, ${failed} inmedi` : `İndirme tamam: ${done}/${cells.length} bölge`), done / cells.length);
+  storageInfo(); lastCacheLat = null;
   if (targetLat !== null) ensureLocal(targetLat, targetLon);
 }
 async function clearOffline(){
@@ -798,36 +1232,26 @@ async function clearOffline(){
   if (targetLat !== null) rebuildLocal(targetLat, targetLon);
 }
 
-/* ---------- ADRES ARAMA & MİNİMAL ROTA YÖNLENDİRME (OSRM + PHOTON) ---------- */
-let navRoute = null; // { destName, destLat, destLon, coords, localPts, cum, totalLen, steps, lastSeg }
-let lastChimeStep = -1, lastRerouteAt = 0, navRerouting = false, navAudioCtx = null;
+/* ---------- ROTA & NAVİGASYON ---------- */
+let navRoute = null, lastDistToTurn = null, lastChimeStep = -1, lastRerouteAt = 0, navRerouting = false, navAudioCtx = null;
 let navSearchTimer = null, navRecent = [];
-let navHudIco = '', navHudTxt = '';
 try{ navRecent = JSON.parse(localStorage.getItem('nav_recent') || '[]') || []; }catch{ navRecent = []; }
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const TURN_SVGS = {
-  'straight':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V5"/><polyline points="7 10 12 5 17 10"/></svg>',
-  'right':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20v-7a4 4 0 0 1 4-4h8"/><polyline points="15 5 19 9 15 13"/></svg>',
-  'slight-right': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20v-5.5a4 4 0 0 1 1.2-2.8L17 5"/><polyline points="11 5 17 5 17 11"/></svg>',
-  'sharp-right':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V8l10 10"/><polyline points="11 18 17 18 17 12"/></svg>',
-  'left':         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-7a4 4 0 0 0-4-4H5"/><polyline points="9 5 5 9 9 13"/></svg>',
-  'slight-left':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 20v-5.5a4 4 0 0 0-1.2-2.8L7 5"/><polyline points="13 5 7 5 7 11"/></svg>',
-  'sharp-left':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20V8L7 18"/><polyline points="13 18 7 18 7 12"/></svg>',
-  'uturn':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V9a4 4 0 0 0-8 0v8"/><polyline points="4 13 8 17 12 13"/></svg>',
-  'roundabout':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="4"/><path d="M12 20v-5"/><path d="M15 8l4-4"/><polyline points="15 4 19 4 19 8"/></svg>',
-  'arrive':       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 1 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>'
+  'straight':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V5"/><polyline points="7 10 12 5 17 10"/></svg>',
+  'right':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20v-7a4 4 0 0 1 4-4h8"/><polyline points="15 5 19 9 15 13"/></svg>',
+  'slight-right': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20v-5.5a4 4 0 0 1 1.2-2.8L17 5"/><polyline points="11 5 17 5 17 11"/></svg>',
+  'sharp-right':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V8l10 10"/><polyline points="11 18 17 18 17 12"/></svg>',
+  'left':         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-7a4 4 0 0 0-4-4H5"/><polyline points="9 5 5 9 9 13"/></svg>',
+  'slight-left':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 20v-5.5a4 4 0 0 0-1.2-2.8L7 5"/><polyline points="13 5 7 5 7 11"/></svg>',
+  'sharp-left':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20V8L7 18"/><polyline points="13 18 7 18 7 12"/></svg>',
+  'uturn':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V9a4 4 0 0 0-8 0v8"/><polyline points="4 13 8 17 12 13"/></svg>',
+  'roundabout':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="4"/><path d="M12 20v-5"/><path d="M15 8l4-4"/><polyline points="15 4 19 4 19 8"/></svg>',
+  'arrive':       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 1 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>'
 };
 
-// Yönlendirme göstergesi: sadece değişince DOM'a yazar
-function setNavHud(ico, txt){
-  if (ico !== navHudIco){ navHudIco = ico; $('navIcon').innerHTML = TURN_SVGS[ico] || TURN_SVGS.straight; }
-  if (txt !== navHudTxt){ navHudTxt = txt; $('navTurnDist').textContent = txt; }
-}
-
 function parseManeuverIcon(step){
-  const m = step.maneuver || {};
-  const t = m.type || '', mod = m.modifier || '';
+  const m = step.maneuver || {}, t = m.type || '', mod = m.modifier || '';
   if (t === 'arrive') return 'arrive';
   if (t === 'roundabout' || t === 'rotary' || t === 'roundabout turn') return 'roundabout';
   if (t === 'exit roundabout' || t === 'exit rotary') return 'slight-right';
@@ -838,357 +1262,212 @@ function parseManeuverIcon(step){
   if (mod === 'sharp left') return 'sharp-left';
   if (mod === 'left') return 'left';
   if (mod === 'slight left') return 'slight-left';
-  if (t === 'merge') return 'slight-left';
-  if (t === 'on ramp') return 'slight-right';
   return 'straight';
 }
-
 function fmtNavDist(m){
   if (m >= 10000) return `${Math.round(m / 1000)} KM`;
   if (m >= 1000) return `${(m / 1000).toFixed(1)} KM`;
   if (m >= 100) return `${Math.round(m / 10) * 10} M`;
   return `${Math.max(5, Math.round(m / 5) * 5)} M`;
 }
-
-const metricCache = {};
-function setMetric(id, txt){ if (metricCache[id] !== txt){ metricCache[id] = txt; $(id).textContent = txt; } }
-function fmtRemKm(m){
-  if (m == null || !isFinite(m)) return '--';
-  if (m < 1000) return `${Math.max(0, Math.round(m))} m`;
-  const km = m / 1000;
-  return km >= 100 ? `${Math.round(km)} km` : `${km.toFixed(1)} km`;
-}
-function fmtEta(sec){
-  if (sec == null || !isFinite(sec)) return '--';
-  const mins = Math.max(1, Math.round(sec / 60));
+function fmtRouteSummary(remM, remSec){
+  const distStr = remM < 1000 ? `${Math.max(0, Math.round(remM))} M` : `${(remM / 1000 >= 100 ? Math.round(remM / 1000) : (remM / 1000).toFixed(1))} KM`;
+  const mins = Math.max(1, Math.round((remSec || 0) / 60));
   const h = Math.floor(mins / 60), m = mins % 60;
-  const durStr = h > 0 ? (m > 0 ? `${h} sa ${m} dk` : `${h} sa`) : `${m} dk`;
+  const durStr = h > 0 ? (m > 0 ? `${h} SA ${m} DK` : `${h} SA`) : `${m} DK`;
   const arr = new Date(Date.now() + mins * 60000);
-  return `${durStr} · ${pad(arr.getHours())}:${pad(arr.getMinutes())}`;
+  return `${distStr} · ${durStr} · ${pad(arr.getHours())}:${pad(arr.getMinutes())}`;
 }
-function snapToPolyline(px, py, pts, cum, from = 0, to = pts.length - 1){
-  let bestDSq = Infinity, bestSeg = from, bestT = 0, bestX = pts[from][0], bestY = pts[from][1];
-  for (let i = from; i < to; i++){
+function snapToPolyline(px, py, pts, cum){
+  let bestDSq = Infinity, bestSeg = 0, bestT = 0, bestX = pts[0][0], bestY = pts[0][1];
+  for (let i = 0; i < pts.length - 1; i++){
     const ax = pts[i][0], ay = pts[i][1], bx = pts[i+1][0], by = pts[i+1][1];
     const dx = bx - ax, dy = by - ay, l2 = dx*dx + dy*dy;
     let t = l2 > 0 ? ((px - ax)*dx + (py - ay)*dy) / l2 : 0;
     t = Math.max(0, Math.min(1, t));
-    const cx = ax + t*dx, cy = ay + t*dy;
-    const dSq = (px - cx)*(px - cx) + (py - cy)*(py - cy);
+    const cx = ax + t*dx, cy = ay + t*dy, dSq = (px - cx)*(px - cx) + (py - cy)*(py - cy);
     if (dSq < bestDSq){ bestDSq = dSq; bestSeg = i; bestT = t; bestX = cx; bestY = cy; }
   }
-  const segLen = cum[bestSeg + 1] - cum[bestSeg];
-  return {
-    pt: [bestX, bestY],
-    seg: bestSeg,
-    t: bestT,
-    along: cum[bestSeg] + bestT * segLen,
-    offDist: Math.sqrt(bestDSq)
-  };
+  return { pt: [bestX, bestY], seg: bestSeg, t: bestT, along: cum[bestSeg] + bestT * (cum[bestSeg + 1] - cum[bestSeg]), offDist: Math.sqrt(bestDSq) };
 }
-
 function projectNavRoute(){
   if (!navRoute || !roadAnchorSet) return;
   const pts = navRoute.coords.map(([la, lo]) => [(lo - ancLon) * ancMLon, (la - ancLat) * M_LAT]);
   const cum = [0];
-  for (let i = 1; i < pts.length; i++){
-    cum.push(cum[i-1] + Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]));
-  }
-  navRoute.localPts = pts;
-  navRoute.cum = cum;
-  navRoute.totalLen = Math.max(1, cum[cum.length - 1]);
-
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i-1] + Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]));
+  navRoute.localPts = pts; navRoute.cum = cum; navRoute.totalLen = Math.max(1, cum[cum.length - 1]);
   navRoute.steps.forEach((st, idx) => {
     if (idx === navRoute.steps.length - 1){ st.along = navRoute.totalLen; st.xy = pts[pts.length - 1]; return; }
-    const sx = (st.lon - ancLon) * ancMLon, sy = (st.lat - ancLat) * M_LAT;
-    const sn = snapToPolyline(sx, sy, pts, cum);
-    st.along = sn.along;
-    st.xy = sn.pt;
+    const sn = snapToPolyline((st.lon - ancLon) * ancMLon, (st.lat - ancLat) * M_LAT, pts, cum);
+    st.along = sn.along; st.xy = sn.pt;
   });
 }
-
 function playTurnChime(){
   try{
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     if (!navAudioCtx) navAudioCtx = new AC();
     if (navAudioCtx.state === 'suspended') navAudioCtx.resume();
     const now = navAudioCtx.currentTime;
     [587.33, 880].forEach((freq, i) => {
       const osc = navAudioCtx.createOscillator(), g = navAudioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + i * 0.13);
-      g.gain.setValueAtTime(0.001, now + i * 0.13);
-      g.gain.exponentialRampToValueAtTime(0.14, now + i * 0.13 + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.13 + 0.22);
-      osc.connect(g); g.connect(navAudioCtx.destination);
-      osc.start(now + i * 0.13); osc.stop(now + i * 0.13 + 0.24);
+      osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + i * 0.13);
+      g.gain.setValueAtTime(0.001, now + i * 0.13); g.gain.exponentialRampToValueAtTime(0.13, now + i * 0.13 + 0.02); g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.13 + 0.22);
+      osc.connect(g); g.connect(navAudioCtx.destination); osc.start(now + i * 0.13); osc.stop(now + i * 0.13 + 0.24);
     });
   }catch{}
 }
-
 function syncNavUiState(){
   const active = !!navRoute;
-  $('navHud').classList.toggle('on', active && !aheadShown);
-  $('navOpenBtn').classList.toggle('on', active);
-  $('roadWrap').classList.toggle('navon', active);
+  $('navHud').classList.toggle('on', active);
+  $('sigRoute').classList.toggle('on', active);
   $('navCancelModalBtn').style.display = active ? 'inline-block' : 'none';
-  $('navMetrics').classList.toggle('on', active);
-  if (!active){ setMetric('remDist', '--'); setMetric('remEta', '--'); }
+  if (!active) lastDistToTurn = null;
 }
-
 function cancelNav(announce=false){
-  navRoute = null;
-  lastChimeStep = -1;
+  navRoute = null; lastChimeStep = -1; lastDistToTurn = null;
   syncNavUiState();
-  drawRoadMap();
+  if (autoZoom) targetZoomMeters = computeAutoZoomMeters(fixSpeed, null);
+  kickRoadAnim();
   if (announce) toast('Rota iptal edildi');
 }
-
 function saveRecentDest(item){
-  navRecent = navRecent.filter(x => x.name !== item.name);
-  navRecent.unshift(item);
+  navRecent = navRecent.filter(x => x.name !== item.name); navRecent.unshift(item);
   if (navRecent.length > 4) navRecent.length = 4;
   try{ localStorage.setItem('nav_recent', JSON.stringify(navRecent)); }catch{}
 }
-
 async function startRouteTo(destName, destLat, destLon, isReroute=false){
-  if (targetLat === null || targetLon === null){
-    toast('Önce GPS konumu bekleniyor');
-    return;
-  }
+  if (targetLat === null || targetLon === null){ toast('Önce GPS konumu bekleniyor'); return; }
   if (!isReroute){
     saveRecentDest({ name: destName, lat: destLat, lon: destLon });
-    if (!aheadShown) $('navHud').classList.add('on');
-    $('navOpenBtn').classList.add('on');
-    $('roadWrap').classList.add('navon');
-    $('navMetrics').classList.add('on');
-    setNavHud('straight', '…');
-    setMetric('remDist', '…'); setMetric('remEta', '…');
+    $('navHud').classList.add('on'); $('sigRoute').classList.add('on');
+    $('navIcon').innerHTML = TURN_SVGS.straight; $('navTurnDist').textContent = '…'; $('sigRoute').textContent = 'ROTA HESAPLANIYOR…';
   }
-
   const coordsParam = `${targetLon.toFixed(6)},${targetLat.toFixed(6)};${destLon.toFixed(6)},${destLat.toFixed(6)}`;
-  const endpoints = [
+  let routeData = null;
+  for (const url of [
     `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordsParam}?overview=full&geometries=geojson&steps=true`,
     `https://router.project-osrm.org/route/v1/driving/${coordsParam}?overview=full&geometries=geojson&steps=true`
-  ];
-
-  let routeData = null;
-  for (const url of endpoints){
+  ]){
     try{
-      const ctrl = new AbortController();
-      const tm = setTimeout(() => ctrl.abort(), 10000);
-      const res = await fetch(url, { signal: ctrl.signal });
-      clearTimeout(tm);
+      const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 10000);
+      const res = await fetch(url, { signal: ctrl.signal }); clearTimeout(tm);
       if (!res.ok) continue;
       const d = await res.json();
       if (d && d.code === 'Ok' && d.routes && d.routes[0]){ routeData = d.routes[0]; break; }
     }catch{}
   }
-
-  if (!routeData){
-    if (!isReroute){ cancelNav(false); toast('Rota hesaplanamadı, interneti kontrol et'); }
-    return;
-  }
-
-  const rawCoords = routeData.geometry.coordinates.map(([lo, la]) => [la, lo]);
-  const rawSteps = [];
-  (routeData.legs || []).forEach(leg => {
-    (leg.steps || []).forEach(st => {
-      const ico = parseManeuverIcon(st);
-      const loc = (st.maneuver && st.maneuver.location) || [destLon, destLat];
-      rawSteps.push({ lon: loc[0], lat: loc[1], ico, along: 0, xy: null });
-    });
-  });
-
+  if (!routeData){ if (!isReroute){ cancelNav(false); toast('Rota hesaplanamadı'); } return; }
   navRoute = {
-    destName,
-    destLat,
-    destLon,
-    coords: rawCoords,
-    localPts: [],
-    cum: [0],
-    totalLen: routeData.distance || 1,
-    steps: rawSteps,
-    totalDur: routeData.duration || 0,
-    lastSeg: null
+    destName, destLat, destLon,
+    coords: routeData.geometry.coordinates.map(([lo, la]) => [la, lo]),
+    localPts: [], cum: [0], totalLen: routeData.distance || 1, totalDur: routeData.duration || 0,
+    steps: (routeData.legs || []).flatMap(leg => (leg.steps || []).map(st => {
+      const loc = (st.maneuver && st.maneuver.location) || [destLon, destLat];
+      return { lon: loc[0], lat: loc[1], ico: parseManeuverIcon(st), along: 0, xy: null };
+    }))
   };
   lastChimeStep = -1;
-  if (!roadAnchorSet) rebuildLocal(targetLat, targetLon);
-  else projectNavRoute();
-
-  setMetric('remDist', fmtRemKm(navRoute.totalLen));
-  setMetric('remEta', fmtEta(navRoute.totalDur));
-  syncNavUiState();
-  drawRoadMap();
-  if (!isReroute) toast(`Rota hazır: ${fmtNavDist(navRoute.totalLen)}`);
+  if (!roadAnchorSet) rebuildLocal(targetLat, targetLon); else projectNavRoute();
+  $('sigRoute').textContent = fmtRouteSummary(navRoute.totalLen, navRoute.totalDur);
+  syncNavUiState(); drawRoadMap();
+  if (!isReroute) toast(`Rota: ${fmtNavDist(navRoute.totalLen)}`);
 }
-
 function updateNavProgress(ox, oy){
   if (!navRoute || !navRoute.localPts.length) return null;
-  const pts = navRoute.localPts, cum = navRoute.cum;
-
-  let snap = null;
-  if (navRoute.lastSeg != null){
-    snap = snapToPolyline(ox, oy, pts, cum, Math.max(0, navRoute.lastSeg - 4), Math.min(pts.length - 1, navRoute.lastSeg + 80));
-    if (snap.offDist > 45) snap = null;
-  }
-  if (!snap) snap = snapToPolyline(ox, oy, pts, cum);
-  navRoute.lastSeg = snap.seg;
-
-  if (!manual && !navRerouting && snap.offDist > 65 && Date.now() - lastRerouteAt > 12000){
-    lastRerouteAt = Date.now();
-    navRerouting = true;
-    setNavHud(navHudIco || 'straight', '…');
+  const snap = snapToPolyline(ox, oy, navRoute.localPts, navRoute.cum);
+  if (!navRerouting && snap.offDist > 65 && Date.now() - lastRerouteAt > 12000){
+    lastRerouteAt = Date.now(); navRerouting = true; $('navTurnDist').textContent = '…';
     startRouteTo(navRoute.destName, navRoute.destLat, navRoute.destLon, true).finally(() => { navRerouting = false; });
-    return { snap, nextStep: null, distToTurn: 0 };
+    return { snap, nextStep: null };
   }
-
   const remDist = Math.max(0, navRoute.totalLen - snap.along);
-  const remSec = (navRoute.totalDur || 0) * (navRoute.totalLen > 0 ? Math.max(0, Math.min(1, remDist / navRoute.totalLen)) : 0);
+  const remSec = (navRoute.totalDur || 0) * (1 - (navRoute.totalLen > 0 ? Math.max(0, Math.min(1, snap.along / navRoute.totalLen)) : 0));
   let nextIdx = navRoute.steps.length - 1;
-  for (let i = 1; i < navRoute.steps.length; i++){
-    if (navRoute.steps[i].along > snap.along + 10){ nextIdx = i; break; }
-  }
+  for (let i = 1; i < navRoute.steps.length; i++){ if (navRoute.steps[i].along > snap.along + 10){ nextIdx = i; break; } }
   const step = navRoute.steps[nextIdx] || navRoute.steps[navRoute.steps.length - 1];
   const distToTurn = Math.max(0, step.along - snap.along);
-
+  lastDistToTurn = distToTurn;
+  if (autoZoom) targetZoomMeters = computeAutoZoomMeters(fixSpeed, distToTurn);
   if (remDist < 28){
-    setNavHud('arrive', 'VARIŞ');
-    setMetric('remDist', '0 m'); setMetric('remEta', 'Varıldı');
+    $('navIcon').innerHTML = TURN_SVGS.arrive; $('navTurnDist').textContent = 'VARIŞ'; $('sigRoute').textContent = 'HEDEFE VARILDI';
     if (lastChimeStep !== 9999){ lastChimeStep = 9999; playTurnChime(); }
-    return { snap, nextStep: step, distToTurn };
+    return { snap, nextStep: step };
   }
-
-  if (distToTurn <= 120 && lastChimeStep !== nextIdx){
-    lastChimeStep = nextIdx;
-    playTurnChime();
-  }
-
-  setNavHud(step.ico, fmtNavDist(distToTurn));
-  setMetric('remDist', fmtRemKm(remDist));
-  setMetric('remEta', fmtEta(remSec));
-  return { snap, nextStep: step, distToTurn };
+  if (distToTurn <= 120 && lastChimeStep !== nextIdx){ lastChimeStep = nextIdx; playTurnChime(); }
+  $('navIcon').innerHTML = TURN_SVGS[step.ico] || TURN_SVGS.straight;
+  $('navTurnDist').textContent = fmtNavDist(distToTurn);
+  $('sigRoute').textContent = fmtRouteSummary(remDist, remSec);
+  return { snap, nextStep: step };
 }
-
-function openNav(){
-  $('navModal').classList.add('open');
-  syncNavUiState();
-  renderNavDefaults();
-  setTimeout(() => $('navInput').focus(), 50);
-}
+function openNav(){ $('navModal').classList.add('open'); syncNavUiState(); storageInfo(); renderNavDefaults(); setTimeout(() => $('navInput').focus(), 50); }
 function closeNav(){ $('navModal').classList.remove('open'); }
-
 function renderNavDefaults(){
   const l = $('navRes'); l.innerHTML = '';
-  if (!navRecent.length){
-    $('navHint').textContent = 'Örnek: Alsancak İzmir, Bodrum Marina, Muğla Otogar…';
-    return;
-  }
+  if (!navRecent.length){ $('navHint').textContent = 'Örnek: Alsancak İzmir, Bodrum Marina, Muğla Otogar…'; return; }
   $('navHint').textContent = 'Son aranan hedefler';
   navRecent.forEach(item => {
     const o = document.createElement('div'); o.className = 'opt';
     const dStr = targetLat !== null ? fmtNavDist(distKm(targetLat, targetLon, item.lat, item.lon) * 1000) : '';
-    o.innerHTML = `<div class="opt-top"><span>${esc(item.name)}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">Son hedef</div>`;
+    o.innerHTML = `<div class="opt-top"><span>${item.name}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">Son hedef</div>`;
     o.onclick = () => { closeNav(); startRouteTo(item.name, item.lat, item.lon, false); };
     l.appendChild(o);
   });
 }
-
 $('navInput').addEventListener('input', e => {
-  clearTimeout(navSearchTimer);
-  const q = e.target.value.trim();
+  clearTimeout(navSearchTimer); const q = e.target.value.trim();
   if (q.length < 2){ renderNavDefaults(); return; }
   $('navHint').textContent = 'Adres aranıyor…';
   navSearchTimer = setTimeout(async () => {
-    const l = $('navRes');
-    let items = [];
+    const l = $('navRes'); let items = [];
     try{
       const bias = (targetLat !== null && targetLon !== null) ? `&lat=${targetLat.toFixed(4)}&lon=${targetLon.toFixed(4)}` : '';
       const d = await (await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6${bias}`)).json();
       items = (d.features || []).map(f => {
-        const p = f.properties || {}, g = f.geometry && f.geometry.coordinates;
-        if (!g) return null;
-        const title = p.name || [p.street, p.housenumber].filter(Boolean).join(' ') || p.city || q;
-        const sub = [p.district || p.suburb, p.city || p.county, p.state, p.country].filter(Boolean).join(', ');
-        return { name: title, sub: sub || 'Konum', lat: g[1], lon: g[0] };
+        const p = f.properties || {}, g = f.geometry && f.geometry.coordinates; if (!g) return null;
+        return { name: p.name || [p.street, p.housenumber].filter(Boolean).join(' ') || p.city || q, sub: [p.district || p.suburb, p.city || p.county, p.country].filter(Boolean).join(', ') || 'Konum', lat: g[1], lon: g[0] };
       }).filter(Boolean);
     }catch{}
-
     if (!items.length){
       try{
         const d2 = await (await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&accept-language=tr`)).json();
-        items = (d2 || []).map(it => {
-          const parts = String(it.display_name || '').split(',');
-          return { name: parts[0].trim(), sub: parts.slice(1, 4).join(',').trim(), lat: parseFloat(it.lat), lon: parseFloat(it.lon) };
-        });
+        items = (d2 || []).map(it => { const pts = String(it.display_name || '').split(','); return { name: pts[0].trim(), sub: pts.slice(1, 4).join(',').trim(), lat: parseFloat(it.lat), lon: parseFloat(it.lon) }; });
       }catch{}
     }
-
     l.innerHTML = '';
-    $('navHint').textContent = items.length ? 'Gitmek istediğin adresi seç' : 'Sonuç bulunamadı, farklı yazmayı dene';
+    $('navHint').textContent = items.length ? 'Gitmek istediğin adresi seç' : 'Sonuç bulunamadı';
     items.forEach(it => {
       const o = document.createElement('div'); o.className = 'opt';
       const dStr = targetLat !== null ? fmtNavDist(distKm(targetLat, targetLon, it.lat, it.lon) * 1000) : '';
-      o.innerHTML = `<div class="opt-top"><span>${esc(it.name)}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">${esc(it.sub)}</div>`;
+      o.innerHTML = `<div class="opt-top"><span>${it.name}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">${it.sub}</div>`;
       o.onclick = () => { closeNav(); startRouteTo(it.name, it.lat, it.lon, false); };
       l.appendChild(o);
     });
   }, 320);
 });
 
-/* --- Çizim --- */
-const MODES = [
-  { k: 'aurora', n: 'Aurora + enerji', neon: true },
-  { k: 'plasma', n: 'Plazma', neon: true },
-  { k: 'arrow',  n: 'Ok akışı', neon: true },
-  { k: 'plain',  n: 'Sade', neon: false }
-];
-let modeIdx = 0;
-try{ const mv = parseInt(localStorage.getItem('mapmode'), 10); if (mv >= 0 && mv < MODES.length) modeIdx = mv; }catch{}
-$('roadWrap').classList.toggle('neon', MODES[modeIdx].neon);
-function toggleMapStyle(){
-  modeIdx = (modeIdx + 1) % MODES.length;
-  try{ localStorage.setItem('mapmode', String(modeIdx)); }catch{}
-  $('roadWrap').classList.toggle('neon', MODES[modeIdx].neon);
-  drawRoadMap();
-  toast('Mod: ' + MODES[modeIdx].n);
-}
+/* ---------- HARİTA ÇİZİMİ ---------- */
 function ptSegDistSq(px, py, ax, ay, bx, by){
-  const dx = bx - ax, dy = by - ay;
-  const lenSq = dx*dx + dy*dy;
+  const dx = bx - ax, dy = by - ay, lenSq = dx*dx + dy*dy;
   let t = lenSq > 0 ? ((px - ax)*dx + (py - ay)*dy) / lenSq : 0;
   t = Math.max(0, Math.min(1, t));
   const cx = ax + t*dx, cy = ay + t*dy;
   return (px - cx)*(px - cx) + (py - cy)*(py - cy);
 }
-const STYLE = {
-  0: ['rgba(255,255,255,0.52)', 2.6], 1: ['rgba(255,255,255,0.44)', 2.1], 2: ['rgba(255,255,255,0.36)', 1.7],
-  3: ['rgba(255,255,255,0.28)', 1.35], 4: ['rgba(255,255,255,0.20)', 1.1],
-  6: ['rgba(255,255,255,0.24)', 1.1, [6, 5]], 7: ['rgba(99,167,207,0.44)', 1.4], 8: ['rgba(99,167,207,0.56)', 1.6]
-};
-/* [çizgi rengi, kalınlık, kesik, ışıma rengi, ışıma kalınlığı] */
-const NEON = {
-  0: ['rgba(240,248,255,0.97)', 2.8, null, 'rgba(120,170,255,0.24)', 10],
-  1: ['rgba(225,238,255,0.88)', 2.2, null, 'rgba(120,170,255,0.17)', 8],
-  2: ['rgba(195,218,255,0.74)', 1.7, null, 'rgba(120,170,255,0.11)', 6],
-  3: ['rgba(155,192,246,0.58)', 1.3, null, null, 0],
-  4: ['rgba(125,168,232,0.44)', 1.0, null, null, 0],
-  6: ['rgba(155,192,246,0.32)', 1.0, [6, 5], null, 0],
-  7: ['rgba(95,135,205,0.55)', 1.3, null, null, 0],
-  8: ['rgba(115,165,235,0.65)', 1.5, null, null, 0]
+const ROAD_STYLE = {
+  0: ['rgba(226, 244, 255, 0.86)', 2.7], 1: ['rgba(186, 228, 255, 0.66)', 2.15],
+  2: ['rgba(142, 196, 236, 0.48)', 1.7], 3: ['rgba(108, 162, 206, 0.35)', 1.3],
+  4: ['rgba(84, 134, 178, 0.24)', 1.0], 6: ['rgba(130, 178, 220, 0.30)', 1.1, [6, 5]],
+  7: ['rgba(72, 168, 232, 0.50)', 1.5], 8: ['rgba(116, 202, 248, 0.65)', 1.7]
 };
 const DRAW_ORDER = [8, 7, 6, 4, 3, 2, 1, 0];
 let fadeCache = { w: 0, h: 0, gx: null, gy: null };
 
 function collectRoute(pts, seg, p0, dir, maxLen){
-  const P = [p0], D = [0];
-  let len = 0, j = dir === 1 ? seg + 1 : seg;
+  const P = [p0], D = [0]; let len = 0, j = dir === 1 ? seg + 1 : seg;
   while (j >= 0 && j < pts.length && len < maxLen){
     const last = P[P.length - 1];
     len += Math.hypot(pts[j][0] - last[0], pts[j][1] - last[1]);
-    P.push(pts[j]); D.push(len);
-    j += dir;
+    P.push(pts[j]); D.push(len); j += dir;
   }
   return { P, D, len: Math.max(len, 1) };
 }
@@ -1202,32 +1481,33 @@ function routePointAt(R, d){
   }
   return null;
 }
-const mixRGB = (a, b, k) => `${Math.round(a[0] + (b[0] - a[0]) * k)},${Math.round(a[1] + (b[1] - a[1]) * k)},${Math.round(a[2] + (b[2] - a[2]) * k)}`;
 
 function drawRoadMap(){
   const w = roadCv.width, h = roadCv.height;
   if (!w || !h) return;
-  const dp = DPR;
-  const neon = MODES[modeIdx].neon;
-  const br = 0.88 + 0.12 * Math.sin(Date.now() / 800);
-  const tNow = performance.now();
-  const dtD = Math.min(0.2, Math.max(0, (tNow - lastDrawT) / 1000));
+  const dp = DPR, br = 0.88 + 0.12 * Math.sin(Date.now() / 800);
+  const tNow = performance.now(), dtD = Math.min(0.2, Math.max(0, (tNow - lastDrawT) / 1000));
   lastDrawT = tNow;
+
   rctx.setTransform(1, 0, 0, 1, 0, 0);
   rctx.globalCompositeOperation = 'source-over';
   rctx.clearRect(0, 0, w, h);
-  const tx = w * 0.5, ty = h * 0.78;
+
+  const tx = w * 0.5, ty = h * 0.66;
+  const bgGlow = rctx.createRadialGradient(w * 0.5, h * 0.46, 0, w * 0.5, h * 0.48, Math.max(w, h) * 0.56);
+  bgGlow.addColorStop(0, 'rgba(15, 36, 66, 0.52)');
+  bgGlow.addColorStop(0.55, 'rgba(8, 20, 38, 0.26)');
+  bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  rctx.fillStyle = bgGlow; rctx.fillRect(0, 0, w, h);
 
   if (renderLat === null || renderLon === null){
-    rctx.fillStyle = 'rgba(245,245,247,.25)';
-    rctx.beginPath(); rctx.arc(tx, ty, 4 * dp, 0, Math.PI * 2); rctx.fill();
+    rctx.fillStyle = 'rgba(125,211,252,.35)'; rctx.beginPath(); rctx.arc(tx, ty, 4 * dp, 0, Math.PI * 2); rctx.fill();
     return;
   }
 
-  const zoomMeters = ZOOM_STEPS[zoomIdx].meters;
-  const ppm = (h * 0.78) / zoomMeters;
+  const zoomMeters = renderZoomMeters, ppm = (h * 0.72) / zoomMeters;
   const ox = (renderLon - ancLon) * ancMLon, oy = (renderLat - ancLat) * M_LAT;
-  const R = Math.max(zoomMeters * 1.6 * Math.max(1, w / h * 0.6), manual ? 460 : 160);
+  const R = Math.max(zoomMeters * 1.9, 450);
 
   const buckets = [[], [], [], [], [], [], [], [], []];
   let best = null, bestSeg = 0, bestD = Infinity;
@@ -1241,599 +1521,135 @@ function drawRoadMap(){
       if (d < bestD){ bestD = d; best = way; bestSeg = i; }
     }
   }
-  const matchRadius = manual ? 450 : 120;
-  const matched = best && bestD <= matchRadius * matchRadius ? best : null;
-
+  const matched = best && bestD <= 130 * 130 ? best : null;
   const navState = navRoute ? updateNavProgress(ox, oy) : null;
 
   const rad = renderHeading * Math.PI / 180;
   const X = p => (p[0] - ox) * ppm, Y = p => -(p[1] - oy) * ppm;
-  const range = zoomMeters * 1.3;
+  const range = zoomMeters * 1.35;
 
-  rctx.save();
-  rctx.translate(tx, ty);
-  rctx.rotate(-rad);
-  rctx.lineCap = 'round';
-  rctx.lineJoin = 'round';
+  rctx.save(); rctx.translate(tx, ty); rctx.rotate(-rad); rctx.lineCap = 'round'; rctx.lineJoin = 'round';
 
-  if (neon) rctx.globalCompositeOperation = 'lighter';
-  for (const c of DRAW_ORDER){
-    const list = buckets[c];
-    if (!list.length) continue;
-    const st = neon ? NEON[c] : STYLE[c];
-    const dash = st[2];
+  for (const c of [1, 0]){
+    const list = buckets[c]; if (!list.length) continue;
+    rctx.strokeStyle = c === 0 ? 'rgba(96, 195, 255, 0.22)' : 'rgba(96, 195, 255, 0.12)';
+    rctx.lineWidth = (c === 0 ? 7.5 : 5.0) * dp;
     rctx.beginPath();
-    for (const way of list){
-      const pts = way.m;
-      for (let i = 0; i < pts.length; i++){
-        if (i === 0) rctx.moveTo(X(pts[i]), Y(pts[i])); else rctx.lineTo(X(pts[i]), Y(pts[i]));
-      }
-    }
-    if (neon && st[3]){ rctx.strokeStyle = st[3]; rctx.lineWidth = st[4] * dp; rctx.stroke(); }
-    rctx.strokeStyle = st[0]; rctx.lineWidth = st[1] * dp;
-    if (dash) rctx.setLineDash(dash.map(v => v * dp));
+    for (const way of list){ const pts = way.m; for (let i = 0; i < pts.length; i++){ if (i === 0) rctx.moveTo(X(pts[i]), Y(pts[i])); else rctx.lineTo(X(pts[i]), Y(pts[i])); } }
     rctx.stroke();
-    if (dash) rctx.setLineDash([]);
   }
-  rctx.globalCompositeOperation = 'source-over';
 
-  const fadeStroke = (Rt, rng, aMax, aMin, wCore, wHalo, haloMul, colA, colB) => {
-    if (Rt.P.length < 2) return;
-    const N = 10;
-    for (let c = 0; c < N; c++){
+  for (const c of DRAW_ORDER){
+    const list = buckets[c]; if (!list.length) continue;
+    const st = ROAD_STYLE[c];
+    rctx.strokeStyle = st[0]; rctx.lineWidth = st[1] * dp;
+    if (st[2]) rctx.setLineDash(st[2].map(v => v * dp));
+    rctx.beginPath();
+    for (const way of list){ const pts = way.m; for (let i = 0; i < pts.length; i++){ if (i === 0) rctx.moveTo(X(pts[i]), Y(pts[i])); else rctx.lineTo(X(pts[i]), Y(pts[i])); } }
+    rctx.stroke();
+    if (st[2]) rctx.setLineDash([]);
+  }
+
+  const drawStyledPath = (Rt) => {
+    if (!Rt || Rt.P.length < 2) return;
+    const m = MAP_MODES[mapModeIdx].k;
+    if (m === 'aurora'){
+      const N = 28, tt = Date.now() / 1000;
+      rctx.save(); rctx.globalCompositeOperation = 'lighter'; rctx.lineCap = 'round';
+      for (let c = 0; c < N; c++){
+        rctx.beginPath(); let any = false;
+        for (let i = 1; i < Rt.P.length; i++){
+          const mid = (Rt.D[i-1] + Rt.D[i]) / 2;
+          if (Math.min(N - 1, Math.floor(mid / range * N)) !== c) continue;
+          rctx.moveTo(X(Rt.P[i-1]), Y(Rt.P[i-1])); rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); any = true;
+        }
+        if (!any) continue;
+        const k = (c + 0.5) / N, al = 1 - 0.8 * k, hu = (190 + k * 140 - tt * 55 + 720) % 360;
+        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,65%,${(0.35 * al * br).toFixed(3)})`; rctx.lineWidth = 10 * dp; rctx.stroke();
+        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,86%,${(0.95 * al).toFixed(3)})`; rctx.lineWidth = 3.2 * dp; rctx.stroke();
+      }
+      rctx.restore();
+    } else if (m === 'plasma'){
+      rctx.save(); rctx.globalCompositeOperation = 'lighter'; rctx.lineCap = 'round';
       rctx.beginPath();
-      let any = false;
-      for (let i = 1; i < Rt.P.length; i++){
-        const mid = (Rt.D[i-1] + Rt.D[i]) / 2;
-        if (Math.min(N - 1, Math.floor(mid / rng * N)) !== c) continue;
-        rctx.moveTo(X(Rt.P[i-1]), Y(Rt.P[i-1])); rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i]));
-        any = true;
-      }
-      if (!any) continue;
-      const k = (c + 0.5) / N, al = aMax - (aMax - aMin) * k;
-      rctx.lineCap = 'butt';
-      rctx.strokeStyle = `rgba(${TH.acc},${(al * haloMul * br).toFixed(3)})`;
-      rctx.lineWidth = wHalo * dp; rctx.stroke();
-      rctx.lineCap = 'round';
-      rctx.strokeStyle = `rgba(${mixRGB(colA, colB, Math.min(1, k * 1.2))},${al.toFixed(3)})`;
-      rctx.lineWidth = wCore * dp; rctx.stroke();
-    }
-    rctx.lineCap = 'round';
-  };
-  const drawConnector = (p, dist) => {
-    if (dist < 10 || dist > 200) return;
-    rctx.save();
-    rctx.setLineDash([3 * dp, 5 * dp]);
-    rctx.lineCap = 'round';
-    rctx.strokeStyle = `rgba(${TH.core},0.55)`;
-    rctx.lineWidth = 1.3 * dp;
-    rctx.beginPath(); rctx.moveTo(0, 0); rctx.lineTo(X(p), Y(p)); rctx.stroke();
-    rctx.restore();
-  };
-
-  /* AKAN ENERJİ: kuyruklu parlak ışık paketleri */
-  const energyPackets = (Rt, rng) => {
-    const lim = Math.min(Rt.len, rng), spacing = 90, tail = 46, seg = 6;
-    rctx.save();
-    rctx.globalCompositeOperation = 'lighter';
-    rctx.lineCap = 'round';
-    for (let d = pulsePhase; d < lim; d += spacing){
-      const al = 0.95 * Math.pow(Math.max(0, 1 - d / rng), 1.2) * Math.min(1, d / 25);
-      if (al < 0.03) continue;
-      let prev = routePointAt(Rt, Math.max(0, d - tail));
-      for (let j = 1; j <= seg; j++){
-        const q = routePointAt(Rt, Math.max(0, d - tail * (1 - j / seg)));
-        if (prev && q){
-          const f = j / seg;
-          rctx.strokeStyle = `rgba(255,255,255,${(al * f * f).toFixed(3)})`;
-          rctx.lineWidth = (1.4 + 2.4 * f) * dp;
-          rctx.beginPath(); rctx.moveTo(X(prev), Y(prev)); rctx.lineTo(X(q), Y(q)); rctx.stroke();
-        }
-        prev = q;
-      }
-      const hd = routePointAt(Rt, d);
-      if (hd){
-        const x = X(hd), y = Y(hd), g = rctx.createRadialGradient(x, y, 0, x, y, 12 * dp);
-        g.addColorStop(0, `rgba(${TH.core},${al.toFixed(3)})`); g.addColorStop(1, `rgba(${TH.core},0)`);
-        rctx.fillStyle = g; rctx.beginPath(); rctx.arc(x, y, 12 * dp, 0, 6.2832); rctx.fill();
-      }
-    }
-    rctx.restore();
-  };
-
-  /* PLAZMA: neon tüp + elektrik titreşimi + akan enerji + kıvılcım */
-  const mkRnd = seed => { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
-  const plasmaRoute = (Rt, rng, boost, packets) => {
-    if (Rt.P.length < 2) return;
-    const N = 10, now = Date.now(), tt = now / 1000;
-    const lim = Math.min(Rt.len, rng);
-    const gl = br * (0.92 + 0.08 * Math.sin(tt * 19) * Math.sin(tt * 5.3));
-    rctx.save();
-    rctx.globalCompositeOperation = 'lighter';
-    rctx.lineCap = 'butt'; rctx.lineJoin = 'round';
-    for (let c = 0; c < N; c++){
-      rctx.beginPath(); let any = false, last = -2;
-      for (let i = 1; i < Rt.P.length; i++){
-        const mid = (Rt.D[i-1] + Rt.D[i]) / 2;
-        if (Math.min(N - 1, Math.floor(mid / rng * N)) !== c) continue;
-        if (last !== i - 1) rctx.moveTo(X(Rt.P[i-1]), Y(Rt.P[i-1]));
-        rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); last = i; any = true;
-      }
-      if (!any) continue;
-      const k = (c + 0.5) / N, al = 1 - 0.88 * k;
-      rctx.strokeStyle = `rgba(${TH.acc},${(0.10 * al * gl).toFixed(3)})`; rctx.lineWidth = 20 * (1 + 0.3 * boost) * dp; rctx.stroke();
-      rctx.strokeStyle = `rgba(${TH.acc},${(0.22 * al * gl).toFixed(3)})`; rctx.lineWidth = 10 * (1 + 0.25 * boost) * dp; rctx.stroke();
-      rctx.strokeStyle = `rgba(${mixRGB(TH.coreA, [255,255,255], 0.35)},${(0.55 * al * gl).toFixed(3)})`; rctx.lineWidth = 5 * dp; rctx.stroke();
-      rctx.strokeStyle = `rgba(255,255,255,${(0.95 * al).toFixed(3)})`; rctx.lineWidth = 2.4 * (1 + 0.2 * boost) * dp; rctx.stroke();
-    }
-    const nS = Math.max(4, Math.floor(lim / 12));
-    const xs = [], ys = [];
-    for (let i = 0; i <= nS; i++){
-      const p = routePointAt(Rt, Math.min(lim, i * lim / nS));
-      if (!p) break; xs.push(X(p)); ys.push(Y(p));
-    }
-    const n = xs.length;
-    if (n > 3){
-      const bucket = Math.floor(now / 90);
-      rctx.lineCap = 'round';
-      for (let pass = 0; pass < 2; pass++){
-        const r = mkRnd(bucket * 7 + pass * 1013);
-        const amp = (pass ? 1.6 : 2.4) * (1 + 0.4 * boost) * dp;
-        const jx = [], jy = [];
-        for (let i = 0; i < n; i++){
-          const a = Math.max(0, i - 1), b = Math.min(n - 1, i + 1);
-          let nx = -(ys[b] - ys[a]), ny = xs[b] - xs[a];
-          const L = Math.hypot(nx, ny) || 1; nx /= L; ny /= L;
-          const o = (r() - 0.5) * 2 * amp * Math.min(1, i / 3);
-          jx.push(xs[i] + nx * o); jy.push(ys[i] + ny * o);
-        }
-        for (let b = 0; b < 5; b++){
-          const i0 = Math.floor(b * (n - 1) / 5), i1 = Math.floor((b + 1) * (n - 1) / 5);
-          const al = (pass ? 0.26 : 0.38) * (1 - b * 0.2);
-          rctx.beginPath(); rctx.moveTo(jx[i0], jy[i0]);
-          for (let i = i0 + 1; i <= i1; i++) rctx.lineTo(jx[i], jy[i]);
-          rctx.strokeStyle = pass ? `rgba(255,255,255,${al.toFixed(3)})` : `rgba(${TH.core},${al.toFixed(3)})`;
-          rctx.lineWidth = (pass ? 0.9 : 1.2) * dp; rctx.stroke();
-        }
-      }
-    }
-    if (packets) energyPackets(Rt, rng);
-    const sr = mkRnd(Math.floor(now / 140) * 31 + 7), age = (now % 140) / 140;
-    const cnt = sr() < 0.6 ? 1 + (sr() < 0.4 ? 1 : 0) : 0;
-    rctx.lineCap = 'round';
-    for (let s = 0; s < cnt; s++){
-      const ds = 20 + sr() * Math.max(10, lim * 0.65);
-      const p = routePointAt(Rt, ds);
-      if (!p) continue;
-      let x = X(p), y = Y(p), ang = sr() * 6.2832;
-      const al = (1 - age) * 0.85 * (1 - 0.8 * ds / rng);
-      rctx.strokeStyle = `rgba(255,255,255,${al.toFixed(3)})`; rctx.lineWidth = 1.1 * dp;
-      rctx.beginPath(); rctx.moveTo(x, y);
-      for (let j = 0; j < 3; j++){
-        ang += (sr() - 0.5) * 2.2;
-        x += Math.cos(ang) * (5 + sr() * 5) * dp; y += Math.sin(ang) * (5 + sr() * 5) * dp;
-        rctx.lineTo(x, y);
-      }
-      rctx.stroke();
-    }
-    rctx.restore();
-  };
-
-  /* AURORA: renkleri akarak değişen neon şerit */
-  const auroraRoute = (Rt, rng, boost) => {
-    if (Rt.P.length < 2) return;
-    const N = 36, tt = Date.now() / 1000, groups = [];
-    for (let c = 0; c < N; c++) groups.push([]);
-    for (let i = 1; i < Rt.P.length; i++){
-      const mid = (Rt.D[i-1] + Rt.D[i]) / 2;
-      groups[Math.min(N - 1, Math.floor(mid / rng * N))].push(i);
-    }
-    const hs = (hh, l, a) => `hsla(${hh.toFixed(0)},100%,${l}%,${a.toFixed(3)})`;
-    rctx.save();
-    rctx.globalCompositeOperation = 'lighter';
-    rctx.lineCap = 'butt'; rctx.lineJoin = 'round';
-    for (let c = 0; c < N; c++){
-      const g = groups[c]; if (!g.length) continue;
-      rctx.beginPath(); let last = -2;
-      for (const i of g){
-        if (last !== i - 1) rctx.moveTo(X(Rt.P[i-1]), Y(Rt.P[i-1]));
-        rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); last = i;
-      }
-      const k = (c + 0.5) / N, al = 1 - 0.82 * k, hu = (190 + k * 140 - tt * 55 + 720) % 360;
-      rctx.strokeStyle = hs(hu, 60, 0.14 * al * br); rctx.lineWidth = 20 * (1 + 0.3 * boost) * dp; rctx.stroke();
-      rctx.strokeStyle = hs(hu, 62, 0.38 * al * br); rctx.lineWidth = 9 * (1 + 0.25 * boost) * dp; rctx.stroke();
-      rctx.strokeStyle = hs(hu, 86, 0.95 * al); rctx.lineWidth = 3 * (1 + 0.2 * boost) * dp; rctx.stroke();
-    }
-    rctx.restore();
-  };
-
-  /* OK AKIŞI: yol boyunca ilerleyen neon oklar */
-  const arrowRoute = (Rt, rng, boost) => {
-    if (Rt.P.length < 2) return;
-    fadeStroke(Rt, rng, 0.5, 0.05, 1.6, 7, 0.4, TH.coreA, TH.farA);
-    const lim = Math.min(Rt.len, rng), sp = 30, ph = pulsePhase / 3, u = dp;
-    rctx.save();
-    rctx.globalCompositeOperation = 'lighter';
-    rctx.lineCap = 'round'; rctx.lineJoin = 'round';
-    rctx.shadowColor = `rgb(${TH.core})`; rctx.shadowBlur = 8 * u;
-    for (let d = ph; d < lim; d += sp){
-      const al = Math.pow(Math.max(0, 1 - d / rng), 0.9) * Math.min(1, d / 16);
-      if (al < 0.04) continue;
-      const p = routePointAt(Rt, d), p2 = routePointAt(Rt, Math.min(Rt.len, d + 4));
-      if (!p || !p2) continue;
-      let tx2 = X(p2) - X(p), ty2 = Y(p2) - Y(p);
-      const L = Math.hypot(tx2, ty2) || 1; tx2 /= L; ty2 /= L;
-      const nx = -ty2, ny = tx2, x = X(p), y = Y(p);
+      for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
+      rctx.strokeStyle = `rgba(${TH.acc},${(0.35 * br).toFixed(3)})`; rctx.lineWidth = 13 * dp; rctx.stroke();
+      rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 3.2 * dp; rctx.stroke();
+      rctx.restore();
+    } else if (m === 'arrow'){
       rctx.beginPath();
-      rctx.moveTo(x - tx2 * 4 * u + nx * 6 * u, y - ty2 * 4 * u + ny * 6 * u);
-      rctx.lineTo(x + tx2 * 4 * u, y + ty2 * 4 * u);
-      rctx.lineTo(x - tx2 * 4 * u - nx * 6 * u, y - ty2 * 4 * u - ny * 6 * u);
-      rctx.strokeStyle = `rgba(${mixRGB(TH.coreA, [255,255,255], 0.55)},${al.toFixed(3)})`;
-      rctx.lineWidth = 2.4 * u * (1 + 0.2 * boost); rctx.stroke();
-    }
-    rctx.restore();
-  };
-
-  /* seçili moda göre rota efektini çizer */
-  const routeFx = (Rt, rng, boost, moving) => {
-    const m = MODES[modeIdx].k;
-    if (m === 'aurora'){ auroraRoute(Rt, rng, boost); if (moving) energyPackets(Rt, rng); }
-    else if (m === 'plasma') plasmaRoute(Rt, rng, boost, moving);
-    else if (m === 'arrow') arrowRoute(Rt, rng, boost);
-    else fadeStroke(Rt, rng, 1, 0.12, 3.4 * (1 + 0.25 * boost), 11 * (1 + 0.3 * boost), 0.28 * (1 + 0.4 * boost), TH.coreA, TH.farA);
-  };
-
-  if (navRoute && navRoute.localPts.length >= 2){
-    const rPts = navRoute.localPts;
-    const sn = (navState && navState.snap) ? navState.snap : snapToPolyline(ox, oy, rPts, navRoute.cum);
-    const ahead = collectRoute(rPts, sn.seg, sn.pt, 1, range);
-    const behind = collectRoute(rPts, sn.seg, sn.pt, -1, 80);
-    const ns = navState && navState.nextStep && navState.nextStep.ico !== 'arrive' ? navState.nextStep : null;
-    const dTurn = navState ? navState.distToTurn : 9999;
-    const boost = ns ? Math.max(0, Math.min(1, (220 - dTurn) / 120)) : 0;
-
-    drawConnector(sn.pt, sn.offDist);
-    fadeStroke(behind, 80, 0.42, 0, 2.6, 7, 0.5, TH.coreA, TH.accA);
-    pulsePhase = (pulsePhase + dtD * (12 + fixSpeed * 0.7)) % 90;
-    routeFx(ahead, range, boost, true);
-
-    if (ns && ns.xy){
-      const nx = X(ns.xy), ny = Y(ns.xy);
-      if (dTurn < 600){
-        const inten = Math.max(0.25, Math.min(1, 1 - dTurn / 500));
-        const ph = ((Date.now() / 1000) * (dTurn < 150 ? 1.6 : 0.8)) % 1;
-        for (let wv = 0; wv < 2; wv++){
-          const p = (ph + wv * 0.5) % 1;
-          rctx.strokeStyle = `rgba(${TH.core},${((1 - p) * 0.55 * inten).toFixed(3)})`;
-          rctx.lineWidth = 1.6 * dp;
-          rctx.beginPath(); rctx.arc(nx, ny, (6 + p * 18) * dp, 0, 6.2832); rctx.stroke();
-        }
-      }
-      rctx.fillStyle = `rgba(${TH.acc},0.35)`;
-      rctx.beginPath(); rctx.arc(nx, ny, 9 * dp, 0, 6.2832); rctx.fill();
-      rctx.fillStyle = '#ffffff';
-      rctx.beginPath(); rctx.arc(nx, ny, 3.5 * dp, 0, 6.2832); rctx.fill();
-    }
-
-    const endPt = rPts[rPts.length - 1];
-    const ex = X(endPt), ey = Y(endPt);
-    if (Math.abs(ex) < w && Math.abs(ey) < h * 1.5){
-      rctx.strokeStyle = `rgb(${TH.core})`;
-      rctx.lineWidth = 2 * dp;
-      rctx.beginPath(); rctx.arc(ex, ey, 8 * dp * br, 0, 6.2832); rctx.stroke();
-      rctx.fillStyle = `rgb(${TH.acc})`;
-      rctx.beginPath(); rctx.arc(ex, ey, 4 * dp, 0, 6.2832); rctx.fill();
-    }
-  } else if (matched){
-    const pts = matched.m, seg = bestSeg;
-    const a = pts[seg], b = pts[seg+1];
-    const dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx*dx + dy*dy;
-    let tt = L2 > 0 ? ((ox - a[0])*dx + (oy - a[1])*dy) / L2 : 0;
-    tt = Math.max(0, Math.min(1, tt));
-    const p0 = [a[0] + tt*dx, a[1] + tt*dy];
-    const dir = (dx * Math.sin(rad) + dy * Math.cos(rad)) >= 0 ? 1 : -1;
-    const ahead = collectRoute(pts, seg, p0, dir, range);
-    const behind = collectRoute(pts, seg, p0, -dir, 70);
-
-    drawConnector(p0, Math.sqrt(bestD));
-    fadeStroke(behind, 70, 0.4, 0, 2.4, 7, 0.5, TH.coreA, TH.accA);
-    const moving = fixSpeed > 1.5;
-    if (moving) pulsePhase = (pulsePhase + dtD * (12 + fixSpeed * 0.7)) % 90;
-    routeFx(ahead, range, 0, moving);
-  }
-  rctx.restore();
-
-  const glow = rctx.createRadialGradient(tx, ty, 0, tx, ty, 80 * dp);
-  glow.addColorStop(0, `rgba(${TH.acc},${(0.34 * br).toFixed(3)})`);
-  glow.addColorStop(1, `rgba(${TH.acc},0)`);
-  rctx.fillStyle = glow;
-  rctx.beginPath(); rctx.arc(tx, ty, 80 * dp, 0, Math.PI * 2); rctx.fill();
-
-  if (!fadeCache.gx || fadeCache.w !== w || fadeCache.h !== h || fadeCache.n !== neon){
-    const ease = k => k <= 0 ? 0 : k >= 1 ? 1 : 0.5 - 0.5 * Math.cos(Math.PI * k);
-    const sx = neon ? 0.05 : 0.20, sTop = neon ? 0.10 : 0.24, sBot = neon ? 0.06 : 0.13;
-    const gx = rctx.createLinearGradient(0, 0, w, 0);
-    const gy = rctx.createLinearGradient(0, 0, 0, h);
-    for (let i = 0; i <= 32; i++){
-      const s = i / 32;
-      gx.addColorStop(s, `rgba(0,0,0,${ease(Math.min(s, 1 - s) / sx).toFixed(3)})`);
-      gy.addColorStop(s, `rgba(0,0,0,${(s < 0.5 ? ease(s / sTop) : ease((1 - s) / sBot)).toFixed(3)})`);
-    }
-    const gr = rctx.createRadialGradient(tx, ty, 0, tx, ty, Math.hypot(w * 0.6, h * 0.85));
-    gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.5, 'rgba(0,0,0,0.85)'); gr.addColorStop(1, 'rgba(0,0,0,0.5)');
-    fadeCache = { w, h, n: neon, gx, gy, gr };
-  }
-  rctx.save();
-  rctx.globalCompositeOperation = 'destination-in';
-  rctx.fillStyle = fadeCache.gx; rctx.fillRect(0, 0, w, h);
-  rctx.fillStyle = fadeCache.gy; rctx.fillRect(0, 0, w, h);
-  if (neon){ rctx.fillStyle = fadeCache.gr; rctx.fillRect(0, 0, w, h); }
-  rctx.restore();
-  rctx.globalCompositeOperation = 'source-over';
-
-  rctx.save();
-  rctx.translate(tx, ty);
-  rctx.fillStyle = `rgb(${TH.arrow})`;
-  rctx.beginPath();
-  rctx.moveTo(0, -10 * dp);
-  rctx.lineTo(7.5 * dp, 7.5 * dp);
-  rctx.lineTo(0, 3.5 * dp);
-  rctx.lineTo(-7.5 * dp, 7.5 * dp);
-  rctx.closePath();
-  rctx.fill();
-  rctx.restore();
-}
-
-/* ---------- RENK TEMALARI (saate dokun) ---------- */
-const THEMES = {
-  red:   { n:'Kırmızı',    acc:[229,72,77],   core:[255,112,96],  far:[200,50,90],   arrow:[240,138,69], play:[217,119,36], clk:[245,245,247] },
-  amber: { n:'Kehribar',   acc:[255,176,0],   core:[255,205,100], far:[255,130,0],   arrow:[255,176,0],  play:[255,176,0],  clk:[255,191,71] },
-  ice:   { n:'Buz mavisi', acc:[64,196,255],  core:[150,225,255], far:[60,140,255],  arrow:[95,208,255], play:[76,195,255], clk:[191,234,255] },
-  green: { n:'Neon yeşil', acc:[57,255,120],  core:[150,255,185], far:[20,200,160],  arrow:[57,255,120], play:[57,255,120], clk:[168,255,198] },
-  synth: { n:'Synthwave',  acc:[255,60,200],  core:[255,140,230], far:[150,90,255],  arrow:[255,79,216], play:[182,107,255],clk:[255,155,236] },
-  white: { n:'Beyaz',      acc:[245,245,247], core:[255,255,255], far:[190,190,205], arrow:[255,255,255],play:[255,255,255],clk:[255,255,255] }
-};
-const THEME_ORDER = ['red', 'amber', 'ice', 'green', 'synth', 'white', 'auto'];
-const THEME_KEYS = ['acc', 'core', 'far', 'arrow', 'play', 'clk'];
-const cloneTheme = th => { const o = {}; THEME_KEYS.forEach(k => { o[k] = th[k].slice(); }); return o; };
-let themeKey = 'red';
-try{ const sv = localStorage.getItem('theme'); if (sv && THEME_ORDER.includes(sv)) themeKey = sv; }catch{}
-let curTheme = cloneTheme(THEMES.red), tweenRaf = 0;
-const TH = { acc: '229,72,77', core: '255,112,96', far: '200,50,90', arrow: '240,138,69', clk: '245,245,247',
-  accA: [229,72,77], coreA: [255,112,96], farA: [200,50,90] };
-
-function applyThemeColors(c){
-  const r = a => a.map(v => Math.round(v)).join(',');
-  const root = document.documentElement.style;
-  root.setProperty('--acc', r(c.acc));
-  root.setProperty('--play', 'rgb(' + r(c.play) + ')');
-  root.setProperty('--clk', 'rgb(' + r(c.clk) + ')');
-  TH.acc = r(c.acc); TH.core = r(c.core); TH.far = r(c.far); TH.arrow = r(c.arrow); TH.clk = r(c.clk);
-  TH.accA = c.acc.slice(); TH.coreA = c.core.slice(); TH.farA = c.far.slice();
-  if (typeof eqKick === 'function') eqKick();
-  if (typeof drawTape === 'function') drawTape();
-  if (!roadAnimRaf) drawRoadMap();
-}
-function resolveTheme(){
-  if (themeKey !== 'auto') return { t: THEMES[themeKey], night: false, label: THEMES[themeKey].n };
-  const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
-  if (h >= 6.5 && h < 17.5) return { t: THEMES.ice, night: false, label: 'Buz mavisi' };
-  if (h >= 17.5 && h < 20.5) return { t: THEMES.amber, night: false, label: 'Kehribar' };
-  return { t: THEMES.amber, night: true, label: 'Kehribar' };
-}
-function setTheme(key, announce, instant){
-  themeKey = key;
-  try{ localStorage.setItem('theme', key); }catch{}
-  const r = resolveTheme();
-  $('dimLayer').style.opacity = r.night ? '0.22' : '0';
-  const target = r.t;
-  cancelAnimationFrame(tweenRaf);
-  if (instant){ curTheme = cloneTheme(target); applyThemeColors(curTheme); }
-  else {
-    const from = cloneTheme(curTheme), t0 = performance.now();
-    const step = () => {
-      const k = Math.min(1, (performance.now() - t0) / 700);
-      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      THEME_KEYS.forEach(n => { curTheme[n] = from[n].map((v, i) => v + (target[n][i] - v) * e); });
-      applyThemeColors(curTheme);
-      if (k < 1) tweenRaf = requestAnimationFrame(step);
-    };
-    tweenRaf = requestAnimationFrame(step);
-  }
-  if (announce) toast('Renk: ' + (key === 'auto' ? 'Otomatik (' + r.label + ')' : THEMES[key].n));
-}
-$('clockT').addEventListener('click', () => {
-  if (clkLong){ clkLong = false; return; }
-  setTheme(THEME_ORDER[(THEME_ORDER.indexOf(themeKey) + 1) % THEME_ORDER.length], true, false);
-});
-setInterval(() => { if (themeKey === 'auto') setTheme('auto', false, false); }, 60000);
-setInterval(() => { if (!roadAnimRaf && renderLat !== null && !document.hidden && !restMode) drawRoadMap(); }, 100);
-setInterval(() => { if (navRoute && !roadAnimRaf && renderLat !== null && !document.hidden && !restMode) drawRoadMap(); }, 66);
-
-/* ---------- ARKA PLAN EFEKTLERİ: sadece hız çizgileri ve mola modu gökyüzü ---------- */
-const fxCv = $('fxCanvas'), fxCtx = fxCv.getContext('2d');
-const FDPR = Math.min(2, window.devicePixelRatio || 1);
-let fxOn = true;
-try{ if (localStorage.getItem('fx') === 'off') fxOn = false; }catch{}
-let fxCur = {}, fxSig = '', fxL = { stars: [], streaks: [] }, fxRaf = 0, fxLast = 0;
-let speedLvl = 0, speedFlag = false, shootT = 25, shootCur = null;
-const fxT0 = performance.now();
-
-function fxSize(){
-  fxCv.width = Math.max(1, Math.round(fxCv.clientWidth * FDPR));
-  fxCv.height = Math.max(1, Math.round(fxCv.clientHeight * FDPR));
-  fxBuild(); fxKick();
-}
-function computeFx(){
-  if (!fxOn) return {};
-  const f = {};
-  if (restMode){ f.stars = { n: 120 }; f.aurora = true; f.shoot = true; }
-  return f;
-}
-function setFxState(){
-  const f = computeFx(), sig = JSON.stringify(f);
-  if (sig !== fxSig){ fxSig = sig; fxCur = f; fxBuild(); }
-  fxKick();
-}
-function newStreak(init){
-  const w = fxCv.width, side = Math.random() < 0.5 ? -1 : 1, ang = -0.6 + Math.random() * 1.5;
-  return { dx: side * Math.cos(ang), dy: Math.sin(ang), r: (init ? 0.15 + Math.random() * 0.6 : 0.15 + Math.random() * 0.1) * w,
-    v: (170 + Math.random() * 230) * FDPR, len: (30 + Math.random() * 60) * FDPR, a: 0.10 + Math.random() * 0.14 };
-}
-function fxBuild(){
-  const w = fxCv.width, h = fxCv.height, dp = FDPR, f = fxCur;
-  fxL = { stars: [], streaks: [] };
-  fxCtx.clearRect(0, 0, w, h);
-  if (f.stars){
-    for (let i = 0; i < f.stars.n; i++){
-      const vx = (1 + Math.random() * 3) * dp;
-      fxL.stars.push({ x: Math.random() * w, y: Math.random() * h, r: (0.5 + Math.random()) * dp, a: 0.25 + Math.random() * 0.35,
-        ph: Math.random() * 6.28, sp: 0.5 + Math.random() * 1.5, vx, vy: vx * 0.3 });
-    }
-  }
-  for (let i = 0; i < 26; i++) fxL.streaks.push(newStreak(true));
-}
-function fxHasLayers(){ const f = fxCur; return !!(f.stars || f.aurora); }
-function fxSpeedWanted(){
-  if (!fxOn) return false;
-  const fresh = Date.now() - fixTime < 6000;
-  if (fixSpeed >= 22.2 && fresh) speedFlag = true; else if (fixSpeed < 19 || !fresh) speedFlag = false;
-  return speedFlag;
-}
-function fxKick(){
-  if (fxRaf || document.hidden) return;
-  if (fxHasLayers() || speedLvl > 0.01 || fxSpeedWanted()) fxRaf = requestAnimationFrame(fxFrame);
-}
-function drawAurora(w, h, t){
-  const bands = [
-    { c: TH.acc,  a: 0.11, y: 0.16, th: 0.26, ph: 0, sp: 0.25 },
-    { c: TH.core, a: 0.08, y: 0.26, th: 0.22, ph: 2, sp: -0.18 },
-    { c: TH.acc,  a: 0.06, y: 0.36, th: 0.20, ph: 4, sp: 0.14 }
-  ];
-  for (const b of bands){
-    const pts = [];
-    for (let i = 0; i <= 14; i++){
-      const u = i / 14;
-      pts.push([u * w, h * b.y + Math.sin(u * 8.17 + t * b.sp + b.ph) * h * 0.07 + Math.sin(u * 16.9 - t * b.sp * 0.7 + b.ph * 1.3) * h * 0.03]);
-    }
-    const th = h * b.th;
-    const g = fxCtx.createLinearGradient(0, h * b.y - h * 0.1, 0, h * b.y + th);
-    g.addColorStop(0, `rgba(${b.c},0)`); g.addColorStop(0.35, `rgba(${b.c},${b.a})`); g.addColorStop(1, `rgba(${b.c},0)`);
-    fxCtx.fillStyle = g;
-    fxCtx.beginPath(); fxCtx.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length; i++) fxCtx.lineTo(pts[i][0], pts[i][1]);
-    for (let i = pts.length - 1; i >= 0; i--) fxCtx.lineTo(pts[i][0], pts[i][1] + th);
-    fxCtx.closePath(); fxCtx.fill();
-  }
-}
-function fxFrame(ts){
-  fxRaf = 0;
-  if (document.hidden) return;
-  if (fxLast && ts - fxLast < 33){ fxRaf = requestAnimationFrame(fxFrame); return; }
-  const dt = fxLast ? Math.min(0.1, (ts - fxLast) / 1000) : 0.033;
-  fxLast = ts;
-  const w = fxCv.width, h = fxCv.height, dp = FDPR, f = fxCur;
-  const t = (performance.now() - fxT0) / 1000;
-  const spTarget = fxSpeedWanted() ? 1 : 0;
-  speedLvl += (spTarget - speedLvl) * Math.min(1, dt * 0.9);
-  if (!fxHasLayers() && speedLvl < 0.01 && !spTarget){ fxCtx.clearRect(0, 0, w, h); fxLast = 0; return; }
-  fxCtx.clearRect(0, 0, w, h);
-
-  if (f.aurora) drawAurora(w, h, t);
-  if (f.stars){
-    for (const s of fxL.stars){
-      s.x += s.vx * dt; s.y += s.vy * dt;
-      if (s.x > w + 2) s.x = -2; if (s.y > h + 2) s.y = -2;
-      fxCtx.fillStyle = `rgba(255,255,255,${(s.a * (0.55 + 0.45 * Math.sin(t * s.sp + s.ph))).toFixed(3)})`;
-      fxCtx.beginPath(); fxCtx.arc(s.x, s.y, s.r, 0, 6.2832); fxCtx.fill();
-    }
-  }
-  if (f.shoot){
-    if (!shootCur){
-      shootT -= dt;
-      if (shootT <= 0){
-        shootCur = { x: w * (0.15 + Math.random() * 0.6), y: h * (0.05 + Math.random() * 0.3), vx: (300 + Math.random() * 160) * dp, vy: (150 + Math.random() * 90) * dp, age: 0, life: 0.9 + Math.random() * 0.4 };
-        shootT = 25 + Math.random() * 35;
+      for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
+      rctx.strokeStyle = 'rgba(186, 232, 255, 0.55)'; rctx.lineWidth = 2.6 * dp; rctx.stroke();
+      for (let d = pulsePhase / 2.5; d < Math.min(Rt.len, range); d += 34){
+        const p = routePointAt(Rt, d), p2 = routePointAt(Rt, Math.min(Rt.len, d + 4));
+        if (!p || !p2) continue;
+        let dx2 = X(p2) - X(p), dy2 = Y(p2) - Y(p); const L = Math.hypot(dx2, dy2) || 1; dx2 /= L; dy2 /= L;
+        const nx = -dy2, ny = dx2, x = X(p), y = Y(p);
+        rctx.beginPath();
+        rctx.moveTo(x - dx2 * 4 * dp + nx * 5.5 * dp, y - dy2 * 4 * dp + ny * 5.5 * dp);
+        rctx.lineTo(x + dx2 * 4 * dp, y + dy2 * 4 * dp);
+        rctx.lineTo(x - dx2 * 4 * dp - nx * 5.5 * dp, y - dy2 * 4 * dp - ny * 5.5 * dp);
+        rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 2.2 * dp; rctx.stroke();
       }
     } else {
-      const s = shootCur; s.age += dt; s.x += s.vx * dt; s.y += s.vy * dt;
-      const fade = 1 - s.age / s.life;
-      if (fade <= 0) shootCur = null;
-      else {
-        const g = fxCtx.createLinearGradient(s.x - s.vx * 0.16, s.y - s.vy * 0.16, s.x, s.y);
-        g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, `rgba(255,255,255,${(0.8 * fade).toFixed(3)})`);
-        fxCtx.strokeStyle = g; fxCtx.lineWidth = 1.5 * dp; fxCtx.lineCap = 'round';
-        fxCtx.beginPath(); fxCtx.moveTo(s.x - s.vx * 0.16, s.y - s.vy * 0.16); fxCtx.lineTo(s.x, s.y); fxCtx.stroke();
-      }
+      rctx.beginPath();
+      for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
+      rctx.strokeStyle = `rgba(56, 189, 248, ${(0.36 * br).toFixed(3)})`; rctx.lineWidth = 11 * dp; rctx.stroke();
+      rctx.strokeStyle = '#e0f7ff'; rctx.lineWidth = 3.4 * dp; rctx.stroke();
     }
-  }
-  if (speedLvl > 0.01){
-    const cx = w * 0.5, cy = h * 0.42, maxR = Math.hypot(w, h) * 0.55;
-    const boost = 1 + Math.max(0, Math.min(1.5, (fixSpeed - 22) / 30));
-    fxCtx.lineCap = 'round'; fxCtx.lineWidth = 1.1 * dp;
-    for (const s of fxL.streaks){
-      s.r += s.v * boost * dt;
-      const x1 = cx + s.dx * s.r, y1 = cy + s.dy * s.r;
-      if (x1 < -40 || x1 > w + 40 || y1 > h + 40 || y1 < -40 || s.r > maxR * 1.3){ Object.assign(s, newStreak(false)); continue; }
-      const len = s.len * (0.4 + s.r / maxR), fadeIn = Math.min(1, Math.max(0, (s.r - 0.18 * w) / (0.3 * w)));
-      const al = s.a * speedLvl * fadeIn;
-      if (al < 0.004) continue;
-      fxCtx.strokeStyle = `rgba(${TH.core},${al.toFixed(3)})`;
-      fxCtx.beginPath(); fxCtx.moveTo(x1, y1); fxCtx.lineTo(x1 + s.dx * len, y1 + s.dy * len); fxCtx.stroke();
-    }
-  }
-  fxRaf = requestAnimationFrame(fxFrame);
-}
-$('art').addEventListener('click', () => {
-  fxOn = !fxOn;
-  try{ localStorage.setItem('fx', fxOn ? 'on' : 'off'); }catch{}
-  setFxState();
-  toast('Efektler: ' + (fxOn ? 'Açık' : 'Kapalı'));
-});
+  };
 
-/* ---------- MOLA MODU (3 dk hareketsiz kalınca) ---------- */
-const REST_AFTER = 3 * 60 * 1000;
-let restMode = false, lastMoveAt = Date.now(), restRef = null, restSnoozeUntil = 0, clkLong = false, clkPress = 0;
-const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-function updateRest(){
-  const n = new Date();
-  $('restClock').textContent = pad(n.getHours()) + ':' + pad(n.getMinutes());
-  $('restDate').textContent = DAYS[n.getDay()] + ' · ' + n.getDate() + ' ' + MONTHS[n.getMonth()] + ' ' + n.getFullYear();
-  $('restTemp').textContent = $('mainTemp').textContent + '°';
-  $('restCond').textContent = $('mainCond').textContent;
-  $('restIco').innerHTML = $('art').innerHTML;
-}
-function enterRest(){
-  if (restMode) return;
-  restMode = true;
-  document.querySelector('.screen').classList.add('rest');
-  updateRest(); setFxState(); toast('Mola modu');
-}
-function exitRest(manual){
-  if (!restMode) return;
-  restMode = false;
-  document.querySelector('.screen').classList.remove('rest');
-  if (manual) restSnoozeUntil = Date.now() + 10 * 60 * 1000;
-  lastMoveAt = Date.now();
-  setFxState(); drawRoadMap();
-}
-function trackMovement(lat, lon){
-  if (!restRef) restRef = { lat, lon };
-  if (fixSpeed > 1.5 || distKm(restRef.lat, restRef.lon, lat, lon) > 0.06){
-    lastMoveAt = Date.now(); restRef = { lat, lon };
-    if (restMode) exitRest(false);
+  pulsePhase = (pulsePhase + dtD * (12 + fixSpeed * 0.7)) % 90;
+
+  if (navRoute && navRoute.localPts.length >= 2){
+    const rPts = navRoute.localPts, sn = navState && navState.snap ? navState.snap : snapToPolyline(ox, oy, rPts, navRoute.cum);
+    drawStyledPath(collectRoute(rPts, sn.seg, sn.pt, 1, range * 2));
+    if (navState && navState.nextStep && navState.nextStep.xy){
+      const nx = X(navState.nextStep.xy), ny = Y(navState.nextStep.xy);
+      rctx.fillStyle = 'rgba(56, 189, 248, 0.35)'; rctx.beginPath(); rctx.arc(nx, ny, 9.5 * dp, 0, Math.PI * 2); rctx.fill();
+      rctx.fillStyle = '#ffffff'; rctx.beginPath(); rctx.arc(nx, ny, 3.6 * dp, 0, Math.PI * 2); rctx.fill();
+    }
+    const endPt = rPts[rPts.length - 1], ex = X(endPt), ey = Y(endPt);
+    rctx.strokeStyle = '#bae6fd'; rctx.lineWidth = 2 * dp; rctx.beginPath(); rctx.arc(ex, ey, 8.5 * dp * br, 0, Math.PI * 2); rctx.stroke();
+    rctx.fillStyle = '#38bdf8'; rctx.beginPath(); rctx.arc(ex, ey, 4 * dp, 0, Math.PI * 2); rctx.fill();
+  } else if (matched){
+    const pts = matched.m, seg = bestSeg, a = pts[seg], b = pts[seg+1];
+    const dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx*dx + dy*dy;
+    let tt = L2 > 0 ? ((ox - a[0])*dx + (oy - a[1])*dy) / L2 : 0; tt = Math.max(0, Math.min(1, tt));
+    const p0 = [a[0] + tt*dx, a[1] + tt*dy];
+    const dir = (dx * Math.sin(targetHeading * Math.PI / 180) + dy * Math.cos(targetHeading * Math.PI / 180)) >= 0 ? 1 : -1;
+    drawStyledPath(collectRoute(pts, seg, p0, dir, range));
   }
-}
-{
-  const ck = $('clockT');
-  ck.addEventListener('touchstart', () => {
-    clkLong = false; clearTimeout(clkPress);
-    clkPress = setTimeout(() => { clkLong = true; restMode ? exitRest(true) : enterRest(); }, 700);
-  }, { passive: true });
-  ['touchend', 'touchcancel', 'touchmove'].forEach(n => ck.addEventListener(n, () => clearTimeout(clkPress), { passive: true }));
+  rctx.restore();
+
+  if (!fadeCache.gx || fadeCache.w !== w || fadeCache.h !== h){
+    const ease = k => k <= 0 ? 0 : k >= 1 ? 1 : 0.5 - 0.5 * Math.cos(Math.PI * k);
+    const gx = rctx.createLinearGradient(0, 0, w, 0), gy = rctx.createLinearGradient(0, 0, 0, h);
+    for (let i = 0; i <= 32; i++){
+      const s = i / 32;
+      gx.addColorStop(s, `rgba(0,0,0,${ease(Math.min(s, 1 - s) / 0.16).toFixed(3)})`);
+      gy.addColorStop(s, `rgba(0,0,0,${(s < 0.5 ? ease(s / 0.18) : ease((1 - s) / 0.24)).toFixed(3)})`);
+    }
+    fadeCache = { w, h, gx, gy };
+  }
+  rctx.save(); rctx.globalCompositeOperation = 'destination-in';
+  rctx.fillStyle = fadeCache.gx; rctx.fillRect(0, 0, w, h);
+  rctx.fillStyle = fadeCache.gy; rctx.fillRect(0, 0, w, h);
+  rctx.restore(); rctx.globalCompositeOperation = 'source-over';
+
+  const glow = rctx.createRadialGradient(tx, ty, 0, tx, ty, 76 * dp);
+  glow.addColorStop(0, `rgba(56, 189, 248, ${(0.28 * br).toFixed(3)})`); glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+  rctx.fillStyle = glow; rctx.beginPath(); rctx.arc(tx, ty, 76 * dp, 0, Math.PI * 2); rctx.fill();
+
+  rctx.save(); rctx.translate(tx, ty);
+  rctx.fillStyle = '#07111e'; rctx.strokeStyle = `rgb(${TH.arrow})`; rctx.lineWidth = 2.2 * dp;
+  rctx.beginPath(); rctx.moveTo(0, -11 * dp); rctx.lineTo(8 * dp, 8 * dp); rctx.lineTo(0, 3.8 * dp); rctx.lineTo(-8 * dp, 8 * dp); rctx.closePath();
+  rctx.fill(); rctx.stroke(); rctx.restore();
 }
 
-/* ---------- YOL ÖNÜ HAVA UYARISI (gidiş yönünde 30 / 60 / 100 km) ---------- */
+setInterval(() => { if (!roadAnimRaf && renderLat !== null && !document.hidden && !restMode) drawRoadMap(); }, 180);
+
+/* ---------- YOL ÖNÜ HAVA UYARISI (30 / 60 / 100 KM) ---------- */
 let aheadLast = { t: 0, lat: null, lon: null }, aheadBusy = false, aheadShown = false;
 function aheadPoint(lat, lon, bearing, km){
   const b = bearing * Math.PI / 180;
@@ -1853,27 +1669,19 @@ function hazardOf(c){
 }
 function showAhead(b){
   const chip = $('aheadChip');
-  if (!b){
-    aheadShown = false;
-    chip.classList.remove('on');
-    $('navHud').classList.toggle('on', !!navRoute);
-    return;
-  }
+  if (!b){ aheadShown = false; chip.classList.remove('on'); return; }
   $('aheadText').textContent = `${b.km} KM ÖNDE · ${b.txt}`;
-  aheadShown = true;
-  chip.classList.add('on');
-  $('navHud').classList.remove('on');
+  aheadShown = true; chip.classList.add('on');
 }
 async function checkAhead(){
-  if (aheadBusy || manual || fixLat === null) return;
+  if (aheadBusy || fixLat === null) return;
   const now = Date.now();
   if (fixSpeed < 5 || now - fixTime > 15000) return;
   const moved = aheadLast.lat !== null ? distKm(aheadLast.lat, aheadLast.lon, fixLat, fixLon) : 99;
   if (now - aheadLast.t < 8 * 60000 && moved < 12) return;
   aheadBusy = true; aheadLast = { t: now, lat: fixLat, lon: fixLon };
   try{
-    const kms = [30, 60, 100];
-    const pts = kms.map(k => aheadPoint(fixLat, fixLon, fixHead, k));
+    const kms = [30, 60, 100], pts = kms.map(k => aheadPoint(fixLat, fixLon, fixHead, k));
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${pts.map(p => p[0].toFixed(3)).join(',')}&longitude=${pts.map(p => p[1].toFixed(3)).join(',')}&current=temperature_2m,precipitation,weather_code,wind_gusts_10m&timezone=auto`;
     const d = await (await fetch(url)).json();
     const arr = Array.isArray(d) ? d : [d];
@@ -1887,468 +1695,130 @@ async function checkAhead(){
   }catch{}
   finally{ aheadBusy = false; }
 }
-
+setInterval(checkAhead, 30000);
 setInterval(() => {
   const now = Date.now();
-  if (!restMode && !manual && fixTime > 0 && now - fixTime < 30000 && now > restSnoozeUntil && now - lastMoveAt > REST_AFTER && fixSpeed < 1) enterRest();
-  if (restMode) updateRest();
+  if (!restMode && fixTime > 0 && now - fixTime < 30000 && now > restSnoozeUntil && now - lastMoveAt > 180000 && fixSpeed < 1) enterRest();
   if (aheadShown && now - aheadLast.t > 25 * 60000) showAhead(null);
 }, 5000);
-setInterval(checkAhead, 30000);
 
-/* ---------- ÜST PUSULA ŞERİDİ ---------- */
-const tapeCv = $('tapeCv'), tctx = tapeCv.getContext('2d');
-const CARD = { 0:'N', 45:'NE', 90:'E', 135:'SE', 180:'S', 225:'SW', 270:'W', 315:'NW' };
-let tapeQ = 0;
-function tapeSize(){
-  const dp = Math.min(3, window.devicePixelRatio || 1);
-  tapeCv.width = Math.max(1, Math.round(tapeCv.clientWidth * dp));
-  tapeCv.height = Math.max(1, Math.round(tapeCv.clientHeight * dp));
-  drawTape();
-}
-function drawTape(){
-  if (tapeQ) return;
-  tapeQ = requestAnimationFrame(() => { tapeQ = 0; paintTape(); });
-}
-function paintTape(){
-  const w = tapeCv.width, h = tapeCv.height;
-  if (!w || !h || !tapeCv.clientWidth) return;
-  const c = tctx, dp = w / tapeCv.clientWidth;
-  const hd = heading === null ? 0 : heading, span = 200, ppd = w / span;
-  c.setTransform(1, 0, 0, 1, 0, 0);
-  c.globalCompositeOperation = 'source-over';
-  c.clearRect(0, 0, w, h);
-  c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineCap = 'butt';
-  const fLet = Math.max(9 * dp, h * 0.30), fNum = Math.max(8 * dp, h * 0.26);
-  for (let d = Math.ceil((hd - span / 2) / 5) * 5; d <= hd + span / 2; d += 5){
-    const a = ((Math.round(d) % 360) + 360) % 360, x = w / 2 + (d - hd) * ppd;
-    const big = a % 30 === 0, mid = a % 10 === 0;
-    const len = h * (big ? 0.20 : mid ? 0.13 : 0.08);
-    c.strokeStyle = `rgba(245,245,247,${big ? 0.7 : 0.4})`;
-    c.lineWidth = (big ? 1.6 : 1) * dp;
-    c.beginPath(); c.moveTo(x, h * 0.36); c.lineTo(x, h * 0.36 + len); c.stroke();
-    if (Math.abs(d - hd) <= 11) continue;
-    if (CARD[a] !== undefined){
-      c.font = `700 ${fLet}px Montserrat, sans-serif`;
-      c.fillStyle = `rgba(${TH.acc},0.95)`;
-      c.fillText(CARD[a], x, h * 0.16);
-    }
-    if (big){
-      c.font = `600 ${fNum}px Montserrat, sans-serif`;
-      c.fillStyle = `rgba(${TH.acc},0.72)`;
-      c.fillText(a + '°', x, h * 0.85);
-    }
-  }
-  const cx = w / 2;
-  c.save();
-  c.shadowColor = `rgba(${TH.acc},0.9)`; c.shadowBlur = 8 * dp;
-  c.strokeStyle = `rgb(${TH.acc})`; c.lineWidth = 2.2 * dp;
-  c.beginPath(); c.moveTo(cx, h * 0.10); c.lineTo(cx, h * 0.62); c.stroke();
-  c.fillStyle = `rgb(${TH.acc})`;
-  c.beginPath(); c.arc(cx, h * 0.10, h * 0.055, 0, 6.2832); c.fill();
-  c.restore();
-  c.font = `700 ${Math.max(9 * dp, h * 0.28)}px Montserrat, sans-serif`;
-  c.fillStyle = 'rgba(255,255,255,0.96)';
-  c.fillText(heading === null ? '--°' : (((Math.round(hd) % 360) + 360) % 360) + '°', cx, h * 0.84);
-  c.globalCompositeOperation = 'destination-in';
-  const g = c.createLinearGradient(0, 0, w, 0);
-  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.1, 'rgba(0,0,0,1)');
-  g.addColorStop(0.9, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-  c.fillStyle = g; c.fillRect(0, 0, w, h);
-  c.globalCompositeOperation = 'source-over';
-}
-
-/* ---------- YÖN / RAKIM / KOORDİNAT ---------- */
-const pad = n => String(n).padStart(2,'0');
-function dms(v, pos, neg){
-  const a = Math.abs(v); let d = Math.floor(a), m = Math.floor((a-d)*60), s = Math.round(((a-d)*60-m)*60);
-  if (s===60){ s=0; m++; } if (m===60){ m=0; d++; }
-  return `${d}°${pad(m)}'${pad(s)}" ${v>=0?pos:neg}`;
-}
-let heading = null, compassOn = false, gpsHeadTime = 0, gpsAlt = null, elev = null;
-function setHeading(target){
-  if (heading===null) heading = target;
-  else { let d = ((target-heading+540)%360)-180; heading = (heading + d*0.18 + 360)%360; }
-  drawTape();
-  if (Date.now() - gpsHeadTime >= 5000){
-    targetHeading = heading;
-    kickRoadAnim();
-  }
-}
-function onOrient(e){
-  if (Date.now()-gpsHeadTime < 5000) return;
-  let h = typeof e.webkitCompassHeading==='number' ? e.webkitCompassHeading : (e.absolute && e.alpha!=null ? 360-e.alpha : null);
-  if (h==null) return;
-  const ang = (screen.orientation && screen.orientation.angle!=null) ? screen.orientation.angle : (window.orientation||0);
-  setHeading((h + ang + 360) % 360);
-}
-function startCompass(){
-  if (compassOn) return; compassOn = true;
-  const D = window.DeviceOrientationEvent;
-  if (D && typeof D.requestPermission === 'function'){
-    D.requestPermission().then(r => { if (r==='granted') window.addEventListener('deviceorientation', onOrient, true); else compassOn=false; }).catch(()=>{compassOn=false;});
-  } else {
-    window.addEventListener('deviceorientationabsolute', onOrient, true);
-    window.addEventListener('deviceorientation', onOrient, true);
-  }
-}
-document.addEventListener('click', startCompass, {once:true});
-
-function updateGeo(c){
-  $('latDms').textContent = dms(c.latitude,'N','S');
-  $('lonDms').textContent = dms(c.longitude,'E','W');
-  if (c.altitude!=null && isFinite(c.altitude)) { gpsAlt = c.altitude; $('altVal').textContent = Math.round(gpsAlt); }
-  else if (elev!=null) $('altVal').textContent = Math.round(elev);
-
-  if (c.speed > 1.5 && c.heading != null && isFinite(c.heading)){
-    gpsHeadTime = Date.now();
-    setHeading(c.heading);
-    targetHeading = c.heading;
-  }
-  fixSpeed = (c.speed != null && isFinite(c.speed) && c.speed > 0) ? c.speed : 0;
-  fixHead = (c.speed > 1.5 && c.heading != null && isFinite(c.heading)) ? c.heading : targetHeading;
-  fixLat = c.latitude; fixLon = c.longitude; fixTime = Date.now();
-  trackMovement(c.latitude, c.longitude);
-  if (fixSpeed >= 5) checkAhead();
-  fxKick();
-  if (!manual){
-    targetLat = c.latitude;
-    targetLon = c.longitude;
-    fetchRoadNetwork(targetLat, targetLon, false);
-    kickRoadAnim();
-  }
-}
-
-/* ---------- GPS ---------- */
-const KM_TH = 3, T_TH = 3*60*1000;
-let lastLat=null,lastLon=null,lastFetch=0,manual=false;
+/* ---------- GPS & PUSULA ---------- */
 function distKm(a,b,c,d){
   const R=6371,r=Math.PI/180,dl=(c-a)*r,dn=(d-b)*r;
   const x=Math.sin(dl/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dn/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
-async function placeName(lat,lon){
+let compassOn = false, gpsHeadTime = 0;
+function onOrient(e){
+  if (Date.now() - gpsHeadTime < 5000) return;
+  let h = typeof e.webkitCompassHeading === 'number' ? e.webkitCompassHeading : (e.absolute && e.alpha != null ? 360 - e.alpha : null);
+  if (h == null) return;
+  const ang = (screen.orientation && screen.orientation.angle != null) ? screen.orientation.angle : (window.orientation || 0);
+  targetHeading = (h + ang + 360) % 360;
+  kickRoadAnim();
+}
+function startCompass(){
+  if (compassOn) return; compassOn = true;
+  const D = window.DeviceOrientationEvent;
+  if (D && typeof D.requestPermission === 'function'){
+    D.requestPermission().then(r => { if (r === 'granted') window.addEventListener('deviceorientation', onOrient, true); else compassOn = false; }).catch(() => { compassOn = false; });
+  } else {
+    window.addEventListener('deviceorientationabsolute', onOrient, true);
+    window.addEventListener('deviceorientation', onOrient, true);
+  }
+}
+document.addEventListener('click', startCompass, { once: true });
+
+const KM_TH = 2.5, T_TH = 3 * 60 * 1000;
+let lastGeoLat = null, lastGeoLon = null, lastGeoAt = 0;
+async function updatePlaceSignature(lat, lon, force=false){
+  const now = Date.now(), moved = lastGeoLat !== null ? distKm(lastGeoLat, lastGeoLon, lat, lon) : 99;
+  if (!force && lastGeoLat !== null && moved < KM_TH && now - lastGeoAt < T_TH) return;
+  lastGeoLat = lat; lastGeoLon = lon; lastGeoAt = now;
   try{
     const d = await (await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`)).json();
-    const a=d.locality||d.city||"", p=d.principalSubdivision||"", c=d.countryName||"";
-    if (a && p && a!==p) return `${a}, ${p}, ${c}`;
-    return p ? `${p}, ${c}` : (a||"GPS konumu");
-  }catch{ return "GPS konumu"; }
+    const loc = (d.locality || d.city || '').toUpperCase(), prov = (d.principalSubdivision || '').toUpperCase(), country = (d.countryName || 'TÜRKİYE').toUpperCase();
+    if (loc && prov && loc !== prov){ $('sigCity').textContent = loc; $('sigSub').textContent = `${prov} · ${country}`; }
+    else { $('sigCity').textContent = prov || loc || 'KONUM'; $('sigSub').textContent = country; }
+  }catch{}
 }
-async function onCoords(lat,lon,force){
-  const now=Date.now(), moved = lastLat!==null ? distKm(lastLat,lastLon,lat,lon) : 0;
-  if (force || lastLat===null || moved>=KM_TH || now-lastFetch>=T_TH){
-    lastLat=lat; lastLon=lon; lastFetch=now;
-    fetchWeather(lat,lon,await placeName(lat,lon));
+function updateGeo(c){
+  if (c.speed > 1.5 && c.heading != null && isFinite(c.heading)){ gpsHeadTime = Date.now(); targetHeading = c.heading; }
+  fixSpeed = (c.speed != null && isFinite(c.speed) && c.speed > 0) ? c.speed : 0;
+  fixHead = (c.speed > 1.5 && c.heading != null && isFinite(c.heading)) ? c.heading : targetHeading;
+  fixLat = c.latitude; fixLon = c.longitude; fixTime = Date.now();
+  if (!restRef) restRef = { lat: c.latitude, lon: c.longitude };
+  if (fixSpeed > 1.5 || distKm(restRef.lat, restRef.lon, c.latitude, c.longitude) > 0.06){
+    lastMoveAt = Date.now(); restRef = { lat: c.latitude, lon: c.longitude };
+    if (restMode) exitRest(false);
   }
+  if (autoZoom) targetZoomMeters = computeAutoZoomMeters(fixSpeed, lastDistToTurn);
+  updateSlope(c.latitude, c.longitude, c.altitude);
+  if (fixSpeed >= 5) checkAhead();
+  fxKick();
+  targetLat = c.latitude; targetLon = c.longitude;
+  fetchRoadNetwork(targetLat, targetLon, false);
+  updatePlaceSignature(c.latitude, c.longitude, false);
+  kickRoadAnim();
 }
 function startGps(){
   if (!('geolocation' in navigator)) return ipFallback();
-  navigator.geolocation.watchPosition(p => { updateGeo(p.coords); if (!manual) onCoords(p.coords.latitude,p.coords.longitude,false); },
-    () => { if (lastLat===null && targetLat===null) ipFallback(); }, {enableHighAccuracy:true,maximumAge:4000,timeout:10000});
-  setInterval(() => { if (!manual) navigator.geolocation.getCurrentPosition(p => { updateGeo(p.coords); onCoords(p.coords.latitude,p.coords.longitude,false); }, ()=>{}, {enableHighAccuracy:true,timeout:8000}); }, T_TH);
-}
-function forceGps(){
-  manual=false;
-  if ('geolocation' in navigator) navigator.geolocation.getCurrentPosition(p => { updateGeo(p.coords); onCoords(p.coords.latitude,p.coords.longitude,true); fetchRoadNetwork(p.coords.latitude,p.coords.longitude,true); }, ipFallback, {enableHighAccuracy:true,maximumAge:0,timeout:8000});
-  else ipFallback();
+  navigator.geolocation.watchPosition(p => updateGeo(p.coords), () => { if (targetLat === null) ipFallback(); }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 });
+  setInterval(() => navigator.geolocation.getCurrentPosition(p => updateGeo(p.coords), () => {}, { enableHighAccuracy: true, timeout: 8000 }), T_TH);
 }
 async function ipFallback(){
-  try{ const d = await (await fetch('https://ipwho.is/')).json();
+  try{
+    const d = await (await fetch('https://ipwho.is/')).json();
     if (d && d.latitude){
       targetLat = renderLat = d.latitude; targetLon = renderLon = d.longitude;
-      fetchRoadNetwork(targetLat, targetLon, true);
-      drawRoadMap();
-      return fetchWeather(d.latitude,d.longitude,`${d.city}, ${d.country}`);
+      $('sigCity').textContent = (d.city || 'MUĞLA').toUpperCase(); $('sigSub').textContent = (d.country || 'TÜRKİYE').toUpperCase();
+      fetchRoadNetwork(targetLat, targetLon, true); drawRoadMap(); drawTopCompass(); return;
     }
   }catch{}
-  targetLat = renderLat = 41.0082; targetLon = renderLon = 28.9784;
-  fetchRoadNetwork(targetLat, targetLon, true);
-  drawRoadMap();
-  fetchWeather(41.0082,28.9784,"İstanbul, Türkiye");
+  targetLat = renderLat = 37.2153; targetLon = renderLon = 28.3636;
+  $('sigCity').textContent = 'MUĞLA'; $('sigSub').textContent = 'TÜRKİYE';
+  fetchRoadNetwork(targetLat, targetLon, true); drawRoadMap(); drawTopCompass();
 }
-
-/* ---------- ŞEHİR ADI (altta ortada: büyük isim + küçük il · ülke) ---------- */
-function setCity(place){
-  const parts = String(place || '').split(',').map(s => s.trim()).filter(Boolean);
-  $('cityMain').textContent = parts[0] || 'Konum';
-  $('citySub').textContent = parts.slice(1).join(' · ');
-}
-
-/* ---------- HAVA DURUMU ---------- */
-const DAYS=["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
-const MON3=["OCA","ŞUB","MAR","NİS","MAY","HAZ","TEM","AĞU","EYL","EKİ","KAS","ARA"];
-async function fetchWeather(lat,lon,place){
-  try{
-    const d = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&timezone=auto`)).json();
-    if (!d || !d.current) return;
-    setCity(place);
-    if (typeof d.elevation==='number'){ elev=d.elevation; if (gpsAlt==null) $('altVal').textContent=Math.round(elev); }
-    const info=wx(d.current.weather_code);
-    $('mainTemp').textContent=Math.round(d.current.temperature_2m); $('mainCond').textContent=info.label;
-    $('windText').textContent=d.current.wind_speed_10m.toFixed(1)+' km/sa';
-    $('humText').textContent='%'+Math.round(d.current.relative_humidity_2m);
-    setArt(info.type,d.current.is_day===0);
-  }catch{}
-}
-
-/* ---------- RADYO ---------- */
-const audio=$('audioTag');
-const S=(a,t,b,u,m=null)=>({artist:a,title:t,badge:b,url:u,isRadio:true,meta:m});
-const SW="https://playerservices.streamtheworld.com/api/livestream-redirect/";
-let tracks=[
-  S("Nightride FM","Synthwave • gece sürüşü","NIGHTRIDE\nFM","https://stream.nightride.fm/nightride.mp3",{type:"nightride",id:"nightride"}),
-  S("Chillsynth FM","Chill ve outrun","CHILL\nSYNTH","https://stream.nightride.fm/chillsynth.mp3",{type:"nightride",id:"chillsynth"}),
-  S("Darksynth FM","Darksynth","DARK\nSYNTH","https://stream.nightride.fm/darksynth.mp3",{type:"nightride",id:"darksynth"}),
-  S("Datawave FM","Datawave","DATA\nWAVE","https://stream.nightride.fm/datawave.mp3",{type:"nightride",id:"datawave"}),
-  S("Spacesynth FM","Spacesynth","SPACE\nSYNTH","https://stream.nightride.fm/spacesynth.mp3",{type:"nightride",id:"spacesynth"}),
-  S("Nightwave Plaza","Vaporwave ve gece sürüşü","NIGHTWAVE\nPLAZA","https://radio.plaza.one/mp3",{type:"plaza"}),
-  S("Radio Paradise Mellow","Sakin ve atmosferik","RP\nMELLOW","https://stream.radioparadise.com/mellow-128",{type:"rp",chan:1}),
-  S("Radio Paradise Rock","Klasik ve alternatif rock","RP\nROCK","https://stream.radioparadise.com/rock-128",{type:"rp",chan:2}),
-  S("FIP Radio","Caz, soul ve dünya müziği","FIP\nRADIO","https://icecast.radiofrance.fr/fip-midfi.mp3"),
-  S("FIP Electro","Downtempo ve elektronik","FIP\nELECTRO","https://icecast.radiofrance.fr/fipelectro-midfi.mp3"),
-  S("Power FM","Türkiye • yabancı hit","POWER\nFM","https://listen.powerapp.com.tr/powerfm/mpeg/icecast.audio"),
-  S("Power Türk","Türkiye • Türkçe pop","POWER\nTÜRK","https://listen.powerapp.com.tr/powerturk/mpeg/icecast.audio"),
-  S("Power Love","Türkiye • slow ve romantik","POWER\nLOVE","https://listen.powerapp.com.tr/powerlove/mpeg/icecast.audio"),
-  S("Virgin Radio TR","Türkiye • yabancı pop","VIRGIN\nRADIO",SW+"VIRGIN_RADIO_TR.mp3"),
-  S("Metro FM","Türkiye • hit müzik","METRO\nFM",SW+"METRO_FM.mp3"),
-  S("Süper FM","Türkiye • Türkçe hit","SÜPER\nFM",SW+"SUPER_FM.mp3"),
-  S("Joy Türk","Türkiye • Türkçe slow","JOY\nTÜRK",SW+"JOY_TURK.mp3"),
-  S("Radio Paradise","Global • eklektik","RADIO\nPARADISE","https://stream.radioparadise.com/mp3-128",{type:"rp",chan:0})
-];
-let ti=0, playing=false, liveSec=0, liveTimer=null, skipTimer=null, metaTimer=null, metaAbort=null, nowPlaying="";
-function ui(sub){
-  eqKick();
-  const t=tracks[ti];
-  $('songLabel').textContent=sub||nowPlaying||t.title;
-  $('artistLabel').textContent=t.artist;
-  $('ppSvg').innerHTML = playing ? `<rect x="5" y="4" width="4.5" height="16" rx="1"/><rect x="14.5" y="4" width="4.5" height="16" rx="1"/>` : `<polygon points="6 4 20 12 6 20"/>`;
-  if ('mediaSession' in navigator && window.MediaMetadata){
-    navigator.mediaSession.metadata = new MediaMetadata({ title: nowPlaying || t.title, artist: t.artist });
-  }
-}
-
-/* ---------- CANLI ŞARKI BİLGİSİ (NOW PLAYING) ---------- */
-function cleanTrackTitle(raw, stationName){
-  if (!raw) return "";
-  const s = String(raw).replace(/\s+/g,' ').trim();
-  if (!s || s.length < 2) return "";
-  const low = s.toLowerCase();
-  if (low === "unknown" || low === "-" || low === stationName.toLowerCase()) return "";
-  return s;
-}
-async function readIcyTitle(url, signal){
-  const res = await fetch(url, { headers: { 'Icy-MetaData': '1' }, signal });
-  const metaint = parseInt(res.headers.get('icy-metaint'), 10);
-  if (!metaint || isNaN(metaint) || !res.body) return "";
-  const reader = res.body.getReader();
-  let buf = new Uint8Array(0);
-  while (true){
-    const { value, done } = await reader.read();
-    if (done || !value) break;
-    const next = new Uint8Array(buf.length + value.length);
-    next.set(buf); next.set(value, buf.length); buf = next;
-    if (buf.length >= metaint + 1){
-      const metaLen = buf[metaint] * 16;
-      if (metaLen === 0) break;
-      if (buf.length >= metaint + 1 + metaLen){
-        const raw = new TextDecoder('utf-8').decode(buf.slice(metaint + 1, metaint + 1 + metaLen));
-        const m = raw.match(/StreamTitle='(.*?)';/i) || raw.match(/StreamTitle='([^']*)'/i);
-        return m ? m[1] : "";
-      }
-    }
-    if (buf.length > metaint + 8192) break;
-  }
-  return "";
-}
-async function fetchNowPlaying(){
-  const idx = ti, t = tracks[idx];
-  if (!playing || !t || !t.isRadio) return;
-  if (metaAbort) metaAbort.abort();
-  const ctrl = new AbortController();
-  metaAbort = ctrl;
-  let found = "";
-  try{
-    if (t.meta && t.meta.type === "plaza"){
-      const d = await (await fetch("https://api.plaza.one/status", { signal: ctrl.signal })).json();
-      const s = d && d.song;
-      if (s && (s.artist || s.title)) found = [s.artist, s.title].filter(Boolean).join(" - ");
-    } else if (t.meta && t.meta.type === "rp"){
-      const ch = t.meta.chan ?? 0;
-      const d = await (await fetch(`https://api.radioparadise.com/api/now_playing?chan=${ch}`, { signal: ctrl.signal })).json();
-      if (d && (d.artist || d.title)) found = [d.artist, d.title].filter(Boolean).join(" - ");
-    } else if (t.meta && t.meta.type === "nightride"){
-      const d = await (await fetch("https://stream.nightride.fm/status-json.xsl", { signal: ctrl.signal })).json();
-      const src = d && d.icestats && d.icestats.source;
-      const list = Array.isArray(src) ? src : (src ? [src] : []);
-      const hit = list.find(x => x.listenurl && x.listenurl.includes(`/${t.meta.id}.mp3`));
-      if (hit && hit.title) found = hit.title;
-    }
-    if (!found){
-      found = await readIcyTitle(t.url, ctrl.signal);
-    }
-  }catch{}
-  finally{ ctrl.abort(); }
-  const cleaned = cleanTrackTitle(found, t.artist);
-  if (cleaned && idx === ti && playing){
-    nowPlaying = cleaned;
-    ui();
-  }
-}
-function startMetaPolling(){
-  clearInterval(metaTimer);
-  fetchNowPlaying();
-  metaTimer = setInterval(fetchNowPlaying, 18000);
-}
-function stopMetaPolling(){
-  clearInterval(metaTimer);
-  if (metaAbort){ metaAbort.abort(); metaAbort = null; }
-}
-
-function liveStart(){ clearInterval(liveTimer); liveTimer=setInterval(()=>{ if(playing&&tracks[ti].isRadio) liveSec++; },1000); }
-function select(i,go=true){
-  clearTimeout(skipTimer); clearInterval(liveTimer); stopMetaPolling(); liveSec=0; nowPlaying="";
-  ti=(i+tracks.length)%tracks.length; const t=tracks[ti];
-  audio.pause(); audio.removeAttribute('src'); audio.load();
-  if (go){ playing=true; ui(t.isRadio?"Yayına bağlanıyor…":t.title); audio.src=t.url; audio.play().catch(()=>{ playing=false; ui("Başlatmak için oynat tuşuna basın"); }); }
-  else { playing=false; ui(); }
-}
-function togglePlay(){
-  const t=tracks[ti];
-  if (!playing){
-    if (!audio.src || audio.src===location.href) return select(ti,true);
-    playing=true; ui(t.isRadio?"Yayına bağlanıyor…":t.title); audio.play().catch(()=>{playing=false;ui();});
-  } else { audio.pause(); playing=false; clearInterval(liveTimer); stopMetaPolling(); ui(); }
-}
-const nextSong=()=>select(ti+1,true), prevSong=()=>select(ti-1,true);
-audio.addEventListener('playing',()=>{ playing=true; ui(); if(tracks[ti].isRadio){ liveStart(); startMetaPolling(); } });
-audio.addEventListener('waiting',()=>{ if(playing && !nowPlaying) ui("Tamponlanıyor…"); });
-audio.addEventListener('error',()=>{ if(!playing) return; stopMetaPolling(); ui("Kanal yanıt vermiyor, sonrakine geçiliyor…"); skipTimer=setTimeout(nextSong,1500); });
-audio.addEventListener('ended',()=>{ if(!tracks[ti].isRadio) nextSong(); });
-$('mp3Input').addEventListener('change',e=>{
-  const fs=[...e.target.files]; if(!fs.length) return;
-  tracks=[...fs.map(f=>({artist:"Yerel MP3",title:f.name.replace(/\.[^/.]+$/,""),badge:"YEREL\nMP3",url:URL.createObjectURL(f),isRadio:false})),...tracks];
-  select(0,true);
-});
-
-/* ---------- EKOLAYZIR (saat ve tarihle aynı renk) ---------- */
-const eq=$('eq'), ectx=eq.getContext('2d'), NB=96, bars=new Float32Array(NB); let eqRaf=null;
-const EQ_MAX = 0.7;
-function eqSize(){ const dp=window.devicePixelRatio||1; eq.width=Math.max(1,eq.clientWidth*dp); eq.height=Math.max(1,eq.clientHeight*dp); }
-let eqLast=0;
-function eqFrame(ts){
-  if (eqLast && ts-eqLast<30){ eqRaf=requestAnimationFrame(eqFrame); return; }
-  eqLast=ts;
-  const w=eq.width, h=eq.height, t=ts/1000, dp=window.devicePixelRatio||1;
-  const bw=Math.max(1,Math.round(Math.max(1.5*dp,(w/NB)*0.34))), step=(w-bw)/(NB-1);
-  const cl=TH.clk;
-  let mx=0;
-  ectx.clearRect(0,0,w,h);
-  ectx.lineCap='butt';
-  ectx.lineWidth=bw;
-  for (let i=0;i<NB;i++){
-    const c=i/(NB-1);
-    const leftBias=0.14 + 0.86*Math.exp(-Math.pow((c-0.26)/0.24,2)) + 0.35*Math.exp(-Math.pow((c-0.05)/0.07,2));
-    const w1=Math.abs(Math.sin(t*2.1 + i*0.52));
-    const w2=Math.abs(Math.sin(t*1.35 - i*0.21 + 1.1));
-    const w3=0.5 + 0.5*Math.sin(t*3.7 + i*1.17);
-    const tg=playing ? Math.min(1, (0.08 + 0.92*(w1*w2*0.75 + w3*0.25))*leftBias) * EQ_MAX : 0;
-    bars[i]+=(tg-bars[i])*(tg>bars[i]?0.42:0.14);
-    mx=Math.max(mx,bars[i]);
-    const bh=Math.round(Math.max(2*dp, bars[i]*(h - 2*dp)));
-    const x=Math.round(i*step)+bw/2;
-    ectx.strokeStyle=bars[i]<0.08 ? `rgba(${cl},.38)` : `rgba(${cl},.9)`;
-    ectx.beginPath();
-    ectx.moveTo(x, h);
-    ectx.lineTo(x, h - bh);
-    ectx.stroke();
-  }
-  eqRaf=(playing||mx>.01)?requestAnimationFrame(eqFrame):null;
-}
-function eqKick(){ if(!eqRaf) eqRaf=requestAnimationFrame(eqFrame); }
-
-/* ---------- ŞEHİR ARAMA ---------- */
-let st=null;
-function openCity(){ $('cityModal').classList.add('open'); storageInfo(); setTimeout(()=>$('cityInput').focus(),50); }
-function closeCity(){ $('cityModal').classList.remove('open'); }
-$('cityInput').addEventListener('input',e=>{
-  clearTimeout(st); const q=e.target.value.trim(); if(q.length<2) return;
-  st=setTimeout(async()=>{
-    try{
-      const d=await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=tr`)).json();
-      const l=$('cityRes'); l.innerHTML='';
-      (d.results||[]).forEach(it=>{
-        const o=document.createElement('div'); o.className='opt'; o.textContent=`${it.name}${it.admin1?', '+it.admin1:''} (${it.country||''})`;
-        o.onclick=()=>{
-          manual=true;
-          targetLat=renderLat=it.latitude; targetLon=renderLon=it.longitude; fixSpeed=0;
-          fetchWeather(it.latitude,it.longitude,[it.name,it.admin1,it.country].filter(Boolean).join(', '));
-          fetchRoadNetwork(it.latitude,it.longitude,true);
-          drawRoadMap();
-          closeCity();
-        };
-        l.appendChild(o);
-      });
-    }catch{}
-  },300);
-});
-
-/* ---------- TARİH / SAAT ---------- */
-function setDate(){
-  const n=new Date();
-  $('bigDay').textContent=pad(n.getDate());
-  $('dayLine').textContent=DAYS[n.getDay()]; $('monthLine').textContent=MON3[n.getMonth()]+'. '+n.getFullYear();
-  $('clockT').textContent=pad(n.getHours())+':'+pad(n.getMinutes());
-}
-setDate(); setInterval(setDate,5000);
 
 /* ---------- DİK TELEFON → YATAY EKRAN ---------- */
-const scr=document.querySelector('.screen'), modes=['cw','ccw','off'];
-const modeNames={cw:'Yön: sağa',ccw:'Yön: sola',off:'Döndürme kapalı'};
-function getMode(){ try{ return localStorage.getItem('rot')||'cw'; }catch{ return 'cw'; } }
+const scr = $('screen'), modes = ['cw', 'ccw', 'off'], modeNames = { cw: 'Ekran yönü: sağa', ccw: 'Ekran yönü: sola', off: 'Döndürme kapalı' };
+function getMode(){ try{ return localStorage.getItem('rot') || 'cw'; }catch{ return 'cw'; } }
+function toggleRotMode(){
+  const m = modes[(modes.indexOf(getMode()) + 1) % modes.length];
+  try{ localStorage.setItem('rot', m); }catch{}
+  applyLayout(); toast(modeNames[m]);
+}
 function applyLayout(){
-  const W=innerWidth,H=innerHeight,mode=getMode(); let w=W,h=H;
-  if (H>W && mode!=='off'){
-    w=H; h=W;
-    scr.style.cssText=`position:fixed;left:0;top:0;width:${w}px;height:${h}px;transform-origin:0 0;padding:${h*.008}px 0 ${h*.01}px 0;`+
-      `transform:${mode==='cw'?`translateX(${W}px) rotate(90deg)`:`translateY(${H}px) rotate(-90deg)`}`;
-    document.documentElement.style.setProperty('--px',w*.03+'px');
+  const W = innerWidth, H = innerHeight, mode = getMode(); let w = W, h = H;
+  if (H > W && mode !== 'off'){
+    w = H; h = W;
+    scr.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;transform-origin:0 0;` +
+      `transform:${mode === 'cw' ? `translateX(${W}px) rotate(90deg)` : `translateY(${H}px) rotate(-90deg)`}`;
+    document.documentElement.style.setProperty('--px', w * .032 + 'px');
   } else {
-    scr.style.cssText='';
+    scr.style.cssText = '';
     document.documentElement.style.removeProperty('--px');
   }
-  document.documentElement.style.setProperty('--vh',h/100+'px');
-  document.documentElement.style.setProperty('--vw',w/100+'px');
-  eqSize(); eqKick(); roadSize(); tapeSize(); fxSize();
+  document.documentElement.style.setProperty('--vh', h / 100 + 'px');
+  document.documentElement.style.setProperty('--vw', w / 100 + 'px');
+  roadSize();
 }
-function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('on'),1600); }
-let lastTap=0;
-document.querySelector('.date-wrap').addEventListener('click',()=>{
-  const n=Date.now(); if (n-lastTap<400){
-    const m=modes[(modes.indexOf(getMode())+1)%modes.length]; try{ localStorage.setItem('rot',m); }catch{}
-    applyLayout(); toast(modeNames[m]); lastTap=0;
-  } else lastTap=n;
-});
-addEventListener('resize',applyLayout); addEventListener('orientationchange',()=>setTimeout(applyLayout,150));
-/* Haritaya dokununca mod değişir (Aurora, Plazma, Ok akışı, Sade); ekranın diğer boş yerlerine dokununca radyo kanalı değişir */
-document.addEventListener('click', e => {
-  if (e.target.closest('.loc,.nav-btn,.nav-hud,.date-wrap,.clock,.zoom-hit,.modal,.dock,.toast,.wx-mini,#restBox')) return;
-  const rr = $('roadWrap').getBoundingClientRect();
-  if (!e.target.closest('.left') && e.clientX >= rr.left && e.clientX <= rr.right && e.clientY >= rr.top && e.clientY <= rr.bottom){ toggleMapStyle(); return; }
-  nextSong();
-  toast(tracks[ti].artist);
-});
-$('roadZoomLbl').textContent = ZOOM_STEPS[zoomIdx].label;
-applyLayout();
+
+addEventListener('resize', applyLayout);
+addEventListener('orientationchange', () => setTimeout(applyLayout, 150));
 if (typeof ResizeObserver !== 'undefined'){
   let roRaf = 0;
-  const ro = new ResizeObserver(() => { if (roRaf) return; roRaf = requestAnimationFrame(() => { roRaf = 0; eqSize(); eqKick(); roadSize(); tapeSize(); fxSize(); }); });
-  ro.observe(roadCv); ro.observe(eq); ro.observe(tapeCv); ro.observe(fxCv);
+  const ro = new ResizeObserver(() => { if (roRaf) return; roRaf = requestAnimationFrame(() => { roRaf = 0; roadSize(); }); });
+  ro.observe(roadCv);
 }
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { eqSize(); eqKick(); roadSize(); tapeSize(); fxSize(); });
-document.addEventListener('visibilitychange', () => { if (!document.hidden){ lastStepTs = 0; kickRoadAnim(); drawRoadMap(); drawTape(); eqKick(); fxKick(); } });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden){ lastStepTs = 0; kickRoadAnim(); drawRoadMap(); drawTopCompass(); startEqAnim(); fxKick(); }
+});
+
 setTheme(themeKey, false, true);
-ui(); startGps();
+applyLayout();
+startEqAnim();
+startGps();
 </script>
 </body>
 </html>
