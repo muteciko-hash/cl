@@ -346,6 +346,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, '0');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const DPR = Math.min(3, window.devicePixelRatio || 1);
+const FDPR = Math.min(2, window.devicePixelRatio || 1);
 const M_LAT = 110540;
 const DAYS = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
 const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -386,9 +388,9 @@ function applyThemeColors(c){
   root.setProperty('--clk', 'rgb(' + r(c.clk) + ')');
   TH.acc = r(c.acc); TH.core = r(c.core); TH.far = r(c.far); TH.arrow = r(c.arrow); TH.clk = r(c.clk);
   TH.accA = c.acc.slice(); TH.coreA = c.core.slice(); TH.farA = c.far.slice();
-  if (typeof eqKick === 'function') eqKick();
-  if (typeof drawTopCompass === 'function') drawTopCompass();
-  if (typeof drawRoadMap === 'function') drawRoadMap();
+  eqKick();
+  drawTopCompass();
+  drawRoadMap();
 }
 function resolveTheme(){
   if (themeKey !== 'auto') return { t: THEMES[themeKey], night: false, label: THEMES[themeKey].n };
@@ -429,11 +431,6 @@ function tickClock(){
     $('restDate').textContent = `${DAYS[n.getDay()]} · ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
   }
 }
-tickClock();
-setInterval(() => {
-  tickClock();
-  if (themeKey === 'auto') setTheme('auto', false, false);
-}, 15000);
 
 let lastWxLat = null, lastWxLon = null, lastWxAt = 0;
 async function fetchTempOnly(lat, lon, force=false){
@@ -477,7 +474,6 @@ function exitRest(manual){
 
 /* ---------- ARKA PLAN EFEKTLERİ (MOLA GÖKYÜZÜ & HIZ ÇİZGİLERİ) ---------- */
 const fxCv = $('fxCanvas'), fxCtx = fxCv.getContext('2d');
-const FDPR = Math.min(2, window.devicePixelRatio || 1);
 let fxCur = {}, fxSig = '', fxL = { stars: [], streaks: [] }, fxRaf = 0, fxLast = 0, speedLvl = 0, speedFlag = false;
 const fxT0 = performance.now();
 
@@ -563,6 +559,48 @@ function fxFrame(ts){
   fxRaf = requestAnimationFrame(fxFrame);
 }
 
+/* ---------- EKOLAYZIR (DİKEY ÇUBUKLAR + TEMA RENGİ) ---------- */
+const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d'), NB = 96, bars = new Float32Array(NB);
+let eqRaf = null, eqLast = 0;
+const EQ_MAX = 0.72;
+
+function eqSize(){
+  const dp = window.devicePixelRatio || 1;
+  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * dp));
+  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * dp));
+  eqKick();
+}
+
+function eqFrame(ts){
+  if (eqLast && ts - eqLast < 30){ eqRaf = requestAnimationFrame(eqFrame); return; }
+  eqLast = ts;
+  const w = eqCv.width, h = eqCv.height, t = ts / 1000, dp = window.devicePixelRatio || 1;
+  const bw = Math.max(1, Math.round(Math.max(1.5 * dp, (w / NB) * 0.34))), step = (w - bw) / (NB - 1);
+  let mx = 0;
+  ectx.clearRect(0, 0, w, h);
+  ectx.lineCap = 'butt';
+  ectx.lineWidth = bw;
+  for (let i = 0; i < NB; i++){
+    const c = i / (NB - 1);
+    const leftBias = 0.14 + 0.86 * Math.exp(-Math.pow((c - 0.26) / 0.24, 2)) + 0.35 * Math.exp(-Math.pow((c - 0.05) / 0.07, 2));
+    const w1 = Math.abs(Math.sin(t * 2.1 + i * 0.52));
+    const w2 = Math.abs(Math.sin(t * 1.35 - i * 0.21 + 1.1));
+    const w3 = 0.5 + 0.5 * Math.sin(t * 3.7 + i * 1.17);
+    const tg = radioPlaying ? Math.min(1, (0.08 + 0.92 * (w1 * w2 * 0.75 + w3 * 0.25)) * leftBias) * EQ_MAX : 0;
+    bars[i] += (tg - bars[i]) * (tg > bars[i] ? 0.42 : 0.14);
+    mx = Math.max(mx, bars[i]);
+    const bh = Math.round(Math.max(2 * dp, bars[i] * (h - 2 * dp)));
+    const x = Math.round(i * step) + bw / 2;
+    ectx.strokeStyle = bars[i] < 0.08 ? `rgba(${TH.acc},.48)` : `rgba(${TH.core},.95)`;
+    ectx.beginPath();
+    ectx.moveTo(x, h);
+    ectx.lineTo(x, h - bh);
+    ectx.stroke();
+  }
+  eqRaf = (radioPlaying || mx > 0.01) ? requestAnimationFrame(eqFrame) : null;
+}
+function eqKick(){ if (!eqRaf) eqRaf = requestAnimationFrame(eqFrame); }
+
 /* ---------- RADYO OYNATICI ---------- */
 const SW = "https://playerservices.streamtheworld.com/api/livestream-redirect/";
 const STATIONS = [
@@ -605,7 +643,6 @@ function renderStation(sub){
   $('rsPlayBtn').textContent = radioPlaying ? '❚❚' : '▶';
   $('rsPlayBtn').classList.toggle('active', radioPlaying);
 }
-renderStation();
 
 function cleanTrackTitle(raw, stationName){
   if (!raw) return '';
@@ -716,48 +753,6 @@ function openRadioModal(){
   $('radioModal').classList.add('open');
 }
 function closeRadioModal(){ $('radioModal').classList.remove('open'); }
-
-/* ---------- EKOLAYZIR (DİKEY ÇUBUKLAR + TEMA RENGİ) ---------- */
-const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d'), NB = 96, bars = new Float32Array(NB);
-let eqRaf = null, eqLast = 0;
-const EQ_MAX = 0.72;
-
-function eqSize(){
-  const dp = window.devicePixelRatio || 1;
-  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * dp));
-  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * dp));
-  eqKick();
-}
-
-function eqFrame(ts){
-  if (eqLast && ts - eqLast < 30){ eqRaf = requestAnimationFrame(eqFrame); return; }
-  eqLast = ts;
-  const w = eqCv.width, h = eqCv.height, t = ts / 1000, dp = window.devicePixelRatio || 1;
-  const bw = Math.max(1, Math.round(Math.max(1.5 * dp, (w / NB) * 0.34))), step = (w - bw) / (NB - 1);
-  let mx = 0;
-  ectx.clearRect(0, 0, w, h);
-  ectx.lineCap = 'butt';
-  ectx.lineWidth = bw;
-  for (let i = 0; i < NB; i++){
-    const c = i / (NB - 1);
-    const leftBias = 0.14 + 0.86 * Math.exp(-Math.pow((c - 0.26) / 0.24, 2)) + 0.35 * Math.exp(-Math.pow((c - 0.05) / 0.07, 2));
-    const w1 = Math.abs(Math.sin(t * 2.1 + i * 0.52));
-    const w2 = Math.abs(Math.sin(t * 1.35 - i * 0.21 + 1.1));
-    const w3 = 0.5 + 0.5 * Math.sin(t * 3.7 + i * 1.17);
-    const tg = radioPlaying ? Math.min(1, (0.08 + 0.92 * (w1 * w2 * 0.75 + w3 * 0.25)) * leftBias) * EQ_MAX : 0;
-    bars[i] += (tg - bars[i]) * (tg > bars[i] ? 0.42 : 0.14);
-    mx = Math.max(mx, bars[i]);
-    const bh = Math.round(Math.max(2 * dp, bars[i] * (h - 2 * dp)));
-    const x = Math.round(i * step) + bw / 2;
-    ectx.strokeStyle = bars[i] < 0.08 ? `rgba(${TH.acc},.48)` : `rgba(${TH.core},.95)`;
-    ectx.beginPath();
-    ectx.moveTo(x, h);
-    ectx.lineTo(x, h - bh);
-    ectx.stroke();
-  }
-  eqRaf = (radioPlaying || mx > 0.01) ? requestAnimationFrame(eqFrame) : null;
-}
-function eqKick(){ if (!eqRaf) eqRaf = requestAnimationFrame(eqFrame); }
 
 /* ---------- ÜST PUSULA ŞERİDİ (TEMA RENGİNE DUYARLI) ---------- */
 const compCv = $('compassCanvas'), cctx = compCv.getContext('2d');
@@ -872,7 +867,6 @@ function updateSlope(lat, lon, alt){
 
 /* ---------- HARİTA MOTORU + ÇEVRİMDIŞI DEPO ---------- */
 const roadCv = $('roadCanvas'), rctx = roadCv.getContext('2d');
-const DPR = Math.min(3, window.devicePixelRatio || 1);
 const OVERPASS = [
   'https://overpass-api.de/api/interpreter',
   'https://z.overpass-api.de/api/interpreter',
@@ -1794,13 +1788,16 @@ function updateGeo(c){
   kickRoadAnim();
 }
 function startGps(){
+  setTimeout(() => { if (targetLat === null) ipFallback(); }, 4000);
   if (!('geolocation' in navigator)) return ipFallback();
   navigator.geolocation.watchPosition(p => updateGeo(p.coords), () => { if (targetLat === null) ipFallback(); }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 });
   setInterval(() => navigator.geolocation.getCurrentPosition(p => updateGeo(p.coords), () => {}, { enableHighAccuracy: true, timeout: 8000 }), T_TH);
 }
 async function ipFallback(){
+  if (targetLat !== null) return;
   try{
     const d = await (await fetch('https://ipwho.is/')).json();
+    if (targetLat !== null) return;
     if (d && d.latitude){
       targetLat = renderLat = d.latitude; targetLon = renderLon = d.longitude;
       $('sigCity').textContent = (d.city || 'MUĞLA').toUpperCase(); $('sigSub').textContent = (d.country || 'TÜRKİYE').toUpperCase();
@@ -1808,6 +1805,7 @@ async function ipFallback(){
       drawRoadMap(); drawTopCompass(); return;
     }
   }catch{}
+  if (targetLat !== null) return;
   targetLat = renderLat = 37.2153; targetLon = renderLon = 28.3636;
   $('sigCity').textContent = 'MUĞLA'; $('sigSub').textContent = 'TÜRKİYE';
   fetchRoadNetwork(targetLat, targetLon, true); fetchTempOnly(targetLat, targetLon, true);
@@ -1849,6 +1847,13 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden){ lastStepTs = 0; kickRoadAnim(); drawRoadMap(); drawTopCompass(); eqKick(); fxKick(); }
 });
 
+/* ---------- BAŞLANGIÇ ---------- */
+tickClock();
+setInterval(() => {
+  tickClock();
+  if (themeKey === 'auto') setTheme('auto', false, false);
+}, 15000);
+renderStation();
 setTheme(themeKey, false, true);
 applyLayout();
 eqKick();
