@@ -16,7 +16,7 @@
 :root{
   color-scheme:dark;
   --vh:1vh;--vw:1vw;
-  --px:max(env(safe-area-inset-left),clamp(20px,calc(3.2*var(--vw)),44px));
+  --px:max(env(safe-area-inset-left),clamp(18px,calc(3.0*var(--vw)),42px));
   --compass-top:max(env(safe-area-inset-top),2px);
   --compass-h:clamp(24px,calc(4.1*var(--vh)),34px);
   --eq-h:clamp(20px,calc(3.8*var(--vh)),28px);
@@ -37,64 +37,71 @@ html,body{
   width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#000;color:var(--ice-bright);
   touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;
   font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
-  font-feature-settings:'tnum' 1;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility
+  font-feature-settings:'tnum' 1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:geometricPrecision
 }
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
-.screen{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
+.screen{position:relative;width:100%;height:100%;overflow:hidden;background:#000;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 
 /* HARİTA KATMANI */
 .map-stage{
   position:absolute;inset:0;
   z-index:1;cursor:pointer
 }
-.road-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
-.fx-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.road-cv,.fx-cv,.compass-cv,.eq-cv{
+  width:100%;height:100%;display:block;
+  image-rendering:-webkit-optimize-contrast;
+  image-rendering:crisp-edges
+}
+.road-cv{position:absolute;inset:0}
+.fx-cv{position:absolute;inset:0;pointer-events:none;z-index:2}
 
-/* EN ÜST: PUSULA ŞERİDİ */
+/* EN ÜST: PUSULA ŞERİDİ (EN SOLDAN EN SAĞA) */
 .top-compass{
   position:absolute;left:0;right:0;top:var(--compass-top);
   height:var(--compass-h);z-index:7;pointer-events:none;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 95%,transparent 100%);
-  mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 95%,transparent 100%)
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%)
 }
-.compass-cv{width:100%;height:100%;display:block}
 
-/* SOL ÜST: SAAT + ALTINDA DERECE + EĞİM */
+/* SOL ÜST: SAAT (+%10) + DERECE (+%15) EN SOLA DAYALI, KARTSIZ */
 .top-left-hud{
-  position:absolute;left:var(--px);top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
-  z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(3px,calc(.65*var(--vh)),7px)
+  position:absolute;left:0;top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
+  z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(3px,calc(.65*var(--vh)),7px);
+  padding-left:2px
 }
 .mini-clock{
-  font-size:clamp(18px,calc(3.3*var(--vh)),26px);font-weight:700;letter-spacing:.04em;line-height:1;
+  font-size:calc(clamp(18px,calc(3.3*var(--vh)),26px) * 1.10);
+  font-weight:700;letter-spacing:.04em;line-height:1;
   color:var(--clk,var(--ice-bright));cursor:pointer;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 12px rgba(var(--acc),.42)
+  text-shadow:0 0 14px rgba(var(--acc),.48), 0 1px 8px rgba(0,0,0,.95)
 }
 .mini-temp{
   display:inline-flex;align-items:baseline;gap:2px;
-  font-size:clamp(13px,calc(2.25*var(--vh)),17.5px);font-weight:600;letter-spacing:.03em;line-height:1.15;
+  font-size:calc(clamp(13px,calc(2.25*var(--vh)),17.5px) * 1.15);
+  font-weight:600;letter-spacing:.03em;line-height:1.15;
   color:var(--ice-sub);font-variant-numeric:tabular-nums;
-  text-shadow:0 1px 8px rgba(0,0,0,.9)
+  text-shadow:0 1px 8px rgba(0,0,0,.95)
 }
 .mini-temp sup{font-size:.7em;font-weight:500;color:var(--ice-dim)}
 .grade-pill{
   display:none;align-items:center;gap:5px;margin-top:2px;
-  padding:3px 9px;border-radius:8px;
-  background:rgba(4,9,18,.52);pointer-events:none;
+  padding:2px 4px;background:transparent;pointer-events:none;
   font-size:clamp(9.5px,calc(1.55*var(--vh)),12px);font-weight:600;letter-spacing:.14em;
-  color:var(--ice);font-variant-numeric:tabular-nums
+  color:var(--ice);font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 8px rgba(0,0,0,.95)
 }
 .grade-pill.on{display:inline-flex}
 
-/* SAĞ ÜST: YÖNLENDİRME OKU & MESAFE */
+/* SAĞ ÜST: YÖNLENDİRME OKU & MESAFE EN SAĞA DAYALI, KARTSIZ */
 .top-right-hud{
-  position:absolute;right:var(--px);top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
-  z-index:6;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none
+  position:absolute;right:0;top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
+  z-index:6;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none;
+  padding-right:2px
 }
 .nav-hud{
-  display:none;align-items:center;gap:clamp(8px,calc(1.3*var(--vw)),14px);
-  padding:5px 12px 5px 8px;border-radius:12px;
-  background:rgba(4,9,18,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:none;align-items:center;gap:clamp(6px,calc(1.1*var(--vw)),12px);
+  padding:2px 0;background:transparent;
   pointer-events:auto;cursor:pointer;transition:opacity .25s,transform .15s
 }
 .nav-hud:active{transform:scale(.95)}
@@ -102,21 +109,21 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav-ico{
   width:clamp(22px,calc(4.2*var(--vh)),32px);height:clamp(22px,calc(4.2*var(--vh)),32px);
   color:rgb(var(--acc));display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  filter:drop-shadow(0 0 10px rgba(var(--acc),.55))
+  filter:drop-shadow(0 0 10px rgba(var(--acc),.65))
 }
 .nav-ico svg{width:100%;height:100%}
 .nav-dist{
   font-size:clamp(14px,calc(2.6*var(--vh)),20px);font-weight:600;letter-spacing:.08em;
-  color:var(--ice-bright);font-variant-numeric:tabular-nums;white-space:nowrap
+  color:var(--ice-bright);font-variant-numeric:tabular-nums;white-space:nowrap;
+  text-shadow:0 0 12px rgba(var(--acc),.35), 0 1px 8px rgba(0,0,0,.95)
 }
 
-/* ÜST ORTA: YAKLAŞAN HAVA / YOL UYARISI */
+/* ÜST ORTA: YAKLAŞAN HAVA / YOL UYARISI (KARTSIZ) */
 .ahead-chip{
   position:absolute;left:50%;top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
   transform:translateX(-50%) translateY(-6px);z-index:6;
-  display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;
-  background:rgba(5,10,18,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  border:1px solid rgba(255,176,0,.48);color:#ffd275;
+  display:flex;align-items:center;gap:8px;padding:4px 8px;background:transparent;
+  color:#ffd275;text-shadow:0 0 12px rgba(255,176,0,.45), 0 1px 8px rgba(0,0,0,.95);
   font-size:clamp(9px,calc(1.5*var(--vh)),11.5px);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
   white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .5s,transform .5s
 }
@@ -125,7 +132,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* EKOLAYZIRIN HEMEN ÜSTÜ: TEK SATIR RADYO */
 .radio-strip{
   position:absolute;left:var(--px);right:var(--px);
-  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + clamp(3px,calc(.55*var(--vh)),7px));
+  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + clamp(1px,calc(.2*var(--vh)),3px));
   height:var(--radio-line-h);z-index:8;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   pointer-events:auto;background:transparent
@@ -152,43 +159,57 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .rs-btn:active,.rs-btn.active{color:var(--play,#ff8547)}
 
-/* ALT ORTA: ŞEHİR İMZASI + ROTA ÖZETİ */
+/* ALT ORTA: ŞEHİR İMZASI + ROTA ÖZETİ (ARKA PLAN BLUR + NEON EFEKT) */
 .sig-wrap{
   position:absolute;left:50%;
-  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + var(--radio-line-h) + clamp(8px,calc(1.3*var(--vh)),16px));
+  bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + var(--radio-line-h) + clamp(4px,calc(.7*var(--vh)),10px));
   transform:translateX(-50%);z-index:6;
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:4px 20px;cursor:pointer;max-width:88vw
+  padding:5px 22px;border-radius:16px;cursor:pointer;max-width:88vw;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,.22) 0%, rgba(0,0,0,0) 78%);
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 58%, transparent 100%);
+  mask-image:radial-gradient(ellipse at center, #000 58%, transparent 100%)
 }
 .sig-city{
   font-size:clamp(16px,calc(3.0*var(--vh)),25px);font-weight:600;letter-spacing:.30em;
   text-transform:uppercase;color:#ffffff;
-  text-shadow:0 0 22px rgba(186,232,255,.52), 0 0 8px rgba(255,255,255,.25);
+  text-shadow:
+    0 0 7px rgba(255,255,255,.85),
+    0 0 18px rgba(var(--acc),.85),
+    0 0 36px rgba(var(--acc),.55);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82vw;
-  transition:color .2s
+  transition:color .2s, text-shadow .3s
 }
 .sig-wrap:active .sig-city{color:#bae6fd}
 .sig-sub{
   margin-top:clamp(2px,calc(.55*var(--vh)),5px);
   font-size:clamp(8.5px,calc(1.35*var(--vh)),10.5px);font-weight:500;letter-spacing:.24em;
   text-transform:uppercase;color:var(--ice-sub);
-  text-shadow:0 0 12px rgba(148,210,255,.28);
+  text-shadow:
+    0 0 8px rgba(var(--acc),.65),
+    0 0 20px rgba(var(--acc),.38);
   white-space:nowrap
 }
 .sig-route{
   display:none;margin-top:clamp(4px,calc(.8*var(--vh)),7px);
   font-size:clamp(9px,calc(1.5*var(--vh)),11.5px);font-weight:600;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--ice);font-variant-numeric:tabular-nums;white-space:nowrap
+  text-transform:uppercase;color:var(--ice-bright);font-variant-numeric:tabular-nums;white-space:nowrap;
+  text-shadow:
+    0 0 8px rgba(255,255,255,.70),
+    0 0 18px rgba(var(--acc),.85),
+    0 0 32px rgba(var(--acc),.50)
 }
 .sig-route.on{display:block}
 
-/* EN ALT: DİKEY ÇUBUK EKOLAYZIR */
+/* EN ALT: DİKEY ÇUBUK EKOLAYZIR (PUSULA GİBİ EN SAĞDAN EN SOLA) */
 .bottom-eq{
-  position:absolute;left:var(--px);right:var(--px);
+  position:absolute;left:0;right:0;
   bottom:max(env(safe-area-inset-bottom),2px);
-  height:var(--eq-h);z-index:7;pointer-events:none
+  height:var(--eq-h);z-index:7;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 3%,#000 97%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 3%,#000 97%,transparent 100%)
 }
-.eq-cv{display:block;width:100%;height:100%}
 
 /* MOLA MODU */
 .map-stage,.top-left-hud,.top-compass,.sig-wrap{transition:opacity 1s}
@@ -241,7 +262,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <canvas class="compass-cv" id="compassCanvas"></canvas>
   </div>
 
-  <!-- SOL ÜST: SAAT + ALTINDA DERECE + EĞİM -->
+  <!-- SOL ÜST: SAAT (+%10) + DERECE (+%15) EN SOLA DAYALI -->
   <div class="top-left-hud">
     <div class="mini-clock" id="miniClock">--:--</div>
     <div class="mini-temp"><b id="miniTemp">--</b><sup>°C</sup></div>
@@ -250,7 +271,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     </div>
   </div>
 
-  <!-- SAĞ ÜST: YÖNLENDİRME OKU & MESAFE -->
+  <!-- SAĞ ÜST: YÖNLENDİRME OKU & MESAFE EN SAĞA DAYALI -->
   <div class="top-right-hud">
     <div class="nav-hud" id="navHud" onclick="cancelNav(true)">
       <div class="nav-ico" id="navIcon"></div>
@@ -286,7 +307,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <div class="sig-route" id="sigRoute">--</div>
   </div>
 
-  <!-- EN ALT: DİKEY ÇUBUK EKOLAYZIR -->
+  <!-- EN ALT: DİKEY ÇUBUK EKOLAYZIR (EN SAĞDAN EN SOLA) -->
   <div class="bottom-eq">
     <canvas class="eq-cv" id="eqCanvas"></canvas>
   </div>
@@ -346,8 +367,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, '0');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const DPR = Math.min(3, window.devicePixelRatio || 1);
-const FDPR = Math.min(2, window.devicePixelRatio || 1);
+const DPR = Math.min(4, Math.max(2, window.devicePixelRatio || 1));
+const FDPR = Math.min(3, Math.max(1.5, window.devicePixelRatio || 1));
 const M_LAT = 110540;
 const DAYS = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
 const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -473,7 +494,7 @@ function exitRest(manual){
 }
 
 /* ---------- ARKA PLAN EFEKTLERİ (MOLA GÖKYÜZÜ & HIZ ÇİZGİLERİ) ---------- */
-const fxCv = $('fxCanvas'), fxCtx = fxCv.getContext('2d');
+const fxCv = $('fxCanvas'), fxCtx = fxCv.getContext('2d', { alpha: true });
 let fxCur = {}, fxSig = '', fxL = { stars: [], streaks: [] }, fxRaf = 0, fxLast = 0, speedLvl = 0, speedFlag = false;
 const fxT0 = performance.now();
 
@@ -484,7 +505,7 @@ function fxSize(){
 }
 function computeFx(){
   const f = {};
-  if (restMode){ f.stars = { n: 110 }; f.aurora = true; }
+  if (restMode){ f.stars = { n: 120 }; f.aurora = true; }
   return f;
 }
 function setFxState(){
@@ -504,11 +525,11 @@ function fxBuild(){
   if (f.stars){
     for (let i = 0; i < f.stars.n; i++){
       const vx = (1 + Math.random() * 3) * dp;
-      fxL.stars.push({ x: Math.random() * w, y: Math.random() * h, r: (0.5 + Math.random()) * dp, a: 0.25 + Math.random() * 0.35,
+      fxL.stars.push({ x: Math.random() * w, y: Math.random() * h, r: (0.45 + Math.random() * 0.9) * dp, a: 0.25 + Math.random() * 0.35,
         ph: Math.random() * 6.28, sp: 0.5 + Math.random() * 1.5, vx, vy: vx * 0.3 });
     }
   }
-  for (let i = 0; i < 24; i++) fxL.streaks.push(newStreak(true));
+  for (let i = 0; i < 26; i++) fxL.streaks.push(newStreak(true));
 }
 function fxHasLayers(){ return !!(fxCur.stars || fxCur.aurora); }
 function fxSpeedWanted(){
@@ -546,7 +567,7 @@ function fxFrame(ts){
   }
   if (speedLvl > 0.01){
     const cx = w * 0.5, cy = h * 0.48, maxR = Math.hypot(w, h) * 0.55;
-    fxCtx.lineCap = 'round'; fxCtx.lineWidth = 1.1 * dp;
+    fxCtx.lineCap = 'round'; fxCtx.lineWidth = 1.0 * dp;
     for (const s of fxL.streaks){
       s.r += s.v * dt;
       const x1 = cx + s.dx * s.r, y1 = cy + s.dy * s.r;
@@ -559,23 +580,22 @@ function fxFrame(ts){
   fxRaf = requestAnimationFrame(fxFrame);
 }
 
-/* ---------- EKOLAYZIR (DİKEY ÇUBUKLAR + TEMA RENGİ) ---------- */
-const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d'), NB = 96, bars = new Float32Array(NB);
+/* ---------- EKOLAYZIR (TAM GENİŞLİK · 160 ÇUBUK) ---------- */
+const eqCv = $('eqCanvas'), ectx = eqCv.getContext('2d', { alpha: true }), NB = 160, bars = new Float32Array(NB);
 let eqRaf = null, eqLast = 0;
 const EQ_MAX = 0.72;
 
 function eqSize(){
-  const dp = window.devicePixelRatio || 1;
-  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * dp));
-  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * dp));
+  eqCv.width = Math.max(1, Math.round(eqCv.clientWidth * DPR));
+  eqCv.height = Math.max(1, Math.round(eqCv.clientHeight * DPR));
   eqKick();
 }
 
 function eqFrame(ts){
-  if (eqLast && ts - eqLast < 30){ eqRaf = requestAnimationFrame(eqFrame); return; }
+  if (eqLast && ts - eqLast < 28){ eqRaf = requestAnimationFrame(eqFrame); return; }
   eqLast = ts;
-  const w = eqCv.width, h = eqCv.height, t = ts / 1000, dp = window.devicePixelRatio || 1;
-  const bw = Math.max(1, Math.round(Math.max(1.5 * dp, (w / NB) * 0.34))), step = (w - bw) / (NB - 1);
+  const w = eqCv.width, h = eqCv.height, t = ts / 1000;
+  const bw = Math.max(1, Math.round(Math.max(1.2 * DPR, (w / NB) * 0.34))), step = (w - bw) / (NB - 1);
   let mx = 0;
   ectx.clearRect(0, 0, w, h);
   ectx.lineCap = 'butt';
@@ -583,15 +603,15 @@ function eqFrame(ts){
   for (let i = 0; i < NB; i++){
     const c = i / (NB - 1);
     const leftBias = 0.14 + 0.86 * Math.exp(-Math.pow((c - 0.26) / 0.24, 2)) + 0.35 * Math.exp(-Math.pow((c - 0.05) / 0.07, 2));
-    const w1 = Math.abs(Math.sin(t * 2.1 + i * 0.52));
-    const w2 = Math.abs(Math.sin(t * 1.35 - i * 0.21 + 1.1));
-    const w3 = 0.5 + 0.5 * Math.sin(t * 3.7 + i * 1.17);
+    const w1 = Math.abs(Math.sin(t * 2.1 + i * 0.34));
+    const w2 = Math.abs(Math.sin(t * 1.35 - i * 0.14 + 1.1));
+    const w3 = 0.5 + 0.5 * Math.sin(t * 3.7 + i * 0.78);
     const tg = radioPlaying ? Math.min(1, (0.08 + 0.92 * (w1 * w2 * 0.75 + w3 * 0.25)) * leftBias) * EQ_MAX : 0;
     bars[i] += (tg - bars[i]) * (tg > bars[i] ? 0.42 : 0.14);
     mx = Math.max(mx, bars[i]);
-    const bh = Math.round(Math.max(2 * dp, bars[i] * (h - 2 * dp)));
+    const bh = Math.round(Math.max(2 * DPR, bars[i] * (h - 2 * DPR)));
     const x = Math.round(i * step) + bw / 2;
-    ectx.strokeStyle = bars[i] < 0.08 ? `rgba(${TH.acc},.48)` : `rgba(${TH.core},.95)`;
+    ectx.strokeStyle = bars[i] < 0.08 ? `rgba(${TH.acc},.52)` : `rgba(${TH.core},.96)`;
     ectx.beginPath();
     ectx.moveTo(x, h);
     ectx.lineTo(x, h - bh);
@@ -754,8 +774,8 @@ function openRadioModal(){
 }
 function closeRadioModal(){ $('radioModal').classList.remove('open'); }
 
-/* ---------- ÜST PUSULA ŞERİDİ (TEMA RENGİNE DUYARLI) ---------- */
-const compCv = $('compassCanvas'), cctx = compCv.getContext('2d');
+/* ---------- ÜST PUSULA ŞERİDİ ---------- */
+const compCv = $('compassCanvas'), cctx = compCv.getContext('2d', { alpha: true });
 const CARDINAL_MAP = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
 const INTER_MAP = { 45: 'NE', 135: 'SE', 225: 'SW', 315: 'NW' };
 let smoothCompassHead = 0;
@@ -779,17 +799,17 @@ function drawTopCompass(){
   const startDeg = Math.floor((centerDeg - halfSpanDeg) / 5) * 5;
   const endDeg = Math.ceil((centerDeg + halfSpanDeg) / 5) * 5;
 
-  const topFontPx = Math.max(8.5 * dp, h * 0.34);
-  const botFontPx = Math.max(6.8 * dp, h * 0.25);
-  const tickTopBase = topFontPx + 2.5 * dp;
-  const tickBotBase = h - botFontPx - 2.2 * dp;
+  const topFontPx = Math.round(Math.max(8.5 * dp, h * 0.34));
+  const botFontPx = Math.round(Math.max(6.8 * dp, h * 0.25));
+  const tickTopBase = Math.round(topFontPx + 2.5 * dp);
+  const tickBotBase = Math.round(h - botFontPx - 2.2 * dp);
 
-  cctx.lineCap = 'round';
+  cctx.lineCap = 'butt';
   cctx.textAlign = 'center';
 
   for (let d = startDeg; d <= endDeg; d += 5){
     const norm = ((d % 360) + 360) % 360;
-    const x = cx + (d - centerDeg) * pxPerDeg;
+    const x = Math.round(cx + (d - centerDeg) * pxPerDeg) + 0.5;
     if (x < -28 * dp || x > w + 28 * dp) continue;
 
     const isCard = norm in CARDINAL_MAP;
@@ -809,23 +829,24 @@ function drawTopCompass(){
       cctx.fillText(CARDINAL_MAP[norm], x, 0.5 * dp);
     }
 
-    const tTop = (isCard || is15) ? tickTopBase : tickTopBase + 1.8 * dp;
-    const tBot = (isCard || is15) ? tickBotBase : tickBotBase - 1.2 * dp;
-    cctx.strokeStyle = isCard ? `rgba(${TH.acc}, 0.88)` : (is15 ? `rgba(${TH.clk}, 0.58)` : `rgba(${TH.clk}, 0.30)`);
-    cctx.lineWidth = (isCard ? 1.25 : (is15 ? 1.05 : 0.85)) * dp;
+    const tTop = (isCard || is15) ? tickTopBase : Math.round(tickTopBase + 1.8 * dp);
+    const tBot = (isCard || is15) ? tickBotBase : Math.round(tickBotBase - 1.2 * dp);
+    cctx.strokeStyle = isCard ? `rgba(${TH.acc}, 0.90)` : (is15 ? `rgba(${TH.clk}, 0.62)` : `rgba(${TH.clk}, 0.34)`);
+    cctx.lineWidth = Math.max(1, Math.round((isCard ? 1.25 : (is15 ? 1.0 : 0.8)) * dp));
     cctx.beginPath(); cctx.moveTo(x, tTop); cctx.lineTo(x, tBot); cctx.stroke();
 
     cctx.font = `600 ${botFontPx}px 'Montserrat', sans-serif`;
     cctx.textBaseline = 'bottom';
     if (isCenter){ cctx.fillStyle = `rgb(${TH.core})`; cctx.fillText(`${Math.round(((centerDeg % 360) + 360) % 360)}°`, x, h - 0.5 * dp); }
-    else if (isCard){ cctx.fillStyle = `rgba(${TH.acc}, 0.92)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
-    else if (isInter){ cctx.fillStyle = `rgba(${TH.acc}, 0.86)`; cctx.fillText(INTER_MAP[norm], x, h - 0.5 * dp); }
-    else if (norm % 30 === 0){ cctx.fillStyle = `rgba(${TH.acc}, 0.76)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+    else if (isCard){ cctx.fillStyle = `rgba(${TH.acc}, 0.94)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+    else if (isInter){ cctx.fillStyle = `rgba(${TH.acc}, 0.88)`; cctx.fillText(INTER_MAP[norm], x, h - 0.5 * dp); }
+    else if (norm % 30 === 0){ cctx.fillStyle = `rgba(${TH.acc}, 0.78)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
   }
 
+  const cLineX = Math.round(cx) + 0.5;
   cctx.strokeStyle = `rgb(${TH.acc})`;
-  cctx.lineWidth = 1.5 * dp;
-  cctx.beginPath(); cctx.moveTo(cx, 1 * dp); cctx.lineTo(cx, h - 1 * dp); cctx.stroke();
+  cctx.lineWidth = Math.max(2, Math.round(1.4 * dp));
+  cctx.beginPath(); cctx.moveTo(cLineX, 1 * dp); cctx.lineTo(cLineX, h - 1 * dp); cctx.stroke();
 }
 
 /* ---------- ZOOM (HARİTA YÜKSEKLİĞİ) & AKILLI EĞİM ---------- */
@@ -866,7 +887,7 @@ function updateSlope(lat, lon, alt){
 }
 
 /* ---------- HARİTA MOTORU + ÇEVRİMDIŞI DEPO ---------- */
-const roadCv = $('roadCanvas'), rctx = roadCv.getContext('2d');
+const roadCv = $('roadCanvas'), rctx = roadCv.getContext('2d', { alpha: false });
 const OVERPASS = [
   'https://overpass-api.de/api/interpreter',
   'https://z.overpass-api.de/api/interpreter',
@@ -1469,10 +1490,10 @@ function ptSegDistSq(px, py, ax, ay, bx, by){
   return (px - cx)*(px - cx) + (py - cy)*(py - cy);
 }
 const ROAD_STYLE = {
-  0: ['rgba(226, 244, 255, 0.86)', 2.7], 1: ['rgba(186, 228, 255, 0.66)', 2.15],
-  2: ['rgba(142, 196, 236, 0.48)', 1.7], 3: ['rgba(108, 162, 206, 0.35)', 1.3],
-  4: ['rgba(84, 134, 178, 0.24)', 1.0], 6: ['rgba(130, 178, 220, 0.30)', 1.1, [6, 5]],
-  7: ['rgba(72, 168, 232, 0.50)', 1.5], 8: ['rgba(116, 202, 248, 0.65)', 1.7]
+  0: ['rgba(232, 248, 255, 0.90)', 2.4], 1: ['rgba(190, 232, 255, 0.70)', 1.95],
+  2: ['rgba(146, 200, 240, 0.52)', 1.55], 3: ['rgba(112, 166, 210, 0.38)', 1.2],
+  4: ['rgba(88, 138, 182, 0.27)', 0.95], 6: ['rgba(130, 178, 220, 0.34)', 1.0, [6, 5]],
+  7: ['rgba(72, 168, 232, 0.54)', 1.4], 8: ['rgba(120, 206, 252, 0.70)', 1.55]
 };
 const DRAW_ORDER = [8, 7, 6, 4, 3, 2, 1, 0];
 let fadeCache = { w: 0, h: 0, gx: null, gy: null };
@@ -1506,7 +1527,8 @@ function drawRoadMap(){
 
   rctx.setTransform(1, 0, 0, 1, 0, 0);
   rctx.globalCompositeOperation = 'source-over';
-  rctx.clearRect(0, 0, w, h);
+  rctx.fillStyle = '#000000';
+  rctx.fillRect(0, 0, w, h);
 
   const tx = w * 0.5, ty = h * 0.66;
   const bgGlow = rctx.createRadialGradient(w * 0.5, h * 0.46, 0, w * 0.5, h * 0.48, Math.max(w, h) * 0.56);
@@ -1548,7 +1570,7 @@ function drawRoadMap(){
   for (const c of [1, 0]){
     const list = buckets[c]; if (!list.length) continue;
     rctx.strokeStyle = c === 0 ? 'rgba(96, 195, 255, 0.22)' : 'rgba(96, 195, 255, 0.12)';
-    rctx.lineWidth = (c === 0 ? 7.5 : 5.0) * dp;
+    rctx.lineWidth = (c === 0 ? 7.0 : 4.6) * dp;
     rctx.beginPath();
     for (const way of list){ const pts = way.m; for (let i = 0; i < pts.length; i++){ if (i === 0) rctx.moveTo(X(pts[i]), Y(pts[i])); else rctx.lineTo(X(pts[i]), Y(pts[i])); } }
     rctx.stroke();
@@ -1580,21 +1602,21 @@ function drawRoadMap(){
         }
         if (!any) continue;
         const k = (c + 0.5) / N, al = 1 - 0.8 * k, hu = (190 + k * 140 - tt * 55 + 720) % 360;
-        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,65%,${(0.35 * al * br).toFixed(3)})`; rctx.lineWidth = 10 * dp; rctx.stroke();
-        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,86%,${(0.95 * al).toFixed(3)})`; rctx.lineWidth = 3.2 * dp; rctx.stroke();
+        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,65%,${(0.35 * al * br).toFixed(3)})`; rctx.lineWidth = 9.5 * dp; rctx.stroke();
+        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,86%,${(0.96 * al).toFixed(3)})`; rctx.lineWidth = 2.9 * dp; rctx.stroke();
       }
       rctx.restore();
     } else if (m === 'plasma'){
       rctx.save(); rctx.globalCompositeOperation = 'lighter'; rctx.lineCap = 'round';
       rctx.beginPath();
       for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = `rgba(${TH.acc},${(0.35 * br).toFixed(3)})`; rctx.lineWidth = 13 * dp; rctx.stroke();
-      rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 3.2 * dp; rctx.stroke();
+      rctx.strokeStyle = `rgba(${TH.acc},${(0.35 * br).toFixed(3)})`; rctx.lineWidth = 12 * dp; rctx.stroke();
+      rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 2.9 * dp; rctx.stroke();
       rctx.restore();
     } else if (m === 'arrow'){
       rctx.beginPath();
       for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = `rgba(${TH.core}, 0.55)`; rctx.lineWidth = 2.6 * dp; rctx.stroke();
+      rctx.strokeStyle = `rgba(${TH.core}, 0.55)`; rctx.lineWidth = 2.4 * dp; rctx.stroke();
       for (let d = pulsePhase / 2.5; d < Math.min(Rt.len, range); d += 34){
         const p = routePointAt(Rt, d), p2 = routePointAt(Rt, Math.min(Rt.len, d + 4));
         if (!p || !p2) continue;
@@ -1604,13 +1626,13 @@ function drawRoadMap(){
         rctx.moveTo(x - dx2 * 4 * dp + nx * 5.5 * dp, y - dy2 * 4 * dp + ny * 5.5 * dp);
         rctx.lineTo(x + dx2 * 4 * dp, y + dy2 * 4 * dp);
         rctx.lineTo(x - dx2 * 4 * dp - nx * 5.5 * dp, y - dy2 * 4 * dp - ny * 5.5 * dp);
-        rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 2.2 * dp; rctx.stroke();
+        rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 2.0 * dp; rctx.stroke();
       }
     } else {
       rctx.beginPath();
       for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = `rgba(56, 189, 248, ${(0.36 * br).toFixed(3)})`; rctx.lineWidth = 11 * dp; rctx.stroke();
-      rctx.strokeStyle = '#e0f7ff'; rctx.lineWidth = 3.4 * dp; rctx.stroke();
+      rctx.strokeStyle = `rgba(56, 189, 248, ${(0.36 * br).toFixed(3)})`; rctx.lineWidth = 10 * dp; rctx.stroke();
+      rctx.strokeStyle = '#e0f7ff'; rctx.lineWidth = 3.0 * dp; rctx.stroke();
     }
   };
 
@@ -1667,7 +1689,7 @@ function drawRoadMap(){
   }
 
   rctx.save(); rctx.translate(tx, ty);
-  rctx.fillStyle = '#07111e'; rctx.strokeStyle = `rgb(${TH.arrow})`; rctx.lineWidth = 2.2 * dp;
+  rctx.fillStyle = '#07111e'; rctx.strokeStyle = `rgb(${TH.arrow})`; rctx.lineWidth = 2.0 * dp;
   rctx.beginPath(); rctx.moveTo(0, -11 * dp); rctx.lineTo(8 * dp, 8 * dp); rctx.lineTo(0, 3.8 * dp); rctx.lineTo(-8 * dp, 8 * dp); rctx.closePath();
   rctx.fill(); rctx.stroke(); rctx.restore();
 }
@@ -1821,12 +1843,12 @@ function toggleRotMode(){
   applyLayout(); toast(modeNames[m]);
 }
 function applyLayout(){
-  const W = innerWidth, H = innerHeight, mode = getMode(); let w = W, h = H;
+  const W = Math.round(innerWidth), H = Math.round(innerHeight), mode = getMode(); let w = W, h = H;
   if (H > W && mode !== 'off'){
     w = H; h = W;
     scr.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;transform-origin:0 0;` +
-      `transform:${mode === 'cw' ? `translateX(${W}px) rotate(90deg)` : `translateY(${H}px) rotate(-90deg)`}`;
-    document.documentElement.style.setProperty('--px', w * .032 + 'px');
+      `transform:${mode === 'cw' ? `translate3d(${W}px,0,0) rotate(90deg)` : `translate3d(0,${H}px,0) rotate(-90deg)`}`;
+    document.documentElement.style.setProperty('--px', Math.round(w * .032) + 'px');
   } else {
     scr.style.cssText = '';
     document.documentElement.style.removeProperty('--px');
