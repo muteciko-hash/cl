@@ -64,7 +64,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   mask-image:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%)
 }
 
-/* SOL ÜST: SAAT (+%10) + DERECE (+%15) EN SOLA DAYALI, KARTSIZ */
+/* SOL ÜST: SAAT + DERECE EN SOLA DAYALI, KARTSIZ */
 .top-left-hud{
   position:absolute;left:0;top:calc(var(--compass-top) + var(--compass-h) + clamp(8px,calc(1.4*var(--vh)),16px));
   z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(3px,calc(.65*var(--vh)),7px);
@@ -78,7 +78,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .mini-temp{
   display:inline-flex;align-items:baseline;gap:2px;
-  font-size:calc(clamp(13px,calc(2.25*var(--vh)),17.5px) * 1.15);
+  font-size:calc(clamp(13px,calc(2.25*var(--vh)),17.5px) * 1.21);
   font-weight:600;letter-spacing:.03em;line-height:1.15;
   color:var(--ice-sub);font-variant-numeric:tabular-nums;
   text-shadow:0 1px 8px rgba(0,0,0,.95)
@@ -143,7 +143,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   text-shadow:0 1px 8px rgba(0,0,0,.95)
 }
-.rs-track{font-weight:600;color:#e6f6ff;cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+.rs-track{font-weight:600;color:#e6f6ff;cursor:pointer;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
 .rs-track.paused{color:rgba(210,235,250,.55)}
 .rs-sep{font-weight:400;color:rgba(176,216,245,.52);margin:0 7px;flex-shrink:0}
 .rs-station{
@@ -159,34 +159,39 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .rs-btn:active,.rs-btn.active{color:var(--play,#ff8547)}
 
-/* ALT ORTA: ŞEHİR İMZASI + ROTA ÖZETİ (KARTSIZ · SADECE BLUR + NEON EFEKT) */
+/* ALT ORTA: ŞEHİR İMZASI + ROTA ÖZETİ (KARTSIZ · SADECE YAZI) */
 .sig-wrap{
   position:absolute;left:50%;
   bottom:calc(max(env(safe-area-inset-bottom),2px) + var(--eq-h) + var(--radio-line-h) + clamp(4px,calc(.7*var(--vh)),10px));
   transform:translateX(-50%);z-index:6;
   display:flex;flex-direction:column;align-items:center;text-align:center;
   padding:4px 18px;cursor:pointer;max-width:88vw;
-  background:transparent;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+  background:transparent
+}
+.sig-wrap::before{
+  content:'';position:absolute;inset:-18px -46px;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.50) 0%,rgba(0,0,0,.28) 42%,rgba(0,0,0,0) 72%)
 }
 .sig-city{
   font-size:clamp(16px,calc(3.0*var(--vh)),25px);font-weight:600;letter-spacing:.30em;
   text-transform:uppercase;color:#ffffff;
   text-shadow:
-    0 0 7px rgba(255,255,255,.85),
-    0 0 18px rgba(var(--acc),.85),
-    0 0 36px rgba(var(--acc),.55);
+    0 0 1.5px rgba(0,0,0,.95),
+    0 1px 6px rgba(0,0,0,.92),
+    0 0 14px rgba(0,0,0,.72),
+    0 0 28px rgba(var(--acc),.46);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82vw;
-  transition:color .2s, text-shadow .3s
+  transition:color .2s
 }
 .sig-wrap:active .sig-city{color:#bae6fd}
 .sig-sub{
   margin-top:clamp(2px,calc(.55*var(--vh)),5px);
   font-size:clamp(8.5px,calc(1.35*var(--vh)),10.5px);font-weight:500;letter-spacing:.24em;
-  text-transform:uppercase;color:var(--ice-sub);
+  text-transform:uppercase;color:rgba(238,249,255,.96);
   text-shadow:
-    0 0 8px rgba(var(--acc),.65),
-    0 0 20px rgba(var(--acc),.38);
+    0 1px 4px rgba(0,0,0,.96),
+    0 0 12px rgba(0,0,0,.80),
+    0 0 20px rgba(var(--acc),.34);
   white-space:nowrap
 }
 .sig-route{
@@ -194,9 +199,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   font-size:clamp(9px,calc(1.5*var(--vh)),11.5px);font-weight:600;letter-spacing:.18em;
   text-transform:uppercase;color:var(--ice-bright);font-variant-numeric:tabular-nums;white-space:nowrap;
   text-shadow:
-    0 0 8px rgba(255,255,255,.70),
-    0 0 18px rgba(var(--acc),.85),
-    0 0 32px rgba(var(--acc),.50)
+    0 1px 4px rgba(0,0,0,.96),
+    0 0 12px rgba(0,0,0,.80),
+    0 0 22px rgba(var(--acc),.44)
 }
 .sig-route.on{display:block}
 
@@ -260,7 +265,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <canvas class="compass-cv" id="compassCanvas"></canvas>
   </div>
 
-  <!-- SOL ÜST: SAAT (+%10) + DERECE (+%15) EN SOLA DAYALI -->
+  <!-- SOL ÜST: SAAT + DERECE EN SOLA DAYALI -->
   <div class="top-left-hud">
     <div class="mini-clock" id="miniClock">--:--</div>
     <div class="mini-temp"><b id="miniTemp">--</b><sup>°C</sup></div>
@@ -269,9 +274,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     </div>
   </div>
 
-  <!-- SAĞ ÜST: YÖNLENDİRME OKU & MESAFE EN SAĞA DAYALI -->
+  <!-- SAĞ ÜST: YÖNLENDİRME OKU & MESAFE EN SAĞA DAYALI (iptal için çift dokun) -->
   <div class="top-right-hud">
-    <div class="nav-hud" id="navHud" onclick="cancelNav(true)">
+    <div class="nav-hud" id="navHud" onclick="hudTap()">
       <div class="nav-ico" id="navIcon"></div>
       <span class="nav-dist" id="navTurnDist">--</span>
     </div>
@@ -360,11 +365,11 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 </div>
 
 <audio id="radioAudio" preload="none"></audio>
-
 <script>
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, '0');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const DPR = Math.min(4, Math.max(2, window.devicePixelRatio || 1));
 const FDPR = Math.min(3, Math.max(1.5, window.devicePixelRatio || 1));
 const M_LAT = 110540;
@@ -442,24 +447,29 @@ function setTheme(key, announce, instant){
 
 /* ---------- SAAT, DERECE & MOLA MODU ---------- */
 let restMode = false, lastMoveAt = Date.now(), restRef = null, restSnoozeUntil = 0, clkLong = false, clkPress = 0;
+let lastClockStr = '';
 function tickClock(){
   const n = new Date(), s = `${pad(n.getHours())}:${pad(n.getMinutes())}`;
-  $('miniClock').textContent = s;
-  if (restMode){
+  if (s !== lastClockStr){
+    lastClockStr = s;
+    $('miniClock').textContent = s;
     $('restClock').textContent = s;
-    $('restDate').textContent = `${DAYS[n.getDay()]} · ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
   }
+  if (restMode) $('restDate').textContent = `${DAYS[n.getDay()]} · ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
 }
 
-let lastWxLat = null, lastWxLon = null, lastWxAt = 0;
+/* Derece: sadece başarılı istekte "güncel" sayılır, başarısızsa 15 sn sonra tekrar dener */
+let lastWxLat = null, lastWxLon = null, lastWxAt = 0, wxTryAt = 0;
 async function fetchTempOnly(lat, lon, force=false){
   const now = Date.now(), moved = lastWxLat !== null ? distKm(lastWxLat, lastWxLon, lat, lon) : 99;
   if (!force && lastWxLat !== null && moved < 3 && now - lastWxAt < 180000) return;
-  lastWxLat = lat; lastWxLon = lon; lastWxAt = now;
+  if (!force && now - wxTryAt < 15000) return;
+  wxTryAt = now;
   try{
     const d = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`)).json();
     if (d && d.current && typeof d.current.temperature_2m === 'number'){
       $('miniTemp').textContent = Math.round(d.current.temperature_2m);
+      lastWxLat = lat; lastWxLon = lon; lastWxAt = Date.now();
     }
   }catch{}
 }
@@ -468,7 +478,7 @@ function enterRest(){
   if (restMode) return;
   restMode = true;
   $('screen').classList.add('rest');
-  tickClock(); setFxState(); toast('Mola modu');
+  lastClockStr = ''; tickClock(); setFxState(); toast('Mola modu');
 }
 function exitRest(manual){
   if (!restMode) return;
@@ -640,11 +650,12 @@ const STATIONS = [
   { name: 'JOY TÜRK',            defaultTrack: 'Türkiye · Türkçe Slow',                 url: SW + 'JOY_TURK.mp3' }
 ];
 
-let stIdx = 0, radioPlaying = false, metaTimer = null, metaAbort = null;
+let stIdx = 0, radioPlaying = false, metaTimer = null, metaAbort = null, playTok = 0;
 const audioEl = $('radioAudio');
 
 audioEl.addEventListener('error', () => {
   if (!radioPlaying) return;
+  playTok++;
   radioPlaying = false;
   stopMetaPolling();
   renderStation();
@@ -713,7 +724,7 @@ function stopMetaPolling(){
 }
 
 async function playCurrentStation(){
-  const st = STATIONS[stIdx];
+  const tok = ++playTok, st = STATIONS[stIdx];
   stopMetaPolling();
   audioEl.pause();
   audioEl.src = st.url;
@@ -721,10 +732,12 @@ async function playCurrentStation(){
   renderStation('Yayına bağlanıyor…');
   try{
     await audioEl.play();
+    if (tok !== playTok) return;
     renderStation();
     startMetaPolling();
     toast(st.name);
   }catch{
+    if (tok !== playTok) return;
     radioPlaying = false;
     stopMetaPolling();
     renderStation();
@@ -734,6 +747,7 @@ async function playCurrentStation(){
 
 function toggleRadio(){
   if (radioPlaying){
+    playTok++;
     audioEl.pause();
     radioPlaying = false;
     stopMetaPolling();
@@ -764,7 +778,7 @@ function openRadioModal(){
   STATIONS.forEach((st, idx) => {
     const o = document.createElement('div');
     o.className = 'opt' + (idx === stIdx ? ' cur' : '');
-    o.innerHTML = `<div class="opt-top"><span>${idx + 1}. ${st.name}</span><span class="opt-dist">${idx === stIdx && radioPlaying ? 'ÇALIYOR' : 'SEÇ'}</span></div><div class="opt-sub">${st.currentTrack || st.defaultTrack}</div>`;
+    o.innerHTML = `<div class="opt-top"><span>${idx + 1}. ${esc(st.name)}</span><span class="opt-dist">${idx === stIdx && radioPlaying ? 'ÇALIYOR' : 'SEÇ'}</span></div><div class="opt-sub">${esc(st.currentTrack || st.defaultTrack)}</div>`;
     o.onclick = () => { stIdx = idx; closeRadioModal(); playCurrentStation(); };
     list.appendChild(o);
   });
@@ -776,6 +790,7 @@ function closeRadioModal(){ $('radioModal').classList.remove('open'); }
 const compCv = $('compassCanvas'), cctx = compCv.getContext('2d', { alpha: true });
 const CARDINAL_MAP = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
 const INTER_MAP = { 45: 'NE', 135: 'SE', 225: 'SW', 315: 'NW' };
+const WIND8 = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 let smoothCompassHead = 0;
 
 function compassSize(){
@@ -801,6 +816,7 @@ function drawTopCompass(){
   const botFontPx = Math.round(Math.max(6.8 * dp, h * 0.25));
   const tickTopBase = Math.round(topFontPx + 2.5 * dp);
   const tickBotBase = Math.round(h - botFontPx - 2.2 * dp);
+  const skipPx = Math.max(topFontPx * 1.9, botFontPx * 3.4);
 
   cctx.lineCap = 'butt';
   cctx.textAlign = 'center';
@@ -813,19 +829,7 @@ function drawTopCompass(){
     const isCard = norm in CARDINAL_MAP;
     const isInter = norm in INTER_MAP;
     const is15 = norm % 15 === 0;
-    const isCenter = Math.abs(d - centerDeg) < 2.6;
-
-    if (isCenter){
-      cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
-      cctx.textBaseline = 'top';
-      cctx.fillStyle = `rgb(${TH.core})`;
-      cctx.fillText('0', x, 0.5 * dp);
-    } else if (isCard){
-      cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
-      cctx.textBaseline = 'top';
-      cctx.fillStyle = `rgb(${TH.acc})`;
-      cctx.fillText(CARDINAL_MAP[norm], x, 0.5 * dp);
-    }
+    const nearCenter = Math.abs(x - cx) < skipPx;
 
     const tTop = (isCard || is15) ? tickTopBase : Math.round(tickTopBase + 1.8 * dp);
     const tBot = (isCard || is15) ? tickBotBase : Math.round(tickBotBase - 1.2 * dp);
@@ -833,18 +837,35 @@ function drawTopCompass(){
     cctx.lineWidth = Math.max(1, Math.round((isCard ? 1.25 : (is15 ? 1.0 : 0.8)) * dp));
     cctx.beginPath(); cctx.moveTo(x, tTop); cctx.lineTo(x, tBot); cctx.stroke();
 
+    if (nearCenter) continue;
+
+    if (isCard){
+      cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
+      cctx.textBaseline = 'top';
+      cctx.fillStyle = `rgb(${TH.acc})`;
+      cctx.fillText(CARDINAL_MAP[norm], x, 0.5 * dp);
+    }
+
     cctx.font = `600 ${botFontPx}px 'Montserrat', sans-serif`;
     cctx.textBaseline = 'bottom';
-    if (isCenter){ cctx.fillStyle = `rgb(${TH.core})`; cctx.fillText(`${Math.round(((centerDeg % 360) + 360) % 360)}°`, x, h - 0.5 * dp); }
-    else if (isCard){ cctx.fillStyle = `rgba(${TH.acc}, 0.94)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
+    if (isCard){ cctx.fillStyle = `rgba(${TH.acc}, 0.94)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
     else if (isInter){ cctx.fillStyle = `rgba(${TH.acc}, 0.88)`; cctx.fillText(INTER_MAP[norm], x, h - 0.5 * dp); }
     else if (norm % 30 === 0){ cctx.fillStyle = `rgba(${TH.acc}, 0.78)`; cctx.fillText(`${norm}°`, x, h - 0.5 * dp); }
   }
 
+  const hd = ((Math.round(centerDeg) % 360) + 360) % 360;
   const cLineX = Math.round(cx) + 0.5;
   cctx.strokeStyle = `rgb(${TH.acc})`;
   cctx.lineWidth = Math.max(2, Math.round(1.4 * dp));
-  cctx.beginPath(); cctx.moveTo(cLineX, 1 * dp); cctx.lineTo(cLineX, h - 1 * dp); cctx.stroke();
+  cctx.beginPath(); cctx.moveTo(cLineX, tickTopBase); cctx.lineTo(cLineX, tickBotBase); cctx.stroke();
+
+  cctx.fillStyle = `rgb(${TH.core})`;
+  cctx.font = `700 ${topFontPx}px 'Montserrat', sans-serif`;
+  cctx.textBaseline = 'top';
+  cctx.fillText(WIND8[Math.round(hd / 45) % 8], cLineX, 0.5 * dp);
+  cctx.font = `700 ${botFontPx}px 'Montserrat', sans-serif`;
+  cctx.textBaseline = 'bottom';
+  cctx.fillText(`${hd}°`, cLineX, h - 0.5 * dp);
 }
 
 /* ---------- ZOOM (HARİTA YÜKSEKLİĞİ) & AKILLI EĞİM ---------- */
@@ -866,6 +887,8 @@ function computeAutoZoomMeters(speedMs, distToNextTurn){
   if (kmh < 88) return 1400;
   return 2600;
 }
+/* Zoom büyüdükçe daha geniş alanın yolları çekilir: 0 = yakın, 1 = orta, 2 = geniş */
+function roadLevelFor(z){ return z >= 2000 ? 2 : (z >= 900 ? 1 : 0); }
 
 let slopeRefLat = null, slopeRefLon = null, slopeRefAlt = null, smoothGrade = 0;
 function updateSlope(lat, lon, alt){
@@ -907,7 +930,7 @@ let mapModeIdx = 0, arrowTapAt = 0;
 try{ const mv = parseInt(localStorage.getItem('mapmode'), 10); if (mv >= 0 && mv < MAP_MODES.length) mapModeIdx = mv; }catch{}
 
 let roadWays = [], roadAnchorSet = false, ancLat = 0, ancLon = 0, ancMLon = 111320;
-let roadFetchLat = null, roadFetchLon = null, roadFetchAt = 0, roadFetchRadiusKm = 2.6;
+let roadFetchLat = null, roadFetchLon = null, roadFetchAt = 0, roadFetchRadiusKm = 2.6, roadFetchLevel = 0;
 let roadLastTryAt = 0, roadLoading = false, roadLoadStart = 0, roadRetryTimer = null;
 let liveRaw = [], liveIndex = null;
 const loadedCells = new Map(), loadedLive = new Map();
@@ -978,6 +1001,9 @@ function getLocalMapCoords(e){
   const rect = $('mapStage').getBoundingClientRect();
   return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 }
+function onZoomChanged(){
+  if (targetLat !== null && roadLevelFor(targetZoomMeters) !== roadFetchLevel) fetchRoadNetwork(targetLat, targetLon, true);
+}
 
 $('mapStage').addEventListener('click', e => {
   const pt = getLocalMapCoords(e);
@@ -1009,6 +1035,7 @@ $('mapStage').addEventListener('click', e => {
     targetZoomMeters = computeAutoZoomMeters(fixSpeed, lastDistToTurn);
     toast('Oto yükseklik');
   }
+  onZoomChanged();
   kickRoadAnim();
 });
 
@@ -1076,7 +1103,7 @@ function toLocal(w, lat, lon, mLon){
 }
 function rebuildLocal(lat, lon){
   const cosL = Math.max(0.2, Math.cos(lat * Math.PI / 180)), mLon = 111320 * cosL;
-  const R = 0.055, RL = R / cosL;
+  const R = 0.075, RL = R / cosL;
   const seen = new Set(), out = [];
   const add = arr => {
     for (const w of arr){
@@ -1109,7 +1136,7 @@ async function loadCaches(lat, lon){
   const keep = new Set();
   for (const e of liveIndex){
     const [a, b] = e.k.split('_').map(Number);
-    if (Math.abs(a - lat) < 0.055 && Math.abs(b - lon) < 0.07){
+    if (Math.abs(a - lat) < 0.075 && Math.abs(b - lon) < 0.09){
       keep.add(e.k);
       if (!loadedLive.has(e.k)){ try{ const r = await idbGet('live', e.k); if (r && r.ways){ loadedLive.set(e.k, r.ways); changed = true; } }catch{} }
     }
@@ -1131,7 +1158,7 @@ async function saveLive(lat, lon, raw){
     if (liveIndex === null) liveIndex = (await idbGet('meta', 'liveIndex')) || [];
     liveIndex = liveIndex.filter(e => e.k !== k);
     liveIndex.push({ k, t: Date.now() });
-    while (liveIndex.length > 140){ const old = liveIndex.shift(); await idbDel('live', old.k); loadedLive.delete(old.k); }
+    while (liveIndex.length > 90){ const old = liveIndex.shift(); await idbDel('live', old.k); loadedLive.delete(old.k); }
     await idbPut('meta', 'liveIndex', liveIndex);
   }catch{}
 }
@@ -1176,30 +1203,38 @@ async function overpassSeq(q, ms){
   throw new Error(errs.join(' | '));
 }
 
+/* Yol verisi: zoom seviyesine göre yakın / orta / geniş alan çekilir */
+const ROAD_TIERS = [
+  [[HW_ALL, 0.024, 2.6, true], [HW_MAIN, 0.032, 3.5, true], [HW_MAIN, 0.014, 1.5, false]],
+  [[HW_MAIN + '|tertiary|tertiary_link|unclassified', 0.036, 3.6, true], [HW_MAIN, 0.036, 3.6, true], [HW_MAIN, 0.014, 1.5, false]],
+  [[HW_MAIN, 0.056, 5.8, true], [HW_MAIN, 0.036, 3.6, false], [HW_MAIN, 0.014, 1.5, false]]
+];
 async function fetchRoadNetwork(lat, lon, force=false){
   if (lat == null || lon == null) return;
   ensureLocal(lat, lon);
-  const now = Date.now(), moved = roadFetchLat !== null ? distKm(roadFetchLat, roadFetchLon, lat, lon) : 99;
-  if (!force && liveRaw.length && moved < roadFetchRadiusKm * 0.45 && now - roadFetchAt < 300000) return;
+  const now = Date.now(), want = roadLevelFor(targetZoomMeters);
+  const moved = roadFetchLat !== null ? distKm(roadFetchLat, roadFetchLon, lat, lon) : 99;
+  if (!force && liveRaw.length && want === roadFetchLevel && moved < roadFetchRadiusKm * (want ? 0.35 : 0.45) && now - roadFetchAt < 300000) return;
   if (roadLoading && now - roadLoadStart < 60000) return;
   if (!force && now - roadLastTryAt < 8000) return;
   clearTimeout(roadRetryTimer);
   roadLoading = true; roadLoadStart = now; roadLastTryAt = now;
 
-  let data = null, radius = 2.6;
-  for (const [kinds, d, r, ex] of [[HW_ALL, 0.024, 2.6, true], [HW_MAIN, 0.032, 3.5, true], [HW_MAIN, 0.014, 1.5, false]]){
-    try{ data = await overpassGet(overpassQuery(lat, lon, kinds, d, ex)); radius = r; break; }catch{}
-  }
-  if (!data){
-    roadRetryTimer = setTimeout(() => { if (targetLat !== null && targetLon !== null) fetchRoadNetwork(targetLat, targetLon, true); }, 15000);
-    roadLoading = false; return;
-  }
   try{
+    let data = null, radius = 2.6;
+    for (const [kinds, d, r, ex] of ROAD_TIERS[want]){
+      try{ data = await overpassGet(overpassQuery(lat, lon, kinds, d, ex)); radius = r; break; }catch{}
+    }
+    if (!data){
+      roadRetryTimer = setTimeout(() => { if (targetLat !== null && targetLon !== null) fetchRoadNetwork(targetLat, targetLon, true); }, 15000);
+      return;
+    }
     const raw = rawFromElements(data.elements);
-    liveRaw = raw; roadFetchLat = lat; roadFetchLon = lon; roadFetchAt = Date.now(); roadFetchRadiusKm = radius;
+    liveRaw = raw; roadFetchLat = lat; roadFetchLon = lon; roadFetchAt = Date.now(); roadFetchRadiusKm = radius; roadFetchLevel = want;
     rebuildLocal(targetLat !== null ? targetLat : lat, targetLon !== null ? targetLon : lon);
-    saveLive(lat, lon, raw);
-  }finally{ roadLoading = false; }
+    if (want <= 1) saveLive(lat, lon, raw);
+  }catch{}
+  finally{ roadLoading = false; }
 }
 
 /* --- Çevrimdışı indirme: İzmir · Aydın · Muğla --- */
@@ -1268,7 +1303,7 @@ async function clearOffline(){
 
 /* ---------- ROTA & NAVİGASYON ---------- */
 let navRoute = null, lastDistToTurn = null, lastChimeStep = -1, lastRerouteAt = 0, navRerouting = false, navAudioCtx = null;
-let navSearchTimer = null, navRecent = [];
+let navSearchTimer = null, navSearchTok = 0, navRecent = [], hudTapAt = 0;
 try{ navRecent = JSON.parse(localStorage.getItem('nav_recent') || '[]') || []; }catch{ navRecent = []; }
 
 const TURN_SVGS = {
@@ -1312,9 +1347,11 @@ function fmtRouteSummary(remM, remSec){
   const arr = new Date(Date.now() + mins * 60000);
   return `${distStr} · ${durStr} · ${pad(arr.getHours())}:${pad(arr.getMinutes())}`;
 }
-function snapToPolyline(px, py, pts, cum){
-  let bestDSq = Infinity, bestSeg = 0, bestT = 0, bestX = pts[0][0], bestY = pts[0][1];
-  for (let i = 0; i < pts.length - 1; i++){
+function snapToPolyline(px, py, pts, cum, from = 0, to = pts.length - 1){
+  from = Math.max(0, Math.min(from, pts.length - 2));
+  to = Math.max(from + 1, Math.min(to, pts.length - 1));
+  let bestDSq = Infinity, bestSeg = from, bestT = 0, bestX = pts[from][0], bestY = pts[from][1];
+  for (let i = from; i < to; i++){
     const ax = pts[i][0], ay = pts[i][1], bx = pts[i+1][0], by = pts[i+1][1];
     const dx = bx - ax, dy = by - ay, l2 = dx*dx + dy*dy;
     let t = l2 > 0 ? ((px - ax)*dx + (py - ay)*dy) / l2 : 0;
@@ -1325,11 +1362,11 @@ function snapToPolyline(px, py, pts, cum){
   return { pt: [bestX, bestY], seg: bestSeg, t: bestT, along: cum[bestSeg] + bestT * (cum[bestSeg + 1] - cum[bestSeg]), offDist: Math.sqrt(bestDSq) };
 }
 function projectNavRoute(){
-  if (!navRoute || !roadAnchorSet) return;
+  if (!navRoute || !roadAnchorSet || navRoute.coords.length < 2) return;
   const pts = navRoute.coords.map(([la, lo]) => [(lo - ancLon) * ancMLon, (la - ancLat) * M_LAT]);
   const cum = [0];
   for (let i = 1; i < pts.length; i++) cum.push(cum[i-1] + Math.hypot(pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]));
-  navRoute.localPts = pts; navRoute.cum = cum; navRoute.totalLen = Math.max(1, cum[cum.length - 1]);
+  navRoute.localPts = pts; navRoute.cum = cum; navRoute.totalLen = Math.max(1, cum[cum.length - 1]); navRoute.lastSeg = null;
   navRoute.steps.forEach((st, idx) => {
     if (idx === navRoute.steps.length - 1){ st.along = navRoute.totalLen; st.xy = pts[pts.length - 1]; return; }
     const sn = snapToPolyline((st.lon - ancLon) * ancMLon, (st.lat - ancLat) * M_LAT, pts, cum);
@@ -1364,6 +1401,12 @@ function cancelNav(announce=false){
   kickRoadAnim();
   if (announce) toast('Rota iptal edildi');
 }
+/* Sağ üstteki oka yanlışlıkla dokunmak rotayı iptal etmesin: iptal için hızlı iki dokunuş */
+function hudTap(){
+  const now = Date.now();
+  if (now - hudTapAt < 1600){ hudTapAt = 0; cancelNav(true); }
+  else { hudTapAt = now; toast('İptal için tekrar dokun'); }
+}
 function saveRecentDest(item){
   navRecent = navRecent.filter(x => x.name !== item.name); navRecent.unshift(item);
   if (navRecent.length > 4) navRecent.length = 4;
@@ -1387,18 +1430,20 @@ async function startRouteTo(destName, destLat, destLon, isReroute=false){
       const res = await fetch(url, { signal: ctrl.signal }); clearTimeout(tm);
       if (!res.ok) continue;
       const d = await res.json();
-      if (d && d.code === 'Ok' && d.routes && d.routes[0]){ routeData = d.routes[0]; break; }
+      if (d && d.code === 'Ok' && d.routes && d.routes[0] && d.routes[0].geometry && d.routes[0].geometry.coordinates && d.routes[0].geometry.coordinates.length >= 2){ routeData = d.routes[0]; break; }
     }catch{}
   }
   if (!routeData){ if (!isReroute){ cancelNav(false); toast('Rota hesaplanamadı'); } return; }
+  const steps = (routeData.legs || []).flatMap(leg => (leg.steps || []).map(st => {
+    const loc = (st.maneuver && st.maneuver.location) || [destLon, destLat];
+    return { lon: loc[0], lat: loc[1], ico: parseManeuverIcon(st), along: 0, xy: null };
+  }));
+  if (!steps.length) steps.push({ lon: destLon, lat: destLat, ico: 'arrive', along: 0, xy: null });
   navRoute = {
     destName, destLat, destLon,
     coords: routeData.geometry.coordinates.map(([lo, la]) => [la, lo]),
     localPts: [], cum: [0], totalLen: routeData.distance || 1, totalDur: routeData.duration || 0,
-    steps: (routeData.legs || []).flatMap(leg => (leg.steps || []).map(st => {
-      const loc = (st.maneuver && st.maneuver.location) || [destLon, destLat];
-      return { lon: loc[0], lat: loc[1], ico: parseManeuverIcon(st), along: 0, xy: null };
-    }))
+    steps, lastSeg: null
   };
   lastChimeStep = -1;
   if (!roadAnchorSet) rebuildLocal(targetLat, targetLon); else projectNavRoute();
@@ -1407,8 +1452,15 @@ async function startRouteTo(destName, destLat, destLon, isReroute=false){
   if (!isReroute) toast(`Rota: ${fmtNavDist(navRoute.totalLen)}`);
 }
 function updateNavProgress(ox, oy){
-  if (!navRoute || !navRoute.localPts.length) return null;
-  const snap = snapToPolyline(ox, oy, navRoute.localPts, navRoute.cum);
+  if (!navRoute || navRoute.localPts.length < 2) return null;
+  const pts = navRoute.localPts, cum = navRoute.cum;
+  let snap = null;
+  if (navRoute.lastSeg != null){
+    snap = snapToPolyline(ox, oy, pts, cum, navRoute.lastSeg - 4, navRoute.lastSeg + 80);
+    if (snap.offDist > 45) snap = null;
+  }
+  if (!snap) snap = snapToPolyline(ox, oy, pts, cum);
+  navRoute.lastSeg = snap.seg;
   if (!navRerouting && snap.offDist > 65 && Date.now() - lastRerouteAt > 12000){
     lastRerouteAt = Date.now(); navRerouting = true; $('navTurnDist').textContent = '…';
     startRouteTo(navRoute.destName, navRoute.destLat, navRoute.destLon, true).finally(() => { navRerouting = false; });
@@ -1416,9 +1468,11 @@ function updateNavProgress(ox, oy){
   }
   const remDist = Math.max(0, navRoute.totalLen - snap.along);
   const remSec = (navRoute.totalDur || 0) * (1 - (navRoute.totalLen > 0 ? Math.max(0, Math.min(1, snap.along / navRoute.totalLen)) : 0));
-  let nextIdx = navRoute.steps.length - 1;
-  for (let i = 1; i < navRoute.steps.length; i++){ if (navRoute.steps[i].along > snap.along + 10){ nextIdx = i; break; } }
-  const step = navRoute.steps[nextIdx] || navRoute.steps[navRoute.steps.length - 1];
+  const stepsArr = navRoute.steps;
+  let nextIdx = stepsArr.length - 1;
+  for (let i = 1; i < stepsArr.length; i++){ if (stepsArr[i].along > snap.along + 10){ nextIdx = i; break; } }
+  const step = stepsArr[nextIdx] || stepsArr[stepsArr.length - 1];
+  if (!step) return { snap, nextStep: null };
   const distToTurn = Math.max(0, step.along - snap.along);
   lastDistToTurn = distToTurn;
   if (autoZoom) targetZoomMeters = computeAutoZoomMeters(fixSpeed, distToTurn);
@@ -1442,13 +1496,14 @@ function renderNavDefaults(){
   navRecent.forEach(item => {
     const o = document.createElement('div'); o.className = 'opt';
     const dStr = targetLat !== null ? fmtNavDist(distKm(targetLat, targetLon, item.lat, item.lon) * 1000) : '';
-    o.innerHTML = `<div class="opt-top"><span>${item.name}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">Son hedef</div>`;
+    o.innerHTML = `<div class="opt-top"><span>${esc(item.name)}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">Son hedef</div>`;
     o.onclick = () => { closeNav(); startRouteTo(item.name, item.lat, item.lon, false); };
     l.appendChild(o);
   });
 }
 $('navInput').addEventListener('input', e => {
   clearTimeout(navSearchTimer); const q = e.target.value.trim();
+  const tok = ++navSearchTok;
   if (q.length < 2){ renderNavDefaults(); return; }
   $('navHint').textContent = 'Adres aranıyor…';
   navSearchTimer = setTimeout(async () => {
@@ -1467,417 +1522,15 @@ $('navInput').addEventListener('input', e => {
         items = (d2 || []).map(it => { const pts = String(it.display_name || '').split(','); return { name: pts[0].trim(), sub: pts.slice(1, 4).join(',').trim(), lat: parseFloat(it.lat), lon: parseFloat(it.lon) }; });
       }catch{}
     }
+    if (tok !== navSearchTok) return;
     l.innerHTML = '';
     $('navHint').textContent = items.length ? 'Gitmek istediğin adresi seç' : 'Sonuç bulunamadı';
     items.forEach(it => {
       const o = document.createElement('div'); o.className = 'opt';
       const dStr = targetLat !== null ? fmtNavDist(distKm(targetLat, targetLon, it.lat, it.lon) * 1000) : '';
-      o.innerHTML = `<div class="opt-top"><span>${it.name}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">${it.sub}</div>`;
+      o.innerHTML = `<div class="opt-top"><span>${esc(it.name)}</span><span class="opt-dist">${dStr}</span></div><div class="opt-sub">${esc(it.sub)}</div>`;
       o.onclick = () => { closeNav(); startRouteTo(it.name, it.lat, it.lon, false); };
       l.appendChild(o);
     });
   }, 320);
 });
-
-/* ---------- HARİTA ÇİZİMİ ---------- */
-function ptSegDistSq(px, py, ax, ay, bx, by){
-  const dx = bx - ax, dy = by - ay, lenSq = dx*dx + dy*dy;
-  let t = lenSq > 0 ? ((px - ax)*dx + (py - ay)*dy) / lenSq : 0;
-  t = Math.max(0, Math.min(1, t));
-  const cx = ax + t*dx, cy = ay + t*dy;
-  return (px - cx)*(px - cx) + (py - cy)*(py - cy);
-}
-const ROAD_STYLE = {
-  0: ['rgba(232, 248, 255, 0.90)', 2.4], 1: ['rgba(190, 232, 255, 0.70)', 1.95],
-  2: ['rgba(146, 200, 240, 0.52)', 1.55], 3: ['rgba(112, 166, 210, 0.38)', 1.2],
-  4: ['rgba(88, 138, 182, 0.27)', 0.95], 6: ['rgba(130, 178, 220, 0.34)', 1.0, [6, 5]],
-  7: ['rgba(72, 168, 232, 0.54)', 1.4], 8: ['rgba(120, 206, 252, 0.70)', 1.55]
-};
-const DRAW_ORDER = [8, 7, 6, 4, 3, 2, 1, 0];
-let fadeCache = { w: 0, h: 0, gx: null, gy: null };
-
-function collectRoute(pts, seg, p0, dir, maxLen){
-  const P = [p0], D = [0]; let len = 0, j = dir === 1 ? seg + 1 : seg;
-  while (j >= 0 && j < pts.length && len < maxLen){
-    const last = P[P.length - 1];
-    len += Math.hypot(pts[j][0] - last[0], pts[j][1] - last[1]);
-    P.push(pts[j]); D.push(len); j += dir;
-  }
-  return { P, D, len: Math.max(len, 1) };
-}
-function routePointAt(R, d){
-  const P = R.P, D = R.D;
-  for (let i = 1; i < P.length; i++){
-    if (D[i] >= d){
-      const span = (D[i] - D[i-1]) || 1, k = (d - D[i-1]) / span;
-      return [P[i-1][0] + (P[i][0] - P[i-1][0]) * k, P[i-1][1] + (P[i][1] - P[i-1][1]) * k];
-    }
-  }
-  return null;
-}
-
-function drawRoadMap(){
-  const w = roadCv.width, h = roadCv.height;
-  if (!w || !h) return;
-  const dp = DPR, br = 0.88 + 0.12 * Math.sin(Date.now() / 800);
-  const tNow = performance.now(), dtD = Math.min(0.2, Math.max(0, (tNow - lastDrawT) / 1000));
-  lastDrawT = tNow;
-
-  rctx.setTransform(1, 0, 0, 1, 0, 0);
-  rctx.globalCompositeOperation = 'source-over';
-  rctx.fillStyle = '#000000';
-  rctx.fillRect(0, 0, w, h);
-
-  const tx = w * 0.5, ty = h * 0.66;
-  const bgGlow = rctx.createRadialGradient(w * 0.5, h * 0.46, 0, w * 0.5, h * 0.48, Math.max(w, h) * 0.56);
-  bgGlow.addColorStop(0, 'rgba(15, 36, 66, 0.52)');
-  bgGlow.addColorStop(0.55, 'rgba(8, 20, 38, 0.26)');
-  bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  rctx.fillStyle = bgGlow; rctx.fillRect(0, 0, w, h);
-
-  if (renderLat === null || renderLon === null){
-    rctx.fillStyle = 'rgba(125,211,252,.35)'; rctx.beginPath(); rctx.arc(tx, ty, 4 * dp, 0, Math.PI * 2); rctx.fill();
-    return;
-  }
-
-  const zoomMeters = renderZoomMeters, ppm = (h * 0.72) / zoomMeters;
-  const ox = (renderLon - ancLon) * ancMLon, oy = (renderLat - ancLat) * M_LAT;
-  const R = Math.max(zoomMeters * 1.9, 450);
-
-  const buckets = [[], [], [], [], [], [], [], [], []];
-  let best = null, bestSeg = 0, bestD = Infinity;
-  for (const way of roadWays){
-    if (way.bx0 - R > ox || way.bx1 + R < ox || way.by0 - R > oy || way.by1 + R < oy) continue;
-    buckets[way.cls].push(way);
-    if (!way.road) continue;
-    const pts = way.m;
-    for (let i = 0; i < pts.length - 1; i++){
-      const d = ptSegDistSq(ox, oy, pts[i][0], pts[i][1], pts[i+1][0], pts[i+1][1]);
-      if (d < bestD){ bestD = d; best = way; bestSeg = i; }
-    }
-  }
-  const matched = best && bestD <= 130 * 130 ? best : null;
-  const navState = navRoute ? updateNavProgress(ox, oy) : null;
-
-  const rad = renderHeading * Math.PI / 180;
-  const X = p => (p[0] - ox) * ppm, Y = p => -(p[1] - oy) * ppm;
-  const range = zoomMeters * 1.35;
-
-  rctx.save(); rctx.translate(tx, ty); rctx.rotate(-rad); rctx.lineCap = 'round'; rctx.lineJoin = 'round';
-
-  for (const c of [1, 0]){
-    const list = buckets[c]; if (!list.length) continue;
-    rctx.strokeStyle = c === 0 ? 'rgba(96, 195, 255, 0.22)' : 'rgba(96, 195, 255, 0.12)';
-    rctx.lineWidth = (c === 0 ? 7.0 : 4.6) * dp;
-    rctx.beginPath();
-    for (const way of list){ const pts = way.m; for (let i = 0; i < pts.length; i++){ if (i === 0) rctx.moveTo(X(pts[i]), Y(pts[i])); else rctx.lineTo(X(pts[i]), Y(pts[i])); } }
-    rctx.stroke();
-  }
-
-  for (const c of DRAW_ORDER){
-    const list = buckets[c]; if (!list.length) continue;
-    const st = ROAD_STYLE[c];
-    rctx.strokeStyle = st[0]; rctx.lineWidth = st[1] * dp;
-    if (st[2]) rctx.setLineDash(st[2].map(v => v * dp));
-    rctx.beginPath();
-    for (const way of list){ const pts = way.m; for (let i = 0; i < pts.length; i++){ if (i === 0) rctx.moveTo(X(pts[i]), Y(pts[i])); else rctx.lineTo(X(pts[i]), Y(pts[i])); } }
-    rctx.stroke();
-    if (st[2]) rctx.setLineDash([]);
-  }
-
-  const drawStyledPath = (Rt) => {
-    if (!Rt || Rt.P.length < 2) return;
-    const m = MAP_MODES[mapModeIdx].k;
-    if (m === 'aurora'){
-      const N = 28, tt = Date.now() / 1000;
-      rctx.save(); rctx.globalCompositeOperation = 'lighter'; rctx.lineCap = 'round';
-      for (let c = 0; c < N; c++){
-        rctx.beginPath(); let any = false;
-        for (let i = 1; i < Rt.P.length; i++){
-          const mid = (Rt.D[i-1] + Rt.D[i]) / 2;
-          if (Math.min(N - 1, Math.floor(mid / range * N)) !== c) continue;
-          rctx.moveTo(X(Rt.P[i-1]), Y(Rt.P[i-1])); rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); any = true;
-        }
-        if (!any) continue;
-        const k = (c + 0.5) / N, al = 1 - 0.8 * k, hu = (190 + k * 140 - tt * 55 + 720) % 360;
-        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,65%,${(0.35 * al * br).toFixed(3)})`; rctx.lineWidth = 9.5 * dp; rctx.stroke();
-        rctx.strokeStyle = `hsla(${hu.toFixed(0)},100%,86%,${(0.96 * al).toFixed(3)})`; rctx.lineWidth = 2.9 * dp; rctx.stroke();
-      }
-      rctx.restore();
-    } else if (m === 'plasma'){
-      rctx.save(); rctx.globalCompositeOperation = 'lighter'; rctx.lineCap = 'round';
-      rctx.beginPath();
-      for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = `rgba(${TH.acc},${(0.35 * br).toFixed(3)})`; rctx.lineWidth = 12 * dp; rctx.stroke();
-      rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 2.9 * dp; rctx.stroke();
-      rctx.restore();
-    } else if (m === 'arrow'){
-      rctx.beginPath();
-      for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = `rgba(${TH.core}, 0.55)`; rctx.lineWidth = 2.4 * dp; rctx.stroke();
-      for (let d = pulsePhase / 2.5; d < Math.min(Rt.len, range); d += 34){
-        const p = routePointAt(Rt, d), p2 = routePointAt(Rt, Math.min(Rt.len, d + 4));
-        if (!p || !p2) continue;
-        let dx2 = X(p2) - X(p), dy2 = Y(p2) - Y(p); const L = Math.hypot(dx2, dy2) || 1; dx2 /= L; dy2 /= L;
-        const nx = -dy2, ny = dx2, x = X(p), y = Y(p);
-        rctx.beginPath();
-        rctx.moveTo(x - dx2 * 4 * dp + nx * 5.5 * dp, y - dy2 * 4 * dp + ny * 5.5 * dp);
-        rctx.lineTo(x + dx2 * 4 * dp, y + dy2 * 4 * dp);
-        rctx.lineTo(x - dx2 * 4 * dp - nx * 5.5 * dp, y - dy2 * 4 * dp - ny * 5.5 * dp);
-        rctx.strokeStyle = '#ffffff'; rctx.lineWidth = 2.0 * dp; rctx.stroke();
-      }
-    } else {
-      rctx.beginPath();
-      for (let i = 0; i < Rt.P.length; i++){ if (i === 0) rctx.moveTo(X(Rt.P[i]), Y(Rt.P[i])); else rctx.lineTo(X(Rt.P[i]), Y(Rt.P[i])); }
-      rctx.strokeStyle = `rgba(56, 189, 248, ${(0.36 * br).toFixed(3)})`; rctx.lineWidth = 10 * dp; rctx.stroke();
-      rctx.strokeStyle = '#e0f7ff'; rctx.lineWidth = 3.0 * dp; rctx.stroke();
-    }
-  };
-
-  pulsePhase = (pulsePhase + dtD * (12 + fixSpeed * 0.7)) % 90;
-
-  if (navRoute && navRoute.localPts.length >= 2){
-    const rPts = navRoute.localPts, sn = navState && navState.snap ? navState.snap : snapToPolyline(ox, oy, rPts, navRoute.cum);
-    drawStyledPath(collectRoute(rPts, sn.seg, sn.pt, 1, range * 2));
-    if (navState && navState.nextStep && navState.nextStep.xy){
-      const nx = X(navState.nextStep.xy), ny = Y(navState.nextStep.xy);
-      rctx.fillStyle = 'rgba(56, 189, 248, 0.35)'; rctx.beginPath(); rctx.arc(nx, ny, 9.5 * dp, 0, Math.PI * 2); rctx.fill();
-      rctx.fillStyle = '#ffffff'; rctx.beginPath(); rctx.arc(nx, ny, 3.6 * dp, 0, Math.PI * 2); rctx.fill();
-    }
-    const endPt = rPts[rPts.length - 1], ex = X(endPt), ey = Y(endPt);
-    rctx.strokeStyle = '#bae6fd'; rctx.lineWidth = 2 * dp; rctx.beginPath(); rctx.arc(ex, ey, 8.5 * dp * br, 0, Math.PI * 2); rctx.stroke();
-    rctx.fillStyle = '#38bdf8'; rctx.beginPath(); rctx.arc(ex, ey, 4 * dp, 0, Math.PI * 2); rctx.fill();
-  } else if (matched){
-    const pts = matched.m, seg = bestSeg, a = pts[seg], b = pts[seg+1];
-    const dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx*dx + dy*dy;
-    let tt = L2 > 0 ? ((ox - a[0])*dx + (oy - a[1])*dy) / L2 : 0; tt = Math.max(0, Math.min(1, tt));
-    const p0 = [a[0] + tt*dx, a[1] + tt*dy];
-    const dir = (dx * Math.sin(targetHeading * Math.PI / 180) + dy * Math.cos(targetHeading * Math.PI / 180)) >= 0 ? 1 : -1;
-    drawStyledPath(collectRoute(pts, seg, p0, dir, range));
-  }
-  rctx.restore();
-
-  if (!fadeCache.gx || fadeCache.w !== w || fadeCache.h !== h){
-    const ease = k => k <= 0 ? 0 : k >= 1 ? 1 : 0.5 - 0.5 * Math.cos(Math.PI * k);
-    const gx = rctx.createLinearGradient(0, 0, w, 0), gy = rctx.createLinearGradient(0, 0, 0, h);
-    for (let i = 0; i <= 32; i++){
-      const s = i / 32;
-      gx.addColorStop(s, `rgba(0,0,0,${ease(Math.min(s, 1 - s) / 0.16).toFixed(3)})`);
-      gy.addColorStop(s, `rgba(0,0,0,${(s < 0.5 ? ease(s / 0.18) : ease((1 - s) / 0.24)).toFixed(3)})`);
-    }
-    fadeCache = { w, h, gx, gy };
-  }
-  rctx.save(); rctx.globalCompositeOperation = 'destination-in';
-  rctx.fillStyle = fadeCache.gx; rctx.fillRect(0, 0, w, h);
-  rctx.fillStyle = fadeCache.gy; rctx.fillRect(0, 0, w, h);
-  rctx.restore(); rctx.globalCompositeOperation = 'source-over';
-
-  const glow = rctx.createRadialGradient(tx, ty, 0, tx, ty, 76 * dp);
-  glow.addColorStop(0, `rgba(${TH.acc}, ${(0.26 * br).toFixed(3)})`); glow.addColorStop(1, `rgba(${TH.acc}, 0)`);
-  rctx.fillStyle = glow; rctx.beginPath(); rctx.arc(tx, ty, 76 * dp, 0, Math.PI * 2); rctx.fill();
-
-  const tapAge = Date.now() - arrowTapAt;
-  if (tapAge < 450){
-    const k = tapAge / 450;
-    rctx.strokeStyle = `rgba(${TH.core}, ${(0.75 * (1 - k)).toFixed(3)})`;
-    rctx.lineWidth = 1.8 * dp;
-    rctx.beginPath();
-    rctx.arc(tx, ty, (14 + k * 24) * dp, 0, Math.PI * 2);
-    rctx.stroke();
-  }
-
-  rctx.save(); rctx.translate(tx, ty);
-  rctx.fillStyle = '#07111e'; rctx.strokeStyle = `rgb(${TH.arrow})`; rctx.lineWidth = 2.0 * dp;
-  rctx.beginPath(); rctx.moveTo(0, -11 * dp); rctx.lineTo(8 * dp, 8 * dp); rctx.lineTo(0, 3.8 * dp); rctx.lineTo(-8 * dp, 8 * dp); rctx.closePath();
-  rctx.fill(); rctx.stroke(); rctx.restore();
-}
-
-setInterval(() => { if (!roadAnimRaf && renderLat !== null && !document.hidden && !restMode) drawRoadMap(); }, 180);
-
-/* ---------- YOL ÖNÜ HAVA UYARISI (30 / 60 / 100 KM) ---------- */
-let aheadLast = { t: 0, lat: null, lon: null }, aheadBusy = false, aheadShown = false;
-function aheadPoint(lat, lon, bearing, km){
-  const b = bearing * Math.PI / 180;
-  return [lat + km * Math.cos(b) / 110.54, lon + km * Math.sin(b) / (111.32 * Math.max(0.2, Math.cos(lat * Math.PI / 180)))];
-}
-function hazardOf(c){
-  const code = c.weather_code, temp = c.temperature_2m, gust = c.wind_gusts_10m || 0, pr = c.precipitation || 0;
-  const wet = [51,53,55,61,63,65,80,81,82,71,73,75,77,85,86].includes(code);
-  if ([95,96,99].includes(code)) return { sev: 5, txt: 'GÖK GÜRÜLTÜLÜ FIRTINA' };
-  if ([56,57,66,67].includes(code) || (temp <= 3 && (pr > 0.1 || wet))) return { sev: 5, txt: 'BUZLANMA RİSKİ' };
-  if ([71,73,75,77,85,86].includes(code)) return { sev: 4, txt: 'KAR YAĞIŞI' };
-  if (gust >= 55) return { sev: 4, txt: 'SERT RÜZGÂR ' + Math.round(gust) + ' KM/SA' };
-  if ([45,48].includes(code)) return { sev: 3, txt: 'SİS' };
-  if ([65,82].includes(code)) return { sev: 3, txt: 'YOĞUN YAĞMUR' };
-  if ([51,53,55,61,63,80,81].includes(code)) return { sev: 2, txt: 'YAĞMUR' };
-  return null;
-}
-function showAhead(b){
-  const chip = $('aheadChip');
-  if (!b){ aheadShown = false; chip.classList.remove('on'); return; }
-  $('aheadText').textContent = `${b.km} KM ÖNDE · ${b.txt}`;
-  aheadShown = true; chip.classList.add('on');
-}
-async function checkAhead(){
-  if (aheadBusy || fixLat === null) return;
-  const now = Date.now();
-  if (fixSpeed < 5 || now - fixTime > 15000) return;
-  const moved = aheadLast.lat !== null ? distKm(aheadLast.lat, aheadLast.lon, fixLat, fixLon) : 99;
-  if (now - aheadLast.t < 8 * 60000 && moved < 12) return;
-  aheadBusy = true; aheadLast = { t: now, lat: fixLat, lon: fixLon };
-  try{
-    const kms = [30, 60, 100], pts = kms.map(k => aheadPoint(fixLat, fixLon, fixHead, k));
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${pts.map(p => p[0].toFixed(3)).join(',')}&longitude=${pts.map(p => p[1].toFixed(3)).join(',')}&current=temperature_2m,precipitation,weather_code,wind_gusts_10m&timezone=auto`;
-    const d = await (await fetch(url)).json();
-    const arr = Array.isArray(d) ? d : [d];
-    let best = null;
-    arr.forEach((o, i) => {
-      const c = o && o.current; if (!c) return;
-      const h = hazardOf(c);
-      if (h && (!best || h.sev > best.sev || (h.sev === best.sev && kms[i] < best.km))) best = { sev: h.sev, txt: h.txt, km: kms[i] };
-    });
-    showAhead(best);
-  }catch{}
-  finally{ aheadBusy = false; }
-}
-setInterval(checkAhead, 30000);
-setInterval(() => {
-  const now = Date.now();
-  if (!restMode && fixTime > 0 && now - fixTime < 30000 && now > restSnoozeUntil && now - lastMoveAt > 180000 && fixSpeed < 1) enterRest();
-  if (aheadShown && now - aheadLast.t > 25 * 60000) showAhead(null);
-}, 5000);
-
-/* ---------- GPS & PUSULA ---------- */
-function distKm(a,b,c,d){
-  const R=6371,r=Math.PI/180,dl=(c-a)*r,dn=(d-b)*r;
-  const x=Math.sin(dl/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dn/2)**2;
-  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
-}
-let compassOn = false, gpsHeadTime = 0;
-function onOrient(e){
-  if (Date.now() - gpsHeadTime < 5000) return;
-  let h = typeof e.webkitCompassHeading === 'number' ? e.webkitCompassHeading : (e.absolute && e.alpha != null ? 360 - e.alpha : null);
-  if (h == null) return;
-  const ang = (screen.orientation && screen.orientation.angle != null) ? screen.orientation.angle : (window.orientation || 0);
-  targetHeading = (h + ang + 360) % 360;
-  kickRoadAnim();
-}
-function startCompass(){
-  if (compassOn) return; compassOn = true;
-  const D = window.DeviceOrientationEvent;
-  if (D && typeof D.requestPermission === 'function'){
-    D.requestPermission().then(r => { if (r === 'granted') window.addEventListener('deviceorientation', onOrient, true); else compassOn = false; }).catch(() => { compassOn = false; });
-  } else {
-    window.addEventListener('deviceorientationabsolute', onOrient, true);
-    window.addEventListener('deviceorientation', onOrient, true);
-  }
-}
-document.addEventListener('click', startCompass, { once: true });
-
-const KM_TH = 2.5, T_TH = 3 * 60 * 1000;
-let lastGeoLat = null, lastGeoLon = null, lastGeoAt = 0;
-async function updatePlaceSignature(lat, lon, force=false){
-  const now = Date.now(), moved = lastGeoLat !== null ? distKm(lastGeoLat, lastGeoLon, lat, lon) : 99;
-  if (!force && lastGeoLat !== null && moved < KM_TH && now - lastGeoAt < T_TH) return;
-  lastGeoLat = lat; lastGeoLon = lon; lastGeoAt = now;
-  try{
-    const d = await (await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`)).json();
-    const loc = (d.locality || d.city || '').toUpperCase(), prov = (d.principalSubdivision || '').toUpperCase(), country = (d.countryName || 'TÜRKİYE').toUpperCase();
-    if (loc && prov && loc !== prov){ $('sigCity').textContent = loc; $('sigSub').textContent = `${prov} · ${country}`; }
-    else { $('sigCity').textContent = prov || loc || 'KONUM'; $('sigSub').textContent = country; }
-  }catch{}
-}
-function updateGeo(c){
-  if (c.speed > 1.5 && c.heading != null && isFinite(c.heading)){ gpsHeadTime = Date.now(); targetHeading = c.heading; }
-  fixSpeed = (c.speed != null && isFinite(c.speed) && c.speed > 0) ? c.speed : 0;
-  fixHead = (c.speed > 1.5 && c.heading != null && isFinite(c.heading)) ? c.heading : targetHeading;
-  fixLat = c.latitude; fixLon = c.longitude; fixTime = Date.now();
-  if (!restRef) restRef = { lat: c.latitude, lon: c.longitude };
-  if (fixSpeed > 1.5 || distKm(restRef.lat, restRef.lon, c.latitude, c.longitude) > 0.06){
-    lastMoveAt = Date.now(); restRef = { lat: c.latitude, lon: c.longitude };
-    if (restMode) exitRest(false);
-  }
-  if (autoZoom) targetZoomMeters = computeAutoZoomMeters(fixSpeed, lastDistToTurn);
-  updateSlope(c.latitude, c.longitude, c.altitude);
-  if (fixSpeed >= 5) checkAhead();
-  fxKick();
-  targetLat = c.latitude; targetLon = c.longitude;
-  fetchRoadNetwork(targetLat, targetLon, false);
-  fetchTempOnly(c.latitude, c.longitude, false);
-  updatePlaceSignature(c.latitude, c.longitude, false);
-  kickRoadAnim();
-}
-function startGps(){
-  setTimeout(() => { if (targetLat === null) ipFallback(); }, 4000);
-  if (!('geolocation' in navigator)) return ipFallback();
-  navigator.geolocation.watchPosition(p => updateGeo(p.coords), () => { if (targetLat === null) ipFallback(); }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 });
-  setInterval(() => navigator.geolocation.getCurrentPosition(p => updateGeo(p.coords), () => {}, { enableHighAccuracy: true, timeout: 8000 }), T_TH);
-}
-async function ipFallback(){
-  if (targetLat !== null) return;
-  try{
-    const d = await (await fetch('https://ipwho.is/')).json();
-    if (targetLat !== null) return;
-    if (d && d.latitude){
-      targetLat = renderLat = d.latitude; targetLon = renderLon = d.longitude;
-      $('sigCity').textContent = (d.city || 'MUĞLA').toUpperCase(); $('sigSub').textContent = (d.country || 'TÜRKİYE').toUpperCase();
-      fetchRoadNetwork(targetLat, targetLon, true); fetchTempOnly(targetLat, targetLon, true);
-      drawRoadMap(); drawTopCompass(); return;
-    }
-  }catch{}
-  if (targetLat !== null) return;
-  targetLat = renderLat = 37.2153; targetLon = renderLon = 28.3636;
-  $('sigCity').textContent = 'MUĞLA'; $('sigSub').textContent = 'TÜRKİYE';
-  fetchRoadNetwork(targetLat, targetLon, true); fetchTempOnly(targetLat, targetLon, true);
-  drawRoadMap(); drawTopCompass();
-}
-
-/* ---------- DİK TELEFON → YATAY EKRAN ---------- */
-const scr = $('screen'), modes = ['cw', 'ccw', 'off'], modeNames = { cw: 'Ekran yönü: sağa', ccw: 'Ekran yönü: sola', off: 'Döndürme kapalı' };
-function getMode(){ try{ return localStorage.getItem('rot') || 'cw'; }catch{ return 'cw'; } }
-function toggleRotMode(){
-  const m = modes[(modes.indexOf(getMode()) + 1) % modes.length];
-  try{ localStorage.setItem('rot', m); }catch{}
-  applyLayout(); toast(modeNames[m]);
-}
-function applyLayout(){
-  const W = Math.round(innerWidth), H = Math.round(innerHeight), mode = getMode(); let w = W, h = H;
-  if (H > W && mode !== 'off'){
-    w = H; h = W;
-    scr.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;transform-origin:0 0;` +
-      `transform:${mode === 'cw' ? `translate3d(${W}px,0,0) rotate(90deg)` : `translate3d(0,${H}px,0) rotate(-90deg)`}`;
-    document.documentElement.style.setProperty('--px', Math.round(w * .032) + 'px');
-  } else {
-    scr.style.cssText = '';
-    document.documentElement.style.removeProperty('--px');
-  }
-  document.documentElement.style.setProperty('--vh', h / 100 + 'px');
-  document.documentElement.style.setProperty('--vw', w / 100 + 'px');
-  roadSize();
-}
-
-addEventListener('resize', applyLayout);
-addEventListener('orientationchange', () => setTimeout(applyLayout, 150));
-if (typeof ResizeObserver !== 'undefined'){
-  let roRaf = 0;
-  const ro = new ResizeObserver(() => { if (roRaf) return; roRaf = requestAnimationFrame(() => { roRaf = 0; roadSize(); }); });
-  ro.observe(roadCv);
-}
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden){ lastStepTs = 0; kickRoadAnim(); drawRoadMap(); drawTopCompass(); eqKick(); fxKick(); }
-});
-
-/* ---------- BAŞLANGIÇ ---------- */
-tickClock();
-setInterval(() => {
-  tickClock();
-  if (themeKey === 'auto') setTheme('auto', false, false);
-}, 15000);
-renderStation();
-setTheme(themeKey, false, true);
-applyLayout();
-eqKick();
-startGps();
-</script>
-</body>
-</html>
